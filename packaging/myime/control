@@ -1,0 +1,6 @@
+Package: agentlinux-myime
+Version: 1.0.14-1
+Architecture: amd64
+Maintainer: AgentLinux
+Depends: fcitx5, libsqlite3-0, libjson-c5, libenchant-2-2, libglib2.0-0t64, python3-gi, gir1.2-gtk-3.0, hunspell-en-us
+Description: MyIME offline predictive input engine and Fcitx 5 frontend

@@ -27,13 +27,23 @@ required_payloads = (
     "opt/claude-cage-package/Cage-0.1.8-linux-amd64.deb",
     "usr/local/lib/zenmux/mihomo",
     "usr/bin/xdotool",
+    "opt/wechat/wechat",
+    "usr/share/applications/wechat.desktop",
+    "usr/share/fcitx5/inputmethod/myime.conf",
+    "usr/share/fcitx5/addon/myime.conf",
+    "usr/lib/x86_64-linux-gnu/fcitx5/libmyime.so",
+    "usr/lib/myime/MyIMEHost",
+    "usr/lib/myime/IMEKit_IMEKit.resources/emoji-map.txt",
+    "usr/share/myime/system.sqlite",
+    "usr/bin/myime-settings",
+    "usr/share/doc/myime/ThirdPartyNotices.txt",
 )
 if any(not (overlay / name).is_file() for name in required_payloads):
     raise SystemExit("Restore the complete release overlay first. See README.md.")
 
 if digest(base, "sha256") != "8c3c89a59b50d3fc9d1affd087d19a3a670ecc5b34cc1e3ab05137bd7ec1b553":
     raise SystemExit("Base ISO checksum mismatch")
-with tempfile.TemporaryDirectory(dir=base.parent) as work:
+with tempfile.TemporaryDirectory(dir=out.parent) as work:
     tmp = Path(work)
     paths = ["boot/grub/grub.cfg", "boot/grub/loopback.cfg", "casper/install-sources.yaml", "md5sum.txt"]
     cmd = ["xorriso", "-indev", base, "-osirrox", "on"]

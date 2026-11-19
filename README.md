@@ -1,9 +1,9 @@
 # ZenMux 中文桌面 ISO
 
-**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.19.1/AgentLinux-24.04.5-network-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.19.1/AgentLinux-24.04.5-network-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
+**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.20/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.20/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
 
-[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.19.1)
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.20)
 
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可通过底座安装器安装到磁盘。
 
@@ -49,7 +49,7 @@
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.19.1)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.20)
 
 运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。需要至少 8 GB 可用空间。Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
@@ -58,7 +58,7 @@
 ```sh
 python3 download-iso.py
 mkdir -p build
-xorriso -osirrox on -indev AgentLinux-24.04.5-network-amd64.iso -extract /casper/minimal.agent.squashfs build/agent.squashfs
+xorriso -osirrox on -indev AgentLinux-24.04.5-desktop-amd64.iso -extract /casper/minimal.agent.squashfs build/agent.squashfs
 unsquashfs -d build/restored-overlay build/agent.squashfs
 cp -a build/restored-overlay/. overlay/
 ```
@@ -83,3 +83,37 @@ cp -a build/restored-overlay/. overlay/
 启用后，主机默认网络命名空间的应用 TCP/UDP 通过 Mihomo TUN 和单个所选节点路由。IPv4/IPv6 出站过滤保留回环、隧道核心带标记的连接、DHCP 与必要的 IPv6 邻居发现。域名解析经隧道；解析代理服务器名称本身会使用引导 DNS。隧道停机时过滤继续生效，主动断开 NetworkManager 连接后撤销。主机应用中的“直连”仍受系统隧道路由；同时启用应用自己的代理可能形成二次代理。容器转发、独立网络命名空间与 Cage 客机需要各自配置和验收。
 
 主机使用 Claude Code 的 managed-settings.d 策略关闭使用指标、错误上报和反馈调查。重新启动支持策略片段的 Claude Code 后生效。Claude 网站、第三方浏览器、独立 Cage 客机与服务端记录有自己的数据处理方式。使用 Cage 中的 CLI 时，可在**客机**内的 /etc/claude-code/managed-settings.d/ 安装相同的 [策略文件](overlay/etc/claude-code/managed-settings.d/40-agentlinux-privacy.json)。Claude 原生 Remote Control 的可用性可能受关闭指标和功能标志影响。[Claude Code 官方数据说明](https://code.claude.com/docs/en/data-usage)
+
+### MyIME 中文输入法（x86-64 Linux 版）
+
+新版镜像的默认中文输入法使用 macOS 版的 Swift IMEKit、原始 SQLite 词库和 Emoji 数据。Fcitx 5 负责 Linux 桌面的按键、预编辑、翻页和候选选择。按 Ctrl+空格启用输入，按空格选中候选，再按空格或数字键选择联想续写。单击 Shift 切换中英文。系统拼音仍可在 Fcitx 中选择。
+
+从应用菜单打开“MyIME 输入法设置”，可以调整个人词频、系统词频、上下文权重，选择模糊音、繁体和英文释义，并导入或导出用户词组。用户数据库保存在 `$XDG_DATA_HOME/myime/user.sqlite`（默认 `~/.local/share/myime/user.sqlite`）。已安装系统可跨重启保留学习记录；普通非持久化 Live 会话的主目录随关机清除。
+
+已有 AgentLinux 可运行 `sudo apt install ./agentlinux-myime_1.0.14-1_amd64.deb`，重新登录，在 Fcitx 5 配置中添加 MyIME。字体和配色由 Linux 桌面的 Fcitx 候选面板控制，英文拼写建议使用系统 Enchant 英语词典。
+
+从源码重建时，在 Ubuntu 24.04 amd64 准备 Swift 6.1、clang++、pkg-config 和 libsqlite3-dev、libfcitx5core-dev、libjson-c-dev、libenchant-2-dev、libglib2.0-dev，运行 `packaging/myime/stage.sh /path/to/MyIME overlay`（原版代码基线 d5e38ef），再运行 `python3 build-iso.py --output AgentLinux-24.04.5-myime-amd64.iso`。
+
+### 腾讯微信 Linux 客户端
+
+含微信的 x86-64 镜像在应用菜单提供“微信”，可从桌面打开并用手机扫码登录。2026-11-20 核对腾讯官网，页面标注版本 4.1.13，官方 amd64 Debian 包版本为 4.1.13.26。MyIME 与微信一同内置。客户端的账号登录和 AgentLinux 的微信遥控配对各自独立。
+
+重建时从[腾讯微信 Linux 官网](https://linux.weixin.qq.com/)下载 x86_64 的 Debian 包，执行 `packaging/wechat/stage.sh WeChatLinux_x86_64.deb overlay`，再运行 ISO 构建脚本。此版官方包的 SHA-256 为 `a0db8caeee8d1e6cfe0aa5ce58710270f8d74a90ff4920f53a3fc22aa0956fe9`。
+
+### ZenOffice
+
+MyIME、微信和 ZenOffice 合集镜像在“办公”菜单中提供 ZenOffice 0.6.107，可直接启动。该版本来自项目发布的 amd64 Debian 包。构建脚本校验上游 SHA-256，并把应用、菜单入口及随包的 AppArmor 配置加入 Live、最小安装和标准安装的文件系统层。
+
+```sh
+python3 packaging/zenoffice/build-image.py AgentLinux-24.04.5-myime-wechat-amd64.iso zenoffice_0.6.107_amd64.deb AgentLinux-24.04.5-myime-wechat-zenoffice-amd64.iso
+```
+
+[ZenOffice 产品主页](https://bennix.github.io/GenZenMuxAIOffice/) · [对应版本](https://github.com/bennix/GenZenMuxAIOffice/releases/tag/v0.6.107)
+
+### 硬盘安装与桌面合集
+
+`AgentLinux-24.04.5-desktop-amd64.iso` 还包含原版 Clash Verge 1.3.8。联网后在“网络”菜单打开 Clash Verge，可自行添加订阅。Obscura Firefox 的书签工具栏提供“火烧云 PRO 官网”和“火烧云 PRO 邀请注册”，使用所提供品牌图中的红橙色云朵标识。
+
+从 U 盘进入 Live 桌面，打开 Ubuntu Kylin 安装器，选择安装目标硬盘；安装完成后拔下启动盘，从硬盘重启。镜像的标准安装源和最小安装源均包含 AgentLinux 定制层和办公应用层，安装后的主目录用于保存个人文件和应用设置。重建合集时在 ZenOffice 镜像构建命令后加入 `--clash-verge clash-verge_1.3.8_amd64.AppImage --libfuse2 libfuse2t64_2.9.9-8.1build1_amd64.deb`。
+
+[Clash Verge 原版发布页](https://github.com/zzzgydi/clash-verge/releases/tag/v1.3.8)

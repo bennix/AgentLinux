@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=MyIME Settings
+Name[zh_CN]=MyIME 输入法设置
+Exec=myime-settings
+Icon=input-keyboard
+Categories=Settings;Utility;
