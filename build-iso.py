@@ -1,4 +1,5 @@
 """Build the amd64 remix from the verified Ubuntu Kylin 24.04.5 desktop ISO."""
+import argparse
 import hashlib
 from pathlib import Path
 import subprocess
@@ -6,7 +7,9 @@ import tempfile
 
 root = Path(__file__).resolve().parent
 base = root / "build/base.iso"
-out = root / "ZenMux-Kylin-24.04.5-amd64.iso"
+parser = argparse.ArgumentParser()
+parser.add_argument("--output", type=Path, default=root / "ZenMux-Kylin-24.04.5-amd64.iso")
+out = parser.parse_args().output.resolve()
 overlay = root / "overlay"
 
 
@@ -38,7 +41,8 @@ with tempfile.TemporaryDirectory(dir=base.parent) as work:
         cmd += ["-extract", "/" + path, tmp / Path(path).name]
     subprocess.run(cmd, check=True)
     layer = tmp / "agent.squashfs"
-    subprocess.run(["mksquashfs", overlay, layer, "-all-root", "-no-xattrs", "-noappend", "-comp", "xz"], check=True)
+    subprocess.run(["mksquashfs", overlay, layer, "-all-root", "-no-xattrs", "-noappend", "-comp", "xz",
+                    "-action", "chmod(0600)@name(agentlinux-proxy.nmconnection)"], check=True)
     updates = {}
     for path in paths[:-1]:
         f = tmp / Path(path).name

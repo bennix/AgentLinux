@@ -1,0 +1,26 @@
+#!/usr/bin/python3
+import json
+import os
+import re
+import sys
+from pathlib import Path
+
+core = "/usr/local/lib/zenmux/mihomo"
+runtime = Path(os.environ["RUNTIME_DIRECTORY"])
+data = json.load(sys.stdin)
+(runtime / "nodes").write_text(data["data"])
+resolver = "https://1.1.1.1/dns-query"
+config = {
+    "mode": "rule", "ipv6": True, "routing-mark": 53741,
+    "tun": {"enable": True, "device": "agproxy0", "stack": "mixed", "auto-route": True,
+            "auto-detect-interface": True, "strict-route": True, "dns-hijack": ["any:53", "tcp://any:53"]},
+    "dns": {"enable": True, "ipv6": True, "enhanced-mode": "fake-ip",
+            "nameserver": [resolver + "#Selected"], "proxy-server-nameserver": [resolver]},
+    "proxy-providers": {"nodes": {"type": "file", "path": "./nodes"}},
+    "proxy-groups": [{"name": "Selected", "type": "select", "use": ["nodes"],
+                      "filter": "^" + re.escape(data["node"]) + "$",
+                      "exclude-type": "direct|pass|dns", "empty-fallback": "REJECT"}],
+    "rules": ["MATCH,Selected"]
+}
+(runtime / "config.yaml").write_text(json.dumps(config))
+os.execv(core, [core, "-d", str(runtime)])

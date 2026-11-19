@@ -1,0 +1,22 @@
+#!/usr/bin/python3
+import json
+import os
+from pathlib import Path
+import sys
+import tempfile
+
+if os.geteuid() != 0:
+    sys.exit("Requires administrator privileges")
+raw = sys.stdin.buffer.read(10 * 1024 * 1024 + 1)
+if len(raw) > 10 * 1024 * 1024:
+    sys.exit("Selection too large")
+selection = json.loads(raw)
+if set(selection) != {"node", "data"} or not all(isinstance(x, str) and x for x in selection.values()):
+    sys.exit("Invalid selection")
+directory = Path("/etc/agentlinux-network")
+directory.mkdir(mode=0o700, exist_ok=True)
+with tempfile.NamedTemporaryFile(dir=directory, delete=False, mode="w") as f:
+    json.dump(selection, f)
+    f.flush()
+    os.fsync(f.fileno())
+os.replace(f.name, directory / "selection.json")

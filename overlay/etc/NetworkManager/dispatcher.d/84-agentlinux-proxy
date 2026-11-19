@@ -1,0 +1,28 @@
+#!/bin/sh
+set -eu
+[ "${CONNECTION_UUID:-}" = 0e7b6bb9-91e3-46f6-bfc5-00f7c33a7978 ] || exit 0
+case "$2" in
+    pre-up|up)
+        if ! nft list table inet agentlinux_proxy >/dev/null 2>&1; then
+            nft -f - <<'NFT'
+table inet agentlinux_proxy {
+    chain output {
+        type filter hook output priority filter; policy drop;
+        oifname { "lo", "agproxy0" } accept
+        meta mark 53741 accept
+        udp sport 68 udp dport 67 accept
+        udp sport 546 udp dport 547 accept
+        ip6 hoplimit 255 icmpv6 type { nd-neighbor-solicit, nd-neighbor-advert, nd-router-solicit } accept
+    }
+}
+NFT
+        fi
+        systemctl start agentlinux-tunnel.service
+        ;;
+    down)
+        systemctl stop agentlinux-tunnel.service
+        if nft list table inet agentlinux_proxy >/dev/null 2>&1; then
+            nft delete table inet agentlinux_proxy
+        fi
+        ;;
+esac

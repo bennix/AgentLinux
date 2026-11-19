@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=系统网络 · 机场代理
+Name[en]=System Network · Subscription Proxy
+Exec=/usr/local/lib/agentlinux-network/settings
+Icon=preferences-system-network
+Categories=Settings;NetworkSettings;Network;
+Terminal=false

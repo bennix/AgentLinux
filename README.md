@@ -68,3 +68,15 @@ cp -a build/restored-overlay/. overlay/
 - [Obscura Firefox 0.3.7](https://github.com/bennix/ObscuraFirefox/releases/tag/firefox-v0.3.7)
 - [Claude Cage 0.1.8](https://github.com/Lee-xeo/Claude-Cage/releases/tag/v0.1.8)
 - [Mihomo 1.19.34](https://github.com/MetaCubeX/mihomo/releases/tag/v1.19.34)
+
+## 系统网络连接与 Claude Code 隐私
+
+已安装 2026.11.19 发行版的用户可下载[系统网络升级包](https://github.com/bennix/AgentLinux/releases/download/v2026.11.19/agentlinux-system-network.deb)，在 AgentLinux 内运行 `sudo apt install ./agentlinux-system-network.deb`。新构建的网络版镜像已集成此功能。旧发行版的 29 个分卷仍对应原始 ISO。
+
+1. 在 ZenMux 助手中导入订阅，选择节点并保存。
+2. 在系统设置分类中打开 **系统网络 · 机场代理**，点击“使用已保存的节点连接”。首次需管理员授权，重新选择节点后可再次点击以应用。
+3. NetworkManager 的“机场代理 (AgentLinux)”连接可随时启停；命令行为 `nmcli con up uuid 0e7b6bb9-91e3-46f6-bfc5-00f7c33a7978` 或 `nmcli con down uuid 0e7b6bb9-91e3-46f6-bfc5-00f7c33a7978`。连接默认手动启用。
+
+启用后，主机默认网络命名空间的应用 TCP/UDP 通过 Mihomo TUN 和单个所选节点路由。IPv4/IPv6 出站过滤保留回环、隧道核心带标记的连接、DHCP 与必要的 IPv6 邻居发现。域名解析经隧道；解析代理服务器名称本身会使用引导 DNS。隧道停机时过滤继续生效，主动断开 NetworkManager 连接后撤销。主机应用中的“直连”仍受系统隧道路由；同时启用应用自己的代理可能形成二次代理。容器转发、独立网络命名空间与 Cage 客机需要各自配置和验收。
+
+主机使用 Claude Code 的 managed-settings.d 策略关闭使用指标、错误上报和反馈调查。重新启动支持策略片段的 Claude Code 后生效。Claude 网站、第三方浏览器、独立 Cage 客机与服务端记录有自己的数据处理方式。使用 Cage 中的 CLI 时，可在**客机**内的 /etc/claude-code/managed-settings.d/ 安装相同的 [策略文件](overlay/etc/claude-code/managed-settings.d/40-agentlinux-privacy.json)。Claude 原生 Remote Control 的可用性可能受关闭指标和功能标志影响。[Claude Code 官方数据说明](https://code.claude.com/docs/en/data-usage)

@@ -1,0 +1,6 @@
+Package: agentlinux-system-network
+Version: 2026.11.19-1
+Architecture: all
+Maintainer: AgentLinux
+Depends: network-manager, nftables, python3-gi, policykit-1 | pkexec
+Description: Host network subscription profile and Claude Code privacy defaults for AgentLinux

@@ -1,0 +1,15 @@
+[connection]
+id=机场代理 (AgentLinux)
+uuid=0e7b6bb9-91e3-46f6-bfc5-00f7c33a7978
+type=dummy
+interface-name=ag-proxy-switch
+autoconnect=false
+
+[dummy]
+
+[ipv4]
+method=disabled
+
+[ipv6]
+method=link-local
+never-default=true

@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+if [ "$1" = remove ]; then
+    nmcli connection down uuid 0e7b6bb9-91e3-46f6-bfc5-00f7c33a7978 >/dev/null 2>&1 || true
+    systemctl stop agentlinux-tunnel.service
+    if nft list table inet agentlinux_proxy >/dev/null 2>&1; then
+        nft delete table inet agentlinux_proxy
+    fi
+fi
