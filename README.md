@@ -41,3 +41,21 @@
 登录桌面后启动 ZenCode 3.14.44，也可在应用菜单或桌面助手中打开。先在 ZenCode 设置自己的模型提供商，再打开工作区，使用“手机控制”中的微信配对入口扫码，选择允许的账号和工作区。远程操作依赖该用户图形会话、网络和正在运行的 ZenCode Host。手机与桌面续接同一任务，可查看进度、回答权限请求、指定文件并通过微信接收。文件回传由上游校验工作区、接收目标、文件大小与会话令牌。原生电脑控制在 ZenCode 内开启，并受图形会话权限和应用可访问性限制。桌面助手与 ZenCode 各自管理供应商凭据。
 
 “桌面网络使用代理”作用于遵循 GNOME 系统代理设置的应用，使用选定节点，仅监听回环地址。关闭时恢复启用前的系统代理配置。“AI 请求使用代理”独立控制桌面助手的模型请求。Cage 虚拟机和使用自身网络设置的软件各自配置代理。
+
+## 发布与完整构建层 / Release and complete build layer
+
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.19)
+
+运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。需要至少 8 GB 可用空间。Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
+
+在干净的克隆中按以下步骤还原构建层。Restore the full layer before rebuilding from a clean clone (Linux, xorriso and squashfs-tools):
+
+```sh
+python3 download-iso.py
+mkdir -p build
+xorriso -osirrox on -indev ZenMux-Kylin-24.04.5-amd64.iso -extract /casper/minimal.agent.squashfs build/agent.squashfs
+unsquashfs -d build/restored-overlay build/agent.squashfs
+cp -a build/restored-overlay/. overlay/
+```
+
+然后按上文下载官方底包并运行构建脚本。After restoring the layer, download the official base ISO as described above, apply any source changes, and run the builder. Bundled upstream applications retain their respective notices and licenses.
