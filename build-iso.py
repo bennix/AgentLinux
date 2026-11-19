@@ -18,6 +18,16 @@ def digest(path, algorithm):
         return checksum.hexdigest()
 
 
+required_payloads = (
+    "opt/ZenCode/zcode",
+    "opt/obscura-firefox/firefox",
+    "opt/claude-cage-package/Cage-0.1.8-linux-amd64.deb",
+    "usr/local/lib/zenmux/mihomo",
+    "usr/bin/xdotool",
+)
+if any(not (overlay / name).is_file() for name in required_payloads):
+    raise SystemExit("Restore the complete release overlay first. See README.md.")
+
 if digest(base, "sha256") != "8c3c89a59b50d3fc9d1affd087d19a3a670ecc5b34cc1e3ab05137bd7ec1b553":
     raise SystemExit("Base ISO checksum mismatch")
 with tempfile.TemporaryDirectory(dir=base.parent) as work:

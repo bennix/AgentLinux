@@ -1,5 +1,7 @@
 # ZenMux 中文桌面 ISO
 
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.19)
+
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可通过底座安装器安装到磁盘。
 
 ## 桌面助手
@@ -59,3 +61,10 @@ cp -a build/restored-overlay/. overlay/
 ```
 
 然后按上文下载官方底包并运行构建脚本。After restoring the layer, download the official base ISO as described above, apply any source changes, and run the builder. Bundled upstream applications retain their respective notices and licenses.
+
+### 上游版本 / Upstream releases
+
+- [ZenCode 3.14.44](https://github.com/bennix/ZCode/releases/tag/v3.14.44)
+- [Obscura Firefox 0.3.7](https://github.com/bennix/ObscuraFirefox/releases/tag/firefox-v0.3.7)
+- [Claude Cage 0.1.8](https://github.com/Lee-xeo/Claude-Cage/releases/tag/v0.1.8)
+- [Mihomo 1.19.34](https://github.com/MetaCubeX/mihomo/releases/tag/v1.19.34)
