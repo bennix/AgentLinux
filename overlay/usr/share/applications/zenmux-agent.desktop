@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=ZenMux 桌面助手
+Comment=中文 AI 对话与桌面操作
+Exec=/usr/local/lib/zenmux/desktop.py
+Icon=system-run
+Categories=Utility;
+Terminal=false

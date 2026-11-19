@@ -1,0 +1,28 @@
+#!/usr/bin/python3
+import os
+import sys
+
+import gi
+gi.require_version("Gtk", "3.0")
+gi.require_version("Vte", "2.91")
+from gi.repository import GLib, Gtk, Pango, Vte
+
+if not os.path.isfile("/usr/bin/claude-cage"):
+    os.execl("/usr/local/bin/zenmux-cage", "zenmux-cage")
+window = Gtk.Window(title="Claude Cage 隔离终端")
+window.set_default_size(820, 520)
+box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+term = Vte.Terminal()
+term.set_font(Pango.FontDescription("Noto Sans Mono CJK SC 11"))
+box.pack_start(term, True, True, 0)
+label = Gtk.Label(label="正在连接 Cage…")
+box.pack_end(label, False, False, 4)
+window.add(box)
+window.connect("destroy", Gtk.main_quit)
+term.connect("child-exited", lambda _, status: label.set_text("Cage 会话已结束，请关闭此窗口。"))
+window.show_all()
+def spawned(terminal, pid, error, *unused):
+    label.set_text(str(error) if error else "Claude Cage 客机终端")
+term.spawn_async(Vte.PtyFlags.DEFAULT, None, ["/usr/bin/claude-cage", "shell"], None,
+                 GLib.SpawnFlags.DEFAULT, None, None, -1, None, spawned, None)
+Gtk.main()

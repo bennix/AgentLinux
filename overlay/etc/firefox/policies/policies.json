@@ -1,0 +1,15 @@
+{
+  "policies": {
+    "Preferences": {
+      "media.peerconnection.enabled": {
+        "Value": false,
+        "Status": "locked"
+      }
+    },
+    "Homepage": {
+      "URL": "https://cs.fudan.edu.cn/",
+      "StartPage": "homepage",
+      "Locked": false
+    }
+  }
+}

@@ -1,0 +1,5 @@
+/build/
+/overlay/
+*.iso
+.DS_Store
+__pycache__/

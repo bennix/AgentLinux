@@ -1,0 +1,10 @@
+[Unit]
+Description=ZenMux desktop network proxy
+[Service]
+Type=notify
+NotifyAccess=all
+ExecStart=/usr/bin/python3 /usr/local/lib/zenmux/network.py
+Restart=on-failure
+RestartSec=3
+[Install]
+WantedBy=default.target

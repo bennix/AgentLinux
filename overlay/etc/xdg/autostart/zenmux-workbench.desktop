@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=ZenCode
+Exec=/opt/ZenCode/zcode %U
+Terminal=false
+Type=Application
+Icon=zcode
+StartupWMClass=ZenCode
+Comment=ZenCode Desktop App
+MimeType=x-scheme-handler/zcode;
+Categories=Development;

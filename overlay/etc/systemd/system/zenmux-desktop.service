@@ -1,0 +1,10 @@
+[Unit]
+Description=Register Cage as the graphical terminal
+After=local-fs.target
+Before=display-manager.service
+[Service]
+Type=oneshot
+ExecStart=/usr/local/lib/zenmux/register-terminal
+RemainAfterExit=yes
+[Install]
+WantedBy=multi-user.target

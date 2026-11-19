@@ -1,0 +1,224 @@
+import base64
+import concurrent.futures
+import contextlib
+import http.client
+import json
+import os
+from pathlib import Path
+import secrets
+import socket
+import statistics
+import subprocess
+import tempfile
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+
+CORE = Path(__file__).with_name("mihomo")
+SETTINGS = Path.home() / ".config/zenmux-agent/settings.json"
+INVITE = "https://zenmux.ai/invite/GBQMC5"
+BASE_URL = "https://zenmux.ai/api/v1"
+
+
+def load():
+    if SETTINGS.exists():
+        return json.loads(SETTINGS.read_text())
+    return {}
+
+
+def save(config):
+    SETTINGS.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(dir=SETTINGS.parent, mode="w", delete=False) as f:
+        json.dump(config, f, ensure_ascii=False)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(f.name, SETTINGS)
+
+
+class SecureRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, url):
+        if urllib.parse.urlsplit(url).scheme != "https":
+            raise ValueError("订阅重定向需要 HTTPS")
+        return super().redirect_request(req, fp, code, msg, headers, url)
+
+
+def provider_data(source):
+    if source.startswith("vless://"):
+        return source
+    if not source.startswith("https://"):
+        raise ValueError("请输入 VLESS 节点或 HTTPS 订阅地址")
+    req = urllib.request.Request(source, headers={"User-Agent": "clash.meta"})
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), SecureRedirect())
+    with opener.open(req, timeout=25) as resp:
+        data = resp.read(8 * 1024 * 1024 + 1)
+    if len(data) > 8 * 1024 * 1024:
+        raise ValueError("订阅超过 8 MiB")
+    return data.decode("utf-8-sig")
+
+
+def port():
+    with socket.socket() as sock:
+        sock.bind(("127.0.0.1", 0))
+        return sock.getsockname()[1]
+
+
+@contextlib.contextmanager
+def proxy(data, selection=None, desktop=False):
+    with tempfile.TemporaryDirectory(prefix="zenmux-") as tmp:
+        root = Path(tmp)
+        (root / "nodes").write_text(data)
+        listen, control = port(), port()
+        while control == listen:
+            control = port()
+        token = secrets.token_hex(24)
+        config = {"mixed-port": listen, "bind-address": "127.0.0.1", "allow-lan": False,
+                  "external-controller": f"127.0.0.1:{control}", "secret": token,
+                  "authentication": [] if desktop else ["agent:" + token], "mode": "rule", "log-level": "silent",
+                  "profile": {"store-selected": False}, "ipv6": True,
+                  "proxy-providers": {"nodes": {"type": "file", "path": "./nodes"}},
+                  "proxy-groups": [{"name": "ZenMux Route", "type": "select", "use": ["nodes"]}],
+                  "rules": ["MATCH,ZenMux Route"]}
+        (root / "config.yaml").write_text(json.dumps(config))
+        proc = subprocess.Popen([str(CORE), "-d", tmp], stdout=subprocess.DEVNULL,
+                                stderr=subprocess.DEVNULL)
+        try:
+            client = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+            url = f"http://127.0.0.1:{control}/proxies/ZenMux%20Route"
+            headers = {"Authorization": "Bearer " + token, "Content-Type": "application/json"}
+            deadline = time.monotonic() + 12
+            while time.monotonic() < deadline and proc.poll() is None:
+                try:
+                    with client.open(urllib.request.Request(url, headers=headers), timeout=1) as r:
+                        names = json.load(r)["all"]
+                    if names and names != ["COMPATIBLE"]:
+                        break
+                except (OSError, KeyError):
+                    pass
+                time.sleep(0.15)
+            else:
+                raise ValueError("代理启动失败，请检查节点格式或重新导入订阅")
+            if selection:
+                if selection not in names:
+                    raise ValueError("所选节点已失效，请重新选择")
+                request = urllib.request.Request(url, data=json.dumps({"name": selection}).encode(),
+                                                 headers=headers, method="PUT")
+                client.open(request, timeout=3).close()
+            yield names, listen, token, control
+        finally:
+            if proc.poll() is None:
+                proc.terminate()
+            try:
+                proc.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                proc.wait()
+
+
+def nodes(source):
+    data = provider_data(source)
+    with proxy(data) as (names, _, __, ___):
+        return data, names
+
+
+def benchmark(data, progress):
+    """Probe each individual proxy via the local Mihomo controller."""
+    with proxy(data) as (names, _, token, control):
+        def probe(name, target):
+            endpoint = urllib.parse.quote(name, safe="")
+            query = urllib.parse.urlencode({"timeout": 4500, "url": target})
+            req = urllib.request.Request(f"http://127.0.0.1:{control}/providers/proxies/nodes/{endpoint}/healthcheck?{query}",
+                                         headers={"Authorization": "Bearer " + token})
+            client = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+            delays = []
+            for _ in range(3):
+                try:
+                    with client.open(req, timeout=6) as resp:
+                        delay = json.load(resp)["delay"]
+                    if isinstance(delay, int) and delay > 0:
+                        delays.append(delay)
+                except (OSError, ValueError, KeyError):
+                    continue
+            return len(delays), int(statistics.median(delays)) if delays else None
+
+        targets = ("https://zenmux.ai/", "https://www.google.com/generate_204")
+        results = {name: {} for name in names}
+        with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
+            futures = {pool.submit(probe, name, url): (name, index)
+                       for name in names for index, url in enumerate(targets)}
+            for done, future in enumerate(concurrent.futures.as_completed(futures), 1):
+                name, index = futures[future]
+                results[name][index] = future.result()
+                progress(done, len(futures))
+        rows = [(name, values[0], values[1]) for name, values in results.items()]
+        return sorted(rows, key=lambda row: (-row[1][0], row[1][1] or float("inf"),
+                                              -row[2][0], row[2][1] or float("inf"), row[0]))
+
+
+TOOLS = [{"type": "function", "function": {
+    "name": name, "description": desc,
+    "parameters": {"type": "object", "properties": props, "required": list(props),
+                   "additionalProperties": False}}}
+    for name, desc, props in [
+        ("open_home", "打开用户主目录的文件管理器", {}),
+        ("create_folder", "在用户主目录新建一个文件夹", {"name": {"type": "string"}}),
+        ("system_info", "查看系统名称、内核版本和架构", {})]]
+
+
+def endpoint(url):
+    parsed = urllib.parse.urlsplit(url)
+    local = parsed.hostname in ("127.0.0.1", "localhost", "::1")
+    if (not parsed.hostname or parsed.username is not None or parsed.password is not None
+            or parsed.query or parsed.fragment or any(c.isspace() for c in url)
+            or not (parsed.scheme == "https" or (parsed.scheme == "http" and local))):
+        raise ValueError("Base URL 需要有效的 HTTPS 地址；本机接口也支持 HTTP")
+    if parsed.port == 0:
+        raise ValueError("Base URL 端口无效")
+    return parsed
+
+
+def chat(cfg, messages, use_tools):
+    profile = cfg.get("providers", {}).get(cfg.get("provider"), cfg)
+    target = endpoint(profile.get("base_url", BASE_URL))
+    if cfg.get("proxied") and target.scheme != "https":
+        raise ValueError("本机 HTTP 接口请使用直连")
+    payload = {"model": profile["model"], "messages": messages}
+    if use_tools:
+        payload["tools"] = TOOLS
+    if cfg.get("proxied") and not (cfg.get("data") and cfg.get("node")):
+        raise ValueError("请先导入并选择代理节点")
+    route = proxy(cfg["data"], cfg["node"]) if cfg.get("proxied") else contextlib.nullcontext()
+    with route as active:
+        if active:
+            _, listen, token, _ = active
+            conn = http.client.HTTPSConnection("127.0.0.1", listen, timeout=90)
+            auth = base64.b64encode(("agent:" + token).encode()).decode()
+            conn.set_tunnel(target.hostname, target.port or 443, {"Proxy-Authorization": "Basic " + auth})
+        else:
+            connection = http.client.HTTPSConnection if target.scheme == "https" else http.client.HTTPConnection
+            conn = connection(target.hostname, target.port, timeout=90)
+        try:
+            conn.request("POST", target.path.rstrip("/") + "/chat/completions", json.dumps(payload).encode(),
+                         {"Authorization": "Bearer " + profile["key"], "Content-Type": "application/json"})
+            response = conn.getresponse()
+            if response.status != 200:
+                raise ValueError(f"供应商返回 HTTP {response.status}，请检查密钥、余额、模型及工具调用支持")
+            return json.load(response)["choices"][0]["message"]
+        finally:
+            conn.close()
+
+
+def action(name, args):
+    if name == "open_home" and not args:
+        subprocess.run(["xdg-open", str(Path.home())], check=True)
+        return "已打开主目录"
+    if name == "system_info" and not args:
+        import platform
+        return " ".join(platform.uname()[i] for i in (0, 2, 4))
+    if name == "create_folder" and set(args) == {"name"}:
+        folder = args["name"]
+        if not isinstance(folder, str) or not folder.strip() or folder in (".", "..") or "/" in folder:
+            raise ValueError("文件夹名称必须是单个有效目录名")
+        (Path.home() / folder).mkdir(mode=0o700)
+        return f"已创建文件夹 {folder}"
+    raise ValueError("不支持此操作")

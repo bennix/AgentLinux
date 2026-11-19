@@ -1,0 +1,5 @@
+[Default Applications]
+text/html=obscura-firefox.desktop
+x-scheme-handler/http=obscura-firefox.desktop
+x-scheme-handler/https=obscura-firefox.desktop
+application/xhtml+xml=obscura-firefox.desktop

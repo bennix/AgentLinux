@@ -1,0 +1,43 @@
+# ZenMux 中文桌面 ISO
+
+基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可通过底座安装器安装到磁盘。
+
+## 桌面助手
+
+在应用菜单搜索 **ZenMux 桌面助手**。在设置页输入 ZenMux API Key 和平台上的完整模型 ID，点击保存。输入另一个 ID 并保存即可扩充模型列表。没有密钥时，设置页提供[邀请注册链接](https://zenmux.ai/invite/GBQMC5)。接口为 `https://zenmux.ai/api/v1/chat/completions`。
+
+勾选允许桌面操作后，可输入“打开主目录”“在主目录创建名为笔记的文件夹”或“查看系统信息”。所选模型需要支持工具调用。助手会显示操作并请求确认。中文输入使用 Fcitx 5 拼音，通常可用 Ctrl+空格切换。
+
+## 代理和订阅
+
+在设置中粘贴单个 VLESS 链接或 HTTPS 机场订阅地址，点击“导入 / 刷新节点”，选择节点，勾选“ZenMux 请求使用代理”后保存。支持 Mihomo 可解析的 Clash YAML 节点、URI 列表和 Base64 节点列表。点击“测速并选择最佳节点”可让每个节点分别向 ZenMux 首页和 Google generate_204 发起三次 HTTPS 延迟探测。两个目标分别显示成功次数和延迟中位数。列表优先比较 ZenMux 成功次数和延迟，平局时比较 Google 结果，自动选中本轮表现最佳的可用节点，仍可手动选择，点击保存后生效。测速反映当下的可达性与响应延迟，不测下载带宽。刷新订阅需要能直接访问订阅服务器。模型请求按所选节点发出，代理失败会显示错误。代理范围为桌面助手内的 ZenMux 请求。
+
+密钥、订阅地址和节点数据保存在当前用户主目录的 `~/.config/zenmux-agent/settings.json`，文件权限为 0600，内容以明文存储。请在安装后的系统内保存以跨重启使用。普通 Live 试用会话使用临时主目录，关机后会丢失设置。
+
+## 浏览器隐私
+
+镜像为自带的 Firefox 配置系统策略，锁定关闭 WebRTC（media.peerconnection.enabled）。这会停用依赖 WebRTC 的网页通话、屏幕共享和对等连接。在 Firefox 的 about:policies 页面可以查看启用的策略。此策略范围限于 Firefox；助手的代理设置只用于模型请求，浏览器普通网页访问仍遵循浏览器及系统自身的网络配置。
+
+## 构建
+
+需要 Python 3.9+、xorriso 和支持 xz 的 squashfs-tools。将[官方底包](https://cdimage.ubuntu.com/ubuntukylin/releases/24.04/release/ubuntukylin-24.04.5-desktop-amd64.iso)放在 `build/base.iso`。项目中的 `overlay/` 包含已准备好的 ZenCode、Obscura Firefox、Mihomo、Cage 安装包、输入法配置和系统集成文件。运行 `python3 build-iso.py`。脚本验证底包 SHA-256，生成附加 SquashFS 层，更新 Live 引导参数、两种安装源和校验清单，输出 ISO 和 SHA-256 文件。
+
+## Claude Cage
+
+应用菜单中的 **Claude Cage 隔离工作台设置** 使用镜像随附的官方 0.1.8 amd64 安装包。首次打开时确认安装，随后可选择联网安装本机虚拟机组件。工作台以普通用户运行。使用本机客机需要可读写的 /dev/kvm、虚拟磁盘空间及首次客机下载；在 Apple Silicon 上模拟 x86 桌面无法提供该 x86 KVM 环境。Cage 通过自己的界面单独配置代理，助手中的节点不会自动传入 Cage。账号使用须遵循服务商规则。详见[官方项目](https://github.com/Lee-xeo/Claude-Cage)。
+
+## 定制版信息
+
+出品方：复旦大学计算与智能创新学院（依项目指定署名）。默认主页为[学院网站](https://cs.fudan.edu.cn/)。
+
+默认浏览器采用 Obscura Firefox 0.3.7，保留上游手动更新方式。系统选择它处理 HTTP、HTTPS 和 HTML。简体中文分别使用 Noto Sans CJK SC、Noto Serif CJK SC 和 Noto Sans Mono CJK SC。
+
+桌面菜单、Ctrl+Alt+T、Win+T、文件管理器的终端动作以及系统默认终端入口使用 Cage。首次使用会打开安装和配置工作台；配置完成后再开终端，即通过 claude-cage shell 连接 Cage 环境。每个窗口是独立会话，同一 Cage 配置共用一台持久客机。桌面入口不执行传入的宿主命令。系统 TTY 和 SSH 登录仍用于维护。
+
+助手首次使用 ZenMux。设置页也可填写其他 OpenAI Chat Completions 兼容供应商的名称、Base URL、API Key 和模型 ID。每个供应商独立保存密钥和模型列表。请填写不含 /chat/completions 的接口前缀。改动 Base URL 后需重新填写密钥；更换供应商或地址后开启新对话。HTTP 限本机直连接口。节点测速仍固定探测 ZenMux 和 Google。
+
+## 微信操作与 Agent 工作台
+
+登录桌面后启动 ZenCode 3.14.44，也可在应用菜单或桌面助手中打开。先在 ZenCode 设置自己的模型提供商，再打开工作区，使用“手机控制”中的微信配对入口扫码，选择允许的账号和工作区。远程操作依赖该用户图形会话、网络和正在运行的 ZenCode Host。手机与桌面续接同一任务，可查看进度、回答权限请求、指定文件并通过微信接收。文件回传由上游校验工作区、接收目标、文件大小与会话令牌。原生电脑控制在 ZenCode 内开启，并受图形会话权限和应用可访问性限制。桌面助手与 ZenCode 各自管理供应商凭据。
+
+“桌面网络使用代理”作用于遵循 GNOME 系统代理设置的应用，使用选定节点，仅监听回环地址。关闭时恢复启用前的系统代理配置。“AI 请求使用代理”独立控制桌面助手的模型请求。Cage 虚拟机和使用自身网络设置的软件各自配置代理。

@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+# Casper skips the distribution AppArmor loader in a live session.
+if [ -d /rofs/etc/apparmor.d ] && [ -e /sys/kernel/security/apparmor/profiles ]; then
+    /usr/sbin/apparmor_parser --replace /etc/apparmor.d/zcode
+fi
+target=/usr/bin/mate-terminal
+saved=/usr/bin/mate-terminal.distrib
+if [ "$(dpkg-divert --truename "$target")" = "$target" ]; then
+    dpkg-divert --local --add --rename --divert "$saved" "$target"
+fi
+test "$(dpkg-divert --truename "$target")" = "$saved"
+ln -sfn /usr/local/lib/zenmux/cage-terminal "$target"
+update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator /usr/local/lib/zenmux/cage-terminal 100
+update-alternatives --set x-terminal-emulator /usr/local/lib/zenmux/cage-terminal

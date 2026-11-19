@@ -1,0 +1,2 @@
+Mihomo v1.19.34, distributed under GPL-3.0.
+Source: https://github.com/MetaCubeX/mihomo/tree/v1.19.34

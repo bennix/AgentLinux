@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+pkg=/opt/claude-cage-package/Cage-0.1.8-linux-amd64.deb
+if ! command -v cage-desktop >/dev/null; then
+    zenity --question --title="Claude Cage" --text="安装镜像随附的 Claude Cage 0.1.8？系统会请求管理员授权。"
+    pkexec /usr/bin/dpkg -i "$pkg" || {
+        zenity --error --text="软件包未安装完成。请在终端运行 sudo apt install $pkg 查看依赖信息。"
+        exit 1
+    }
+fi
+if ! command -v qemu-system-x86_64 >/dev/null || ! command -v qemu-img >/dev/null || [ ! -d /usr/share/OVMF ]; then
+    if zenity --question --title="Claude Cage" --ok-label="安装虚拟机工具" --cancel-label="仅打开工作台" --text="本机虚拟机需要 QEMU、OVMF 和可用的 KVM。是否联网安装虚拟机工具？"; then
+        pkexec /usr/bin/apt-get update && pkexec /usr/bin/apt-get install -y qemu-system-x86 qemu-utils ovmf openssh-client iproute2 git || {
+            zenity --warning --text="虚拟机工具尚未安装完成，可以先使用远程工作台。"
+        }
+    fi
+fi
+exec /usr/bin/cage-desktop

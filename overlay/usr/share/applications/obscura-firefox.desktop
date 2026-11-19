@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Obscura Firefox
+Exec=/opt/obscura-firefox/obscura %u
+Icon=obscura-firefox
+Categories=Network;WebBrowser;
+Terminal=false
+MimeType=text/html;x-scheme-handler/http;x-scheme-handler/https;application/xhtml+xml;
