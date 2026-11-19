@@ -57,7 +57,7 @@ RemainAfterExit=yes
 """)
     (wants / service).symlink_to("../" + service)
     overlay = Path(__file__).resolve().parents[2] / "overlay"
-    for rel in ("etc/firefox/policies/policies.json", "opt/obscura-firefox/distribution/policies.json"):
+    for rel in ("etc/xdg/autostart/zenmux-workbench.desktop", "etc/firefox/policies/policies.json", "opt/obscura-firefox/distribution/policies.json"):
         dest = root / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(overlay / rel, dest)

@@ -8,3 +8,4 @@ StartupWMClass=ZenCode
 Comment=ZenCode Desktop App
 MimeType=x-scheme-handler/zcode;
 Categories=Development;
+Hidden=true

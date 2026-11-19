@@ -1,0 +1,35 @@
+name: Publish desktop ISO parts
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify the public ISO and publish its parts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag=$(jq -r .tag release-manifest.json)
+          iso=$(jq -r .iso release-manifest.json)
+          base="https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/$tag"
+          curl -fL --retry 4 "$base/$iso" -o "$iso"
+          sha256sum -c "$iso.sha256"
+          gh release view "$tag" --json isDraft --jq .isDraft | grep -x true
+          python3 - <<'PY'
+          import hashlib, json, pathlib, subprocess
+          manifest = json.loads(pathlib.Path("release-manifest.json").read_text())
+          with open(manifest["iso"], "rb") as source:
+              for part in manifest["parts"]:
+                  data = source.read(part["size"])
+                  assert hashlib.sha256(data).hexdigest() == part["sha256"]
+                  path = pathlib.Path(part["name"])
+                  path.write_bytes(data)
+                  subprocess.run(["gh", "release", "upload", manifest["tag"], str(path), "--clobber"], check=True)
+                  path.unlink()
+              assert not source.read(1)
+          PY
+          gh release upload "$tag" download-iso.py release-manifest.json "$iso.sha256" --clobber
+          gh release edit "$tag" --draft=false --latest
