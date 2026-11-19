@@ -1,152 +1,152 @@
 {
-  "tag": "v2026.11.19",
-  "iso": "ZenMux-Kylin-24.04.5-amd64.iso",
-  "sha256": "22e04c3fff313a1f511225690a4101a301f573106e308a1a1f80c27021c0cc19",
+  "tag": "v2026.11.19.1",
+  "iso": "AgentLinux-24.04.5-network-amd64.iso",
+  "sha256": "22ce2679b374670d956530a21e04acf8a9e151e34ecdaa44bac6e7532973c780",
   "parts": [
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part01",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part01",
       "size": 268435456,
-      "sha256": "ebf0a5280f705fc537d90d9b083273303ed252443e0eca43b015da040bbe68da"
+      "sha256": "a8bccb8a52d0c98c5394290d657c14bca506261c11ccc64cb052a9ef3e25a213"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part02",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part02",
       "size": 268435456,
       "sha256": "aa14edd2b40c1edaf17049e46b5e9ffa16278176c1f06e8092c128f4fff51cfe"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part03",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part03",
       "size": 268435456,
       "sha256": "41b2581cd84ff57ef91c3429e8da2b73f0df8009244c3fc556d77939aafa7066"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part04",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part04",
       "size": 268435456,
       "sha256": "738aa3082704970ab9c81ff4fbe537d8d09dae2d68aba9e13b6553fc276ce379"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part05",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part05",
       "size": 268435456,
       "sha256": "1e7384edb9fc130ba29779053d6bc59656a328369f4226de154ddac40fadc8cd"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part06",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part06",
       "size": 268435456,
       "sha256": "84f09605a08471d877cd2a769c20c82793c36be4000e38fdcd399e1dfa3747d4"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part07",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part07",
       "size": 268435456,
       "sha256": "1f12ce3c7c1a9bb04271c1f040c19d115434c0d6bbaa57f5eb95fba1040a9629"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part08",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part08",
       "size": 268435456,
       "sha256": "887a53ec45deb4c6c49442fb132000053235bf497a57158122223e26cb65c90d"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part09",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part09",
       "size": 268435456,
       "sha256": "0c53cc9d3482dd546fbbe535af0fd9996c350ec269a0df50b54cbc9159d2bee1"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part10",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part10",
       "size": 268435456,
       "sha256": "f151e3d74994a1a27b794ceb1bcca732637e82f6e727ea9d13f0499852086665"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part11",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part11",
       "size": 268435456,
       "sha256": "411707a64a43f630b4cb2410a1f04bce4ac9a86208d6ede9a8615afb87dfa92a"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part12",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part12",
       "size": 268435456,
       "sha256": "562733771d65f5a34bbf9b94e19f3b3228c97ee454157b6d8b51bc2440bf1cd7"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part13",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part13",
       "size": 268435456,
       "sha256": "4855f272ceaf1c201bf715c0150f3cd7c0e98013952acf948f93c41499252e9b"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part14",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part14",
       "size": 268435456,
       "sha256": "210cfd399976d9757e344edfe091ee9f087a0b57d4ae916e8e9cf8275359d3a3"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part15",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part15",
       "size": 268435456,
       "sha256": "6af58c3cb8465fb5e8b3293ae3d5ee4f5d3e4dd9dfb70187a877ac1ee449200a"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part16",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part16",
       "size": 268435456,
       "sha256": "21cdee327005c7a707e3edceafb3b8c26af615d89a38ae0c7bc24d4cd77be3ba"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part17",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part17",
       "size": 268435456,
       "sha256": "f302292645bf3185861ac170b4a38910d60123f2edb927645220f1f7d838f354"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part18",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part18",
       "size": 268435456,
       "sha256": "ee5949699bdb63d8c05140e6fc19c75688a677024b9c02a6b80d4bec6abb331f"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part19",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part19",
       "size": 268435456,
       "sha256": "ac4e34cb1a58d84f49542cfc999cd83bc28c3432a839b171a59b5ebff4a85d9e"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part20",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part20",
       "size": 268435456,
       "sha256": "863a1e446fdea622080a63013a51db9bc6d671421307c9c86d283933b8aed519"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part21",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part21",
       "size": 268435456,
       "sha256": "8fbcc30a030192558aea5ad9030324951ce80c361a8338acfa2bf104abad7225"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part22",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part22",
       "size": 268435456,
       "sha256": "857510d1adfc96f5450f75cc018d04ce7f75a16b8a28a61b29d2370aebabe5dc"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part23",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part23",
       "size": 268435456,
       "sha256": "4e5bd1575da3f7f511f3a1703ce581504d7208212d43998e7ee2c4d538a8f76e"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part24",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part24",
       "size": 268435456,
       "sha256": "a8842bddb13009696c3e2d9c6bf3b3d59fc511654005b1ebfb7b9ad5941499cf"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part25",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part25",
       "size": 268435456,
-      "sha256": "d298ce2bbf32c70e5e9a3bccd3917fb6b03feb870a8bc4b26745e466b3ad6e01"
+      "sha256": "8dd7a72bb6b129a571899da31d2b804db259d027fbb629a4e07f8b2b704ecee5"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part26",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part26",
       "size": 268435456,
-      "sha256": "dea73cdf716bf2182b33cfd8c9659715dd37af56a244302d61e6bffedc6382d9"
+      "sha256": "dfd4e3ea55b607452a0a2cfa42a3000177cbd277bfa43a126c0ed7c1b462756b"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part27",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part27",
       "size": 268435456,
-      "sha256": "996d9d3c7da6c66ac20eeb70ac51fef9b56695c4cd00cc3c91e45e3c624a0c8c"
+      "sha256": "269c1b2fd8560931cd532bec0201058419a66362f8fa0ee49c7380307a812ca0"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part28",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part28",
       "size": 268435456,
-      "sha256": "eec23cd26e899899add1e996d79dd3ef2c32b05208e332b718931e6599c7e443"
+      "sha256": "5bcbdf5f8b0330bb20fc0da6612b56f07ba54a8726f452e678a9dd292d5ee76c"
     },
     {
-      "name": "ZenMux-Kylin-24.04.5-amd64.iso.part29",
+      "name": "AgentLinux-24.04.5-network-amd64.iso.part29",
       "size": 1245184,
-      "sha256": "78fd6bc757d157f9a9a6b72aa1c0a81bc899516ce6b42a090bd545dd64ea29ea"
+      "sha256": "8ff441727ed22b654faec93e740d95c88401d88b81b8b16edffca8684ec070f6"
     }
   ]
 }

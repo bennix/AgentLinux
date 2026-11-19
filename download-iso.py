@@ -5,7 +5,7 @@ from pathlib import Path
 from urllib.request import urlopen
 
 ROOT = "https://github.com/bennix/AgentLinux"
-TAG = "v2026.11.19"
+TAG = "v2026.11.19.1"
 
 
 def digest(path):
@@ -18,9 +18,8 @@ def digest(path):
 
 def main():
     local = Path(__file__).with_name("release-manifest.json")
-    if local.exists():
-        manifest = json.loads(local.read_text())
-    else:
+    manifest = json.loads(local.read_text()) if local.exists() else {}
+    if manifest.get("tag") != TAG:
         with urlopen(f"{ROOT}/releases/download/{TAG}/release-manifest.json", timeout=90) as response:
             manifest = json.load(response)
     output = Path(manifest["iso"])

@@ -8,7 +8,7 @@ import tempfile
 root = Path(__file__).resolve().parent
 base = root / "build/base.iso"
 parser = argparse.ArgumentParser()
-parser.add_argument("--output", type=Path, default=root / "ZenMux-Kylin-24.04.5-amd64.iso")
+parser.add_argument("--output", type=Path, default=root / "AgentLinux-24.04.5-network-amd64.iso")
 out = parser.parse_args().output.resolve()
 overlay = root / "overlay"
 
