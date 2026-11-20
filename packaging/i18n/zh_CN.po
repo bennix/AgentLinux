@@ -492,3 +492,6 @@ msgstr "已保存节点：{}。系统隧道当前关闭。"
 
 msgid "Select a node to apply it to the active system tunnel."
 msgstr "选择节点即可切换当前系统隧道的出口。"
+
+msgid "System routing applies to desktop apps, host terminals and background services. Claude Cage uses its own proxy."
+msgstr "系统路由覆盖桌面应用、本机字符终端和后台服务。Claude Cage 使用独立代理。"

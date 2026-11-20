@@ -28,6 +28,7 @@ window.add(box)
 status = Gtk.Label(wrap=True)
 box.add(Gtk.Label(label=tr('Enter a subscription URL or load your current Clash Verge profile, then select a node.')))
 box.add(Gtk.Label(label=tr('Smart Routing sends mainland sites and WeChat directly and other traffic through the selected node.')))
+box.add(Gtk.Label(label=tr('System routing applies to desktop apps, host terminals and background services. Claude Cage uses its own proxy.'), wrap=True))
 box.add(status)
 
 
