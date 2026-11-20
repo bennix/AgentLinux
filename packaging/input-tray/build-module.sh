@@ -8,4 +8,4 @@ cd fcitx5-5.1.7
 patch -p1 < "$here/menu.patch"
 inc=${DEVROOT:-}/usr/include
 echo "#define HAVE_PIPE2 1" > config.h
-g++ -shared -fPIC -O2 -std=c++17 -DFMT_HEADER_ONLY -I. -I"$inc" -I"$inc/Fcitx5/Core" -I"$inc/Fcitx5/Config" -I"$inc/Fcitx5/Utils" -Isrc/lib -Isrc/ui/classic -Isrc/modules/dbus src/modules/notificationitem/*.cpp -Wl,-z,defs -l:libFcitx5Core.so.7 -l:libFcitx5Config.so.6 -l:libFcitx5Utils.so.2 -o ../libagentlinuxnotificationitem.so
+g++ -shared -fPIC -O2 -std=c++17 '-DFCITX_GETTEXT_DOMAIN="fcitx5"' -DFMT_HEADER_ONLY -I. -I"$inc" -I"$inc/Fcitx5/Core" -I"$inc/Fcitx5/Config" -I"$inc/Fcitx5/Utils" -Isrc/lib -Isrc/ui/classic -Isrc/modules/dbus src/modules/notificationitem/*.cpp -Wl,-z,defs -l:libFcitx5Core.so.7 -l:libFcitx5Config.so.6 -l:libFcitx5Utils.so.2 -o ../libagentlinuxnotificationitem.so

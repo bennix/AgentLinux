@@ -1,0 +1,3 @@
+The tray module is built from Fcitx 5.1.7 (LGPL-2.1-or-later). The AgentLinux patch changes the list of menu entries in notificationitem. The system Fcitx packages provide the translations and the remaining modules.
+
+On Ubuntu 24.04 amd64, install g++, patch, libfcitx5core-dev and libfmt-dev. Download the [Ubuntu upstream source tarball](https://archive.ubuntu.com/ubuntu/pool/universe/f/fcitx5/fcitx5_5.1.7.orig.tar.xz) as src.tar.xz in a working directory. Run `sh /path/to/input-tray/build-module.sh` there and strip the resulting shared library. The build script verifies the source archive SHA-256 before compiling.
