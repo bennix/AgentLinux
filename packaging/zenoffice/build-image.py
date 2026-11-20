@@ -73,6 +73,13 @@ RemainAfterExit=yes
         dest = root / "etc/skel/.local/share/io.github.clash-verge-rev.clash-verge-rev/profiles"
         dest.mkdir(parents=True)
         rules = json.loads((smart / "rules.json").read_text())
+        # Register global enhancements so the first subscription import keeps
+        # the distributor script instead of creating a fresh upstream template.
+        (dest.parent / "profiles.yaml").write_text(json.dumps({"current": None, "items": [
+            {"uid": "Merge", "type": "merge", "file": "Merge.yaml", "updated": 0},
+            {"uid": "Script", "type": "script", "file": "Script.js", "updated": 0}
+        ]}))
+        (dest / "Merge.yaml").write_text("profile:\n  store-selected: true\n")
         (dest / "Script.js").write_text((smart / "script-template.js").read_text().replace("__DIRECT_RULES__", json.dumps(rules)))
     packaging = Path(__file__).resolve().parents[1]
     user_units = root / "usr/lib/systemd/user"
