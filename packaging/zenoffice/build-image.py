@@ -13,6 +13,7 @@ parser.add_argument("base", type=Path)
 parser.add_argument("deb", type=Path)
 parser.add_argument("output", type=Path)
 parser.add_argument("--clash-verge", type=Path, help="Clash Verge Rev 2.5.10 official amd64 deb")
+parser.add_argument("--obscura-firefox", type=Path, required=True, help="Official Obscura Firefox 0.3.8 Linux amd64 deb")
 args = parser.parse_args()
 if args.output.exists():
     parser.error("Select a new output file")
@@ -58,6 +59,11 @@ RemainAfterExit=yes
 """)
     (wants / service).symlink_to("../" + service)
     overlay = Path(__file__).resolve().parents[2] / "overlay"
+    if checksum(args.obscura_firefox, "sha256") != "91d448e8c617d80a4e54daac515d358d1b01257ab0ec36aeb5febb5728b52ecd":
+        raise SystemExit("Unexpected Obscura Firefox 0.3.8 amd64 package checksum")
+    run("dpkg-deb", "-x", args.obscura_firefox, root)
+    shutil.copy2(overlay / "usr/share/applications/obscura-firefox.desktop",
+                 root / "usr/share/applications/obscura-firefox.desktop")
     for rel in ("etc/NetworkManager/dispatcher.d/84-agentlinux-proxy", "usr/local/lib/zenmux/cage-terminal", "usr/local/lib/agentlinux-network/settings", "usr/local/lib/agentlinux-network/engine", "usr/local/lib/agentlinux-network/configure", "etc/xdg/autostart/zenmux-workbench.desktop", "etc/firefox/policies/policies.json", "opt/obscura-firefox/distribution/policies.json"):
         dest = root / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
