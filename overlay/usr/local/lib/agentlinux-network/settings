@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+from gettext import dgettext
+from functools import partial
+tr = partial(dgettext, 'agentlinux')
 import json
 import os
 import tempfile
@@ -17,13 +20,13 @@ from gi.repository import Gtk, GLib
 uid = "0e7b6bb9-91e3-46f6-bfc5-00f7c33a7978"
 config = Path.home() / ".config/zenmux-agent/settings.json"
 saved = Path.home() / ".config/agentlinux-network/selection.json"
-window = Gtk.Window(title="系统网络 · 机场代理")
+window = Gtk.Window(title=tr('System Network · Subscription Proxy'))
 box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
 box.set_border_width(20)
 window.add(box)
 status = Gtk.Label(wrap=True)
-box.add(Gtk.Label(label="输入订阅地址，或读取 Clash Verge 当前配置，再选择节点连接。"))
-box.add(Gtk.Label(label="连接期间，本机应用默认使用同一节点；关闭连接可恢复网络。"))
+box.add(Gtk.Label(label=tr('Enter a subscription URL or load your current Clash Verge profile, then select a node.')))
+box.add(Gtk.Label(label=tr('Smart Routing sends mainland sites and WeChat directly and other traffic through the selected node.')))
 box.add(status)
 
 
@@ -31,7 +34,7 @@ def run(*command, **kwargs):
     return subprocess.run(command, check=True, capture_output=True, **kwargs)
 
 
-wifi = Gtk.Label(label="正在读取 Wi-Fi 地址…", selectable=True, wrap=True)
+wifi = Gtk.Label(label=tr('Reading Wi-Fi addresses…'), selectable=True, wrap=True)
 box.pack_start(wifi, False, False, 0)
 box.reorder_child(wifi, 0)
 
@@ -49,8 +52,8 @@ def wifi_addresses():
         lines.append("Wi-Fi · " + name)
         for family, label in (("inet", "IPv4"), ("inet6", "IPv6")):
             values = [entry["local"] for entry in addresses if entry["family"] == family]
-            lines.append(label + "  " + (", ".join(values) or "尚未分配"))
-    return "\n".join(lines) or "Wi-Fi 未连接"
+            lines.append(label + "  " + (", ".join(values) or tr('Not assigned')))
+    return "\n".join(lines) or tr('Wi-Fi disconnected')
 
 
 def refresh_wifi():
@@ -58,7 +61,7 @@ def refresh_wifi():
         try:
             message = wifi_addresses()
         except (OSError, ValueError, subprocess.SubprocessError):
-            message = "暂时无法读取 Wi-Fi 地址，正在重试"
+            message = tr('Could not read Wi-Fi addresses. Retrying…')
         GLib.idle_add(display, message)
     def display(message):
         wifi.set_text(message)
@@ -71,7 +74,7 @@ def refresh_wifi():
 refresh_wifi()
 
 
-entry = Gtk.Entry(placeholder_text="HTTPS 订阅地址或 VLESS 链接", visibility=False)
+entry = Gtk.Entry(placeholder_text=tr('HTTPS subscription URL or VLESS link'), visibility=False)
 box.add(entry)
 picker = Gtk.ComboBoxText()
 box.add(picker)
@@ -98,13 +101,13 @@ def load_nodes(button, local):
                 profile = next(i for i in items if (i["uid"] == profiles["current"] if local else i.get("url") == source))
                 path = (folder / "profiles" / profile["file"]).resolve()
                 if path.parent != (folder / "profiles").resolve():
-                    raise ValueError("配置路径无效")
+                    raise ValueError(tr('Invalid profile path'))
                 data = path.read_text()
                 with backend.proxy(data) as (names, *_):
                     pass
             GLib.idle_add(loaded, data, names, local or local_fallback)
         except Exception:
-            GLib.idle_add(status.set_text, "读取失败。可在 Clash Verge 选中有效订阅，然后读取当前配置。")
+            GLib.idle_add(status.set_text, tr('Import failed. Select a working subscription in Clash Verge and load the current profile.'))
         finally:
             GLib.idle_add(button.set_sensitive, True)
     def loaded(data, names, cached):
@@ -113,13 +116,13 @@ def load_nodes(button, local):
         for name in names:
             picker.append(name, name)
         picker.set_active(0)
-        origin = "Clash Verge 本地快照" if cached else "订阅"
-        status.set_text(f"已从{origin}读取 {len(names)} 个节点，请选择后连接。")
+        origin = tr('local Clash Verge snapshot') if cached else tr('subscription')
+        status.set_text(tr('Source: {}. Loaded {} nodes. Select one to connect.').format(origin, len(names)))
     button.set_sensitive(False)
     threading.Thread(target=worker, daemon=True).start()
 
 
-for title, local in [("导入订阅地址", False), ("读取 Clash Verge 当前配置", True)]:
+for title, local in [(tr('Import subscription URL'), False), (tr('Load current Clash Verge profile'), True)]:
     btn = Gtk.Button(label=title)
     btn.connect("clicked", load_nodes, local)
     box.add(btn)
@@ -129,19 +132,19 @@ def measure(button):
     try:
         data = imported.get("data") or json.loads((saved if saved.is_file() else config).read_text())["data"]
     except (OSError, KeyError, ValueError):
-        status.set_text("请先导入订阅或读取 Clash Verge 当前配置。")
+        status.set_text(tr('Import a subscription or load your Clash Verge profile first.'))
         return
     previous = picker.get_active_id()
     box.set_sensitive(False)
-    status.set_text("正在逐节点测试 Google 与 ZenMux…")
+    status.set_text(tr('Testing each node against Google and ZenMux…'))
 
     def progress(done, total):
-        GLib.idle_add(status.set_text, f"节点测速 {done * 100 // total}%（{done}/{total} 项）")
+        GLib.idle_add(status.set_text, tr('Testing nodes: {}% ({}/{})').format(done * 100 // total, done, total))
 
     def finish(rows):
         box.set_sensitive(True)
         if not rows:
-            status.set_text("未获得测速结果，请检查网络。")
+            status.set_text(tr('No test results. Check your connection.'))
             return
         # Prefer reliable Google access, then lower median Google latency.
         rows.sort(key=lambda row: (-row[2][0], row[2][1] or float("inf"), -row[1][0], row[1][1] or float("inf")))
@@ -154,11 +157,11 @@ def measure(button):
             picker.append(name, f"{name}  |  Google {result(google)}  |  ZenMux {result(zenmux)}")
         if rows[0][2][0]:
             picker.set_active(0)
-            status.set_text("已选中 Google 测试表现最佳的节点，点击连接即可应用。")
+            status.set_text(tr('The best performing Google node is selected. Apply a routing mode to use it.'))
         else:
             if not previous or not picker.set_active_id(previous):
                 picker.set_active(0)
-            status.set_text("所有节点的 Google 测试均未通过。")
+            status.set_text(tr('No node passed the Google test.'))
     def worker():
         try:
             rows = backend.benchmark(data, progress)
@@ -168,7 +171,7 @@ def measure(button):
     threading.Thread(target=worker, daemon=True).start()
 
 
-speed = Gtk.Button(label="逐节点测速（Google / ZenMux）")
+speed = Gtk.Button(label=tr('Benchmark nodes (Google / ZenMux)'))
 speed.connect("clicked", measure)
 box.add(speed)
 
@@ -178,20 +181,20 @@ def test_google(button):
         try:
             client = urllib.request.build_opener(urllib.request.ProxyHandler({}))
             with client.open("https://www.google.com/generate_204", timeout=10) as response:
-                message = f"Google 连通性测试：HTTP {response.status}"
+                message = tr('Google connectivity: HTTP {}').format(response.status)
         except OSError:
-            message = "Google 连通性测试失败，请检查连接或更换节点。"
+            message = tr('Google connectivity test failed. Check the connection or try another node.')
         GLib.idle_add(status.set_text, message)
     threading.Thread(target=check, daemon=True).start()
 
 
-def change(button, enable):
+def change(button, mode):
     try:
-        if enable:
+        if mode != "direct":
             cfg = {"data": imported["data"], "node": picker.get_active_id()} if imported else json.loads((saved if saved.is_file() else config).read_text())
-            selection = {"data": cfg["data"], "node": cfg["node"]}
+            selection = {"data": cfg["data"], "node": cfg["node"], "mode": mode}
             if not all(selection.values()):
-                raise ValueError("请先保存代理节点")
+                raise ValueError(tr('Save a node first'))
             run("pkexec", "/usr/local/lib/agentlinux-network/configure", input=json.dumps(selection).encode())
             if imported:
                 saved.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
@@ -203,21 +206,25 @@ def change(button, enable):
                 run("pkexec", "/usr/bin/systemctl", "restart", "agentlinux-tunnel.service")
             else:
                 run("nmcli", "--wait", "20", "connection", "up", "uuid", uid)
-            status.set_text("已启用系统连接：" + cfg["node"] + "。节点不可用时请断开连接恢复直连。")
+            run("gsettings", "set", "org.gnome.system.proxy", "mode", "none")
+            status.set_text(tr('System connection enabled: ') + cfg["node"] + tr('. Disconnect to restore direct access if the node is unavailable.'))
         else:
-            run("nmcli", "--wait", "15", "connection", "down", "uuid", uid)
-            status.set_text("系统连接已断开。")
+            active = run("nmcli", "-g", "UUID", "connection", "show", "--active").stdout.decode().splitlines()
+            if uid in active:
+                run("nmcli", "--wait", "15", "connection", "down", "uuid", uid)
+            run("gsettings", "set", "org.gnome.system.proxy", "mode", "none")
+            status.set_text(tr('System tunnel disconnected.'))
     except (KeyError, ValueError, OSError, subprocess.SubprocessError) as exc:
-        status.set_text("操作失败：" + str(exc))
+        status.set_text(tr('Operation failed: ') + str(exc))
 
-for label, enable in [("使用所选或已保存的节点连接", True), ("断开系统连接", False)]:
+for label, enable in [(tr('Smart Routing'), "smart"), (tr('Route all through proxy'), "proxy"), (tr('Direct (disconnect system tunnel)'), "direct")]:
     b = Gtk.Button(label=label)
     b.connect("clicked", change, enable)
     box.add(b)
-b = Gtk.Button(label="测试 Google 连接")
+b = Gtk.Button(label=tr('Test Google connectivity'))
 b.connect("clicked", test_google)
 box.add(b)
-b = Gtk.Button(label="打开 NetworkManager 网络连接列表")
+b = Gtk.Button(label=tr('Open NetworkManager connections'))
 b.connect("clicked", lambda _: subprocess.Popen(["nm-connection-editor"]))
 box.add(b)
 window.connect("destroy", Gtk.main_quit)

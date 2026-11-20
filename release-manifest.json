@@ -1,12 +1,12 @@
 {
-  "tag": "v2026.11.20.6",
+  "tag": "v2026.11.20.7",
   "iso": "AgentLinux-24.04.5-desktop-amd64.iso",
-  "sha256": "ed6bbd9de7b19ccc844e11342f9d8dc3d0d784a951ddfd79f94f252811e90736",
+  "sha256": "7cc8c36b5b5b3d8d3bf2733f008ebb1e6f45c507e7f0f92806964d75817ac6c5",
   "parts": [
     {
       "name": "AgentLinux-24.04.5-desktop-amd64.iso.part01",
       "size": 268435456,
-      "sha256": "a13995fafa523088bd4813879d8f834d5cc59d14b96b4a0b92d619d1d2c09c29"
+      "sha256": "b196ec7283697a0c375eebf44ccb216bafbfe105326405ca22162d185b22863d"
     },
     {
       "name": "AgentLinux-24.04.5-desktop-amd64.iso.part02",
@@ -151,12 +151,12 @@
     {
       "name": "AgentLinux-24.04.5-desktop-amd64.iso.part30",
       "size": 268435456,
-      "sha256": "34b718449e58f985311bd40ea4090476f3366d3ce34fa1849afb6062583a4a5a"
+      "sha256": "3fef14b6b8abf4873b3806deb51caee49116f6228580e7630835153795d0ba61"
     },
     {
       "name": "AgentLinux-24.04.5-desktop-amd64.iso.part31",
-      "size": 162004992,
-      "sha256": "b5a25b0b131a2d222eee3c2619e4be35dbad9c95cd8fe0cd3822370ee8a96c35"
+      "size": 162070528,
+      "sha256": "53e689290b47d1f61f74331e8828e5dfdd8b2ddfc4850906a41a91a64ba7ea05"
     }
   ]
 }

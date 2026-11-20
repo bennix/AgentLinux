@@ -1,0 +1,473 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_CN\n"
+
+msgid "System Network · Subscription Proxy"
+msgstr "系统网络 · 机场代理"
+
+msgid "Enter a subscription URL or load your current Clash Verge profile, then select a node."
+msgstr "输入订阅地址，或读取 Clash Verge 当前配置，再选择节点连接。"
+
+msgid "Reading Wi-Fi addresses…"
+msgstr "正在读取 Wi-Fi 地址…"
+
+msgid "Not assigned"
+msgstr "尚未分配"
+
+msgid "Wi-Fi disconnected"
+msgstr "Wi-Fi 未连接"
+
+msgid "Could not read Wi-Fi addresses. Retrying…"
+msgstr "暂时无法读取 Wi-Fi 地址，正在重试"
+
+msgid "HTTPS subscription URL or VLESS link"
+msgstr "HTTPS 订阅地址或 VLESS 链接"
+
+msgid "Invalid profile path"
+msgstr "配置路径无效"
+
+msgid "Import failed. Select a working subscription in Clash Verge and load the current profile."
+msgstr "读取失败。可在 Clash Verge 选中有效订阅，然后读取当前配置。"
+
+msgid "local Clash Verge snapshot"
+msgstr "Clash Verge 本地快照"
+
+msgid "subscription"
+msgstr "订阅"
+
+msgid "Source: {}. Loaded {} nodes. Select one to connect."
+msgstr "已从{}读取 {} 个节点，请选择后连接。"
+
+msgid "Import subscription URL"
+msgstr "导入订阅地址"
+
+msgid "Load current Clash Verge profile"
+msgstr "读取 Clash Verge 当前配置"
+
+msgid "Import a subscription or load your Clash Verge profile first."
+msgstr "请先导入订阅或读取 Clash Verge 当前配置。"
+
+msgid "Testing each node against Google and ZenMux…"
+msgstr "正在逐节点测试 Google 与 ZenMux…"
+
+msgid "Testing nodes: {}% ({}/{})"
+msgstr "节点测速 {}%（{}/{} 项）"
+
+msgid "No test results. Check your connection."
+msgstr "未获得测速结果，请检查网络。"
+
+msgid "The best performing Google node is selected. Apply a routing mode to use it."
+msgstr "已选中 Google 测试表现最佳的节点，点击连接即可应用。"
+
+msgid "No node passed the Google test."
+msgstr "所有节点的 Google 测试均未通过。"
+
+msgid "Benchmark nodes (Google / ZenMux)"
+msgstr "逐节点测速（Google / ZenMux）"
+
+msgid "Google connectivity: HTTP {}"
+msgstr "Google 连通性测试：HTTP {}"
+
+msgid "Google connectivity test failed. Check the connection or try another node."
+msgstr "Google 连通性测试失败，请检查连接或更换节点。"
+
+msgid "Save a node first"
+msgstr "请先保存代理节点"
+
+msgid "System connection enabled: "
+msgstr "已启用系统连接："
+
+msgid ". Disconnect to restore direct access if the node is unavailable."
+msgstr "。节点不可用时请断开连接恢复直连。"
+
+msgid "System tunnel disconnected."
+msgstr "系统连接已断开。"
+
+msgid "Operation failed: "
+msgstr "操作失败："
+
+msgid "Smart Routing"
+msgstr "智能分流"
+
+msgid "Route all through proxy"
+msgstr "全部走机场"
+
+msgid "Direct (disconnect system tunnel)"
+msgstr "直连（关闭系统隧道）"
+
+msgid "Test Google connectivity"
+msgstr "测试 Google 连接"
+
+msgid "Open NetworkManager connections"
+msgstr "打开 NetworkManager 网络连接列表"
+
+msgid "ZenMux Desktop Assistant"
+msgstr "ZenMux 桌面助手"
+
+msgid "Respond in English. Use the available tools when the user requests desktop actions."
+msgstr "使用中文回答。用户要求桌面操作时可调用可用工具。"
+
+msgid "Assistant"
+msgstr "助手"
+
+msgid "Settings"
+msgstr "设置"
+
+msgid "Ask a question or describe a desktop action"
+msgstr "输入问题，或描述桌面操作"
+
+msgid "Allow proposed desktop actions (confirm before running)"
+msgstr "允许模型提议桌面操作（执行前询问）"
+
+msgid "Send"
+msgstr "发送"
+
+msgid "Open the agent workbench and WeChat pairing"
+msgstr "打开 Agent 工作台与微信配对"
+
+msgid "AI provider (select or enter a name)"
+msgstr "AI 供应商（选择或输入新名称）"
+
+msgid "Get a ZenMux API key via invitation"
+msgstr "没有 ZenMux API Key？通过邀请链接注册"
+
+msgid "Model name (select or enter a name)"
+msgstr "模型名称（可输入新名称）"
+
+msgid "Proxy AI requests"
+msgstr "AI 请求使用代理"
+
+msgid "Use the desktop proxy for supported applications"
+msgstr "桌面网络使用代理（遵循系统代理的应用）"
+
+msgid "VLESS link or HTTPS subscription"
+msgstr "VLESS 链接或 HTTPS 机场订阅"
+
+msgid "Import / refresh nodes"
+msgstr "导入 / 刷新节点"
+
+msgid "Proxy node"
+msgstr "代理节点"
+
+msgid "Benchmark and select a node"
+msgstr "测速并选择最佳节点"
+
+msgid "Save settings"
+msgstr "保存设置"
+
+msgid "Publisher: Fudan University School of Computer Science and Artificial Intelligence"
+msgstr "出品方：复旦大学计算与智能创新学院"
+
+msgid "Reading nodes…"
+msgstr "正在读取节点…"
+
+msgid "Loaded {} nodes. Select one and save."
+msgstr "已读取 {} 个节点，请选择后保存"
+
+msgid "Import nodes before testing"
+msgstr "请先导入要测速的节点"
+
+msgid "Testing ZenMux and Google three times per destination…"
+msgstr "正在测试 ZenMux 与 Google，每个目标各 3 次…"
+
+msgid "Benchmark: {}/{} tests complete"
+msgstr "测速中：已完成 {}/{} 项测试"
+
+msgid "Unreachable"
+msgstr "不可达"
+
+msgid "Sorted by ZenMux successes and latency. Select a node and save to apply."
+msgstr "已优先按 ZenMux 成功次数和延迟排序。可手动改选，保存后生效。"
+
+msgid "No nodes reached ZenMux. Check the network or refresh the subscription."
+msgstr "本轮所有节点均未连通 ZenMux，请检查网络或刷新订阅。"
+
+msgid "Import the new URL before saving"
+msgstr "请先导入新地址，再保存"
+
+msgid "Import and select a node first"
+msgstr "请先导入并选择节点"
+
+msgid "Enter a provider name"
+msgstr "请输入供应商名称"
+
+msgid "Settings saved locally"
+msgstr "设置已保存至本机"
+
+msgid "Settings saved. The desktop proxy service failed to start."
+msgstr "设置已保存；桌面代理服务启动失败"
+
+msgid "Enter and save an API key and model name first"
+msgstr "请填写并保存 API Key 和模型名称"
+
+msgid "You: "
+msgstr "我　"
+
+msgid "Assistant: "
+msgstr "助手　"
+
+msgid "Action requested."
+msgstr "收到操作请求。"
+
+msgid "Open home folder"
+msgstr "打开主目录"
+
+msgid "Create a folder in your home directory"
+msgstr "在主目录创建文件夹"
+
+msgid "View system information"
+msgstr "查看系统信息"
+
+msgid "Cancelled"
+msgstr "已取消"
+
+msgid "\nAction result: "
+msgstr "\n操作结果："
+
+msgid "Subscription redirects require HTTPS"
+msgstr "订阅重定向需要 HTTPS"
+
+msgid "Enter a VLESS link or HTTPS subscription URL"
+msgstr "请输入 VLESS 节点或 HTTPS 订阅地址"
+
+msgid "Subscription exceeds 8 MiB"
+msgstr "订阅超过 8 MiB"
+
+msgid "Proxy startup failed. Check the node format or import again."
+msgstr "代理启动失败，请检查节点格式或重新导入订阅"
+
+msgid "The selected node is unavailable. Select another."
+msgstr "所选节点已失效，请重新选择"
+
+msgid "Open the home directory in the file manager"
+msgstr "打开用户主目录的文件管理器"
+
+msgid "Create a folder in the home directory"
+msgstr "在用户主目录新建一个文件夹"
+
+msgid "Show the system name, kernel version and architecture"
+msgstr "查看系统名称、内核版本和架构"
+
+msgid "Enter a valid HTTPS base URL. Local endpoints also support HTTP."
+msgstr "Base URL 需要有效的 HTTPS 地址；本机接口也支持 HTTP"
+
+msgid "Invalid base URL port"
+msgstr "Base URL 端口无效"
+
+msgid "Use direct access for local HTTP endpoints"
+msgstr "本机 HTTP 接口请使用直连"
+
+msgid "Import and select a proxy node first"
+msgstr "请先导入并选择代理节点"
+
+msgid "Provider returned HTTP {}. Check the key, balance, model and tool support."
+msgstr "供应商返回 HTTP {}，请检查密钥、余额、模型及工具调用支持"
+
+msgid "Opened home directory"
+msgstr "已打开主目录"
+
+msgid "Enter a single valid directory name"
+msgstr "文件夹名称必须是单个有效目录名"
+
+msgid "Created folder {}"
+msgstr "已创建文件夹 {}"
+
+msgid "Unsupported action"
+msgstr "不支持此操作"
+
+msgid "Claude Cage Isolated Terminal"
+msgstr "Claude Cage 隔离终端"
+
+msgid "Connecting to Cage…"
+msgstr "正在连接 Cage…"
+
+msgid "Open Cage Workbench"
+msgstr "打开 Cage 工作台"
+
+msgid "Cage session ended. Open the workbench to check the configuration and guest."
+msgstr "Cage 会话已结束。可打开工作台查看配置和客机状态。"
+
+msgid "Claude Cage guest terminal"
+msgstr "Claude Cage 客机终端"
+
+msgid "--title=Claude Cage · Proxy Settings"
+msgstr "--title=Claude Cage · 代理设置"
+
+msgid "Create or unlock your local Cage account, then reopen proxy settings."
+msgstr "请在 Cage 工作台创建或解锁本地账户，再重新打开代理设置。"
+
+msgid "The active job changed. Check its status in the workbench."
+msgstr "安装任务已变化，请返回工作台查看状态。"
+
+msgid "Cage could not apply the configuration. Check the node in the workbench."
+msgstr "Cage 无法应用此配置，请在工作台检查节点状态。"
+
+msgid "Operation still running. Check progress in the workbench."
+msgstr "操作仍在进行，请返回工作台查看进度。"
+
+msgid "Import and select a subscription in Clash Verge, then copy its nodes here."
+msgstr "请先在 Clash Verge 导入并选中你的订阅，再回来复制节点。"
+
+msgid "Select a profile in Clash Verge first."
+msgstr "请先在 Clash Verge 选中一个配置。"
+
+msgid "The active profile file is missing."
+msgstr "找不到当前配置文件。"
+
+msgid "--text=Copy nodes from your current Clash Verge profile into Cage? This makes a local snapshot. Import it again after subscription updates."
+msgstr "--text=将 Clash Verge 当前配置中的节点复制到本机 Cage？这是本地快照，订阅更新后可在 Cage 中重新导入。"
+
+msgid "Local Clash Verge profile"
+msgstr "Clash Verge 本地配置"
+
+msgid "This profile has no nodes that Cage can use."
+msgstr "当前配置没有 Cage 能使用的节点。"
+
+msgid "--text=Select a node for installing the guest"
+msgstr "--text=选择用于安装客机的节点"
+
+msgid "--column=Number"
+msgstr "--column=编号"
+
+msgid "--column=Node"
+msgstr "--column=节点"
+
+msgid "--column=Type"
+msgstr "--column=类型"
+
+msgid "The node has not started. Check proxy status in the workbench."
+msgstr "节点尚未启动，请查看 Cage 工作台的代理状态。"
+
+msgid "--text=Node applied and proxy started. Return to the Cage workbench to install the guest."
+msgstr "--text=节点已应用，代理已启动。请回到 Cage 工作台继续安装客机。"
+
+msgid "Cannot read the local profile. Check the workbench."
+msgstr "无法读取本地配置，请检查工作台状态。"
+
+msgid "--text=Cannot read the profile or contact Cage. Open the workbench and sign in first."
+msgstr "--text=无法读取配置或联系 Cage。请先打开工作台，完成登录后再试。"
+
+msgid "Network Connection Properties"
+msgstr "网络连接属性"
+
+msgid "Edit network connections…"
+msgstr "编辑网络连接…"
+
+msgid "IPv4 gateway"
+msgstr "IPv4 网关"
+
+msgid "No Wi-Fi or Ethernet device is connected."
+msgstr "当前没有已连接的 Wi-Fi 或以太网设备。"
+
+msgid "Network information is unavailable. Retrying…"
+msgstr "暂时无法读取网络连接信息，正在重试。"
+
+msgid "MyIME Settings"
+msgstr "MyIME 设置"
+
+msgid "Candidates"
+msgstr "候选"
+
+msgid "Candidates per page"
+msgstr "每页候选数"
+
+msgid "Traditional Chinese output"
+msgstr "输出繁体"
+
+msgid "Show English glosses"
+msgstr "显示英文释义"
+
+msgid "Vertical list"
+msgstr "纵向排列"
+
+msgid "Candidate ranking"
+msgstr "候选排序"
+
+msgid "System frequency"
+msgstr "系统词频"
+
+msgid "Personal frequency"
+msgstr "个人词频"
+
+msgid "Word length"
+msgstr "词长"
+
+msgid "Context"
+msgstr "上下文"
+
+msgid "Fuzzy match penalty"
+msgstr "模糊音惩罚"
+
+msgid "Abbreviation penalty"
+msgstr "简拼惩罚"
+
+msgid "Fuzzy matching"
+msgstr "模糊音"
+
+msgid "Dictionaries"
+msgstr "词库"
+
+msgid "Rime Ice"
+msgstr "雾凇拼音"
+
+msgid "Chinese Wikipedia"
+msgstr "中文维基"
+
+msgid "Jingxing dictionary"
+msgstr "景行词库"
+
+msgid "Sogou categories"
+msgstr "搜狗分类整理"
+
+msgid "Tsinghua Open Chinese Lexicon"
+msgstr "清华开放中文词库"
+
+msgid "Qingjian phrases and corpus"
+msgstr "青简词库与语料短语"
+
+msgid "Clear MyIME learning history on this device?"
+msgstr "清空本机的 MyIME 学习记录？"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "OK"
+msgstr "确定"
+
+msgid "Done"
+msgstr "已完成"
+
+msgid "Import user phrases (TSV)"
+msgstr "导入用户词组 TSV"
+
+msgid "Export user phrases (TSV)"
+msgstr "导出用户词组 TSV"
+
+msgid "Validate and replace system dictionary"
+msgstr "校验并替换系统词库"
+
+msgid "Clear learning history"
+msgstr "清空学习记录"
+
+msgid "Smart Routing sends mainland sites and WeChat directly and other traffic through the selected node."
+msgstr "智能分流：大陆网站与微信直连；其他流量走所选节点。"
+
+msgid "Install the bundled Claude Cage 0.1.8 package? Administrator authorization is required."
+msgstr "安装镜像随附的 Claude Cage 0.1.8？系统会请求管理员授权。"
+
+msgid "Package installation failed. Check the package dependencies in Host Terminal."
+msgstr "软件包未安装完成。请在终端运行 sudo apt install /opt/claude-cage-package/Cage-0.1.8-linux-amd64.deb 查看依赖信息。"
+
+msgid "Install VM tools"
+msgstr "安装虚拟机工具"
+
+msgid "Open workbench only"
+msgstr "仅打开工作台"
+
+msgid "Local guests require QEMU, OVMF and KVM. Download and install the VM tools?"
+msgstr "本机虚拟机需要 QEMU、OVMF 和可用的 KVM。是否联网安装虚拟机工具？"
+
+msgid "VM tools are not fully installed. You can still open the remote workbench."
+msgstr "虚拟机工具尚未安装完成，可以先使用远程工作台。"
+

@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+from gettext import dgettext
+from functools import partial
+tr = partial(dgettext, 'agentlinux')
 import os
 import subprocess
 from pathlib import Path
@@ -16,23 +19,23 @@ if not config.is_file() or "(no VMs)" in subprocess.run(
 ).stdout:
     os.execl("/usr/local/bin/zenmux-cage", "zenmux-cage")
 
-window = Gtk.Window(title="Claude Cage 隔离终端")
+window = Gtk.Window(title=tr('Claude Cage Isolated Terminal'))
 window.set_default_size(820, 520)
 box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 term = Vte.Terminal()
 term.set_font(Pango.FontDescription("Noto Sans Mono CJK SC 11"))
 box.pack_start(term, True, True, 0)
-label = Gtk.Label(label="正在连接 Cage…")
-setup = Gtk.Button(label="打开 Cage 工作台")
+label = Gtk.Label(label=tr('Connecting to Cage…'))
+setup = Gtk.Button(label=tr('Open Cage Workbench'))
 setup.connect("clicked", lambda _: subprocess.Popen(["/usr/local/bin/zenmux-cage"]))
 box.pack_end(setup, False, False, 4)
 box.pack_end(label, False, False, 4)
 window.add(box)
 window.connect("destroy", Gtk.main_quit)
-term.connect("child-exited", lambda _, status: label.set_text("Cage 会话已结束。可打开工作台查看配置和客机状态。"))
+term.connect("child-exited", lambda _, status: label.set_text(tr('Cage session ended. Open the workbench to check the configuration and guest.')))
 window.show_all()
 def spawned(terminal, pid, error, *unused):
-    label.set_text(str(error) if error else "Claude Cage 客机终端")
+    label.set_text(str(error) if error else tr('Claude Cage guest terminal'))
 term.spawn_async(Vte.PtyFlags.DEFAULT, None, ["/usr/bin/claude-cage", "shell"], None,
                  GLib.SpawnFlags.DEFAULT, None, None, -1, None, spawned, None)
 Gtk.main()

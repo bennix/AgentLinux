@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+from gettext import dgettext
+from functools import partial
+tr = partial(dgettext, 'agentlinux')
 import os
 import subprocess
 import gi
@@ -13,13 +16,13 @@ def activate(app):
     if app.get_active_window():
         app.get_active_window().present()
         return
-    window = Gtk.ApplicationWindow(application=app, title="网络连接属性")
+    window = Gtk.ApplicationWindow(application=app, title=tr('Network Connection Properties'))
     window.set_default_size(480, 280)
     box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, margin=18)
     window.add(box)
     info = Gtk.Label(xalign=0, selectable=True, wrap=True)
     box.pack_start(info, True, True, 0)
-    button = Gtk.Button(label="编辑网络连接…")
+    button = Gtk.Button(label=tr('Edit network connections…'))
     button.connect("clicked", lambda _: subprocess.Popen(["nm-connection-editor"]))
     box.pack_end(button, False, False, 0)
     def refresh():
@@ -31,13 +34,13 @@ def activate(app):
                     continue
                 name = nm("-g","GENERAL.CONNECTION","device","show",dev)
                 lines.append(f"{name}  ·  {dev}")
-                for field,label in [("IP4.ADDRESS","IPv4"),("IP6.ADDRESS","IPv6"),("IP4.GATEWAY","IPv4 网关"),("IP4.DNS","IPv4 DNS")]:
+                for field,label in [("IP4.ADDRESS","IPv4"),("IP6.ADDRESS","IPv6"),("IP4.GATEWAY",tr('IPv4 gateway')),("IP4.DNS","IPv4 DNS")]:
                     value = nm("-g",field,"device","show",dev)
-                    lines.append(label+"   "+(", ".join(value.splitlines()) or "尚未分配"))
+                    lines.append(label+"   "+(", ".join(value.splitlines()) or tr('Not assigned')))
                 lines.append("")
-            info.set_text("\n".join(lines).strip() or "当前没有已连接的 Wi-Fi 或以太网设备。")
+            info.set_text("\n".join(lines).strip() or tr('No Wi-Fi or Ethernet device is connected.'))
         except (OSError, ValueError, subprocess.SubprocessError):
-            info.set_text("暂时无法读取网络连接信息，正在重试。")
+            info.set_text(tr('Network information is unavailable. Retrying…'))
         return True
     refresh()
     timer = GLib.timeout_add_seconds(5, refresh)

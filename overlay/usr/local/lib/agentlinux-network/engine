@@ -39,5 +39,9 @@ config = {
                       "exclude-type": "direct|pass|dns", "empty-fallback": "REJECT"}],
     "rules": ["MATCH,Selected"]
 }
+sys.path.insert(0, "/usr/local/lib/zenmux")
+from smart_routing import configure
+if data.get("mode", "smart") == "smart":
+    configure(config, runtime, "Selected")
 (runtime / "config.yaml").write_text(json.dumps(config, ensure_ascii=False))
 os.execv(core, [core, "-d", str(runtime)])

@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
-Name=Claude Cage 隔离工作台设置
+Name=Claude Cage Workbench
+Name[zh_CN]=Claude Cage 隔离工作台设置
 Exec=/usr/local/bin/zenmux-cage
 Icon=utilities-terminal
 Categories=Development;

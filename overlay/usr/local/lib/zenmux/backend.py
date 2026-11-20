@@ -1,3 +1,6 @@
+from gettext import dgettext
+from functools import partial
+tr = partial(dgettext, 'agentlinux')
 import base64
 import concurrent.futures
 import contextlib
@@ -39,7 +42,7 @@ def save(config):
 class SecureRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, url):
         if urllib.parse.urlsplit(url).scheme != "https":
-            raise ValueError("订阅重定向需要 HTTPS")
+            raise ValueError(tr('Subscription redirects require HTTPS'))
         return super().redirect_request(req, fp, code, msg, headers, url)
 
 
@@ -47,13 +50,13 @@ def provider_data(source):
     if source.startswith("vless://"):
         return source
     if not source.startswith("https://"):
-        raise ValueError("请输入 VLESS 节点或 HTTPS 订阅地址")
+        raise ValueError(tr('Enter a VLESS link or HTTPS subscription URL'))
     req = urllib.request.Request(source, headers={"User-Agent": "clash.meta"})
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), SecureRedirect())
     with opener.open(req, timeout=25) as resp:
         data = resp.read(8 * 1024 * 1024 + 1)
     if len(data) > 8 * 1024 * 1024:
-        raise ValueError("订阅超过 8 MiB")
+        raise ValueError(tr('Subscription exceeds 8 MiB'))
     return data.decode("utf-8-sig")
 
 
@@ -79,6 +82,9 @@ def proxy(data, selection=None, desktop=False):
                   "proxy-providers": {"nodes": {"type": "file", "path": "./nodes"}},
                   "proxy-groups": [{"name": "ZenMux Route", "type": "select", "use": ["nodes"]}],
                   "rules": ["MATCH,ZenMux Route"]}
+        if selection:
+            from smart_routing import configure
+            configure(config, root, "ZenMux Route")
         (root / "config.yaml").write_text(json.dumps(config))
         proc = subprocess.Popen([str(CORE), "-d", tmp], stdout=subprocess.DEVNULL,
                                 stderr=subprocess.DEVNULL)
@@ -97,10 +103,10 @@ def proxy(data, selection=None, desktop=False):
                     pass
                 time.sleep(0.15)
             else:
-                raise ValueError("代理启动失败，请检查节点格式或重新导入订阅")
+                raise ValueError(tr('Proxy startup failed. Check the node format or import again.'))
             if selection:
                 if selection not in names:
-                    raise ValueError("所选节点已失效，请重新选择")
+                    raise ValueError(tr('The selected node is unavailable. Select another.'))
                 request = urllib.request.Request(url, data=json.dumps({"name": selection}).encode(),
                                                  headers=headers, method="PUT")
                 client.open(request, timeout=3).close()
@@ -160,9 +166,9 @@ TOOLS = [{"type": "function", "function": {
     "parameters": {"type": "object", "properties": props, "required": list(props),
                    "additionalProperties": False}}}
     for name, desc, props in [
-        ("open_home", "打开用户主目录的文件管理器", {}),
-        ("create_folder", "在用户主目录新建一个文件夹", {"name": {"type": "string"}}),
-        ("system_info", "查看系统名称、内核版本和架构", {})]]
+        ("open_home", tr('Open the home directory in the file manager'), {}),
+        ("create_folder", tr('Create a folder in the home directory'), {"name": {"type": "string"}}),
+        ("system_info", tr('Show the system name, kernel version and architecture'), {})]]
 
 
 def endpoint(url):
@@ -171,9 +177,9 @@ def endpoint(url):
     if (not parsed.hostname or parsed.username is not None or parsed.password is not None
             or parsed.query or parsed.fragment or any(c.isspace() for c in url)
             or not (parsed.scheme == "https" or (parsed.scheme == "http" and local))):
-        raise ValueError("Base URL 需要有效的 HTTPS 地址；本机接口也支持 HTTP")
+        raise ValueError(tr('Enter a valid HTTPS base URL. Local endpoints also support HTTP.'))
     if parsed.port == 0:
-        raise ValueError("Base URL 端口无效")
+        raise ValueError(tr('Invalid base URL port'))
     return parsed
 
 
@@ -181,12 +187,12 @@ def chat(cfg, messages, use_tools):
     profile = cfg.get("providers", {}).get(cfg.get("provider"), cfg)
     target = endpoint(profile.get("base_url", BASE_URL))
     if cfg.get("proxied") and target.scheme != "https":
-        raise ValueError("本机 HTTP 接口请使用直连")
+        raise ValueError(tr('Use direct access for local HTTP endpoints'))
     payload = {"model": profile["model"], "messages": messages}
     if use_tools:
         payload["tools"] = TOOLS
     if cfg.get("proxied") and not (cfg.get("data") and cfg.get("node")):
-        raise ValueError("请先导入并选择代理节点")
+        raise ValueError(tr('Import and select a proxy node first'))
     route = proxy(cfg["data"], cfg["node"]) if cfg.get("proxied") else contextlib.nullcontext()
     with route as active:
         if active:
@@ -202,7 +208,7 @@ def chat(cfg, messages, use_tools):
                          {"Authorization": "Bearer " + profile["key"], "Content-Type": "application/json"})
             response = conn.getresponse()
             if response.status != 200:
-                raise ValueError(f"供应商返回 HTTP {response.status}，请检查密钥、余额、模型及工具调用支持")
+                raise ValueError(tr('Provider returned HTTP {}. Check the key, balance, model and tool support.').format(response.status))
             return json.load(response)["choices"][0]["message"]
         finally:
             conn.close()
@@ -211,14 +217,14 @@ def chat(cfg, messages, use_tools):
 def action(name, args):
     if name == "open_home" and not args:
         subprocess.run(["xdg-open", str(Path.home())], check=True)
-        return "已打开主目录"
+        return tr('Opened home directory')
     if name == "system_info" and not args:
         import platform
         return " ".join(platform.uname()[i] for i in (0, 2, 4))
     if name == "create_folder" and set(args) == {"name"}:
         folder = args["name"]
         if not isinstance(folder, str) or not folder.strip() or folder in (".", "..") or "/" in folder:
-            raise ValueError("文件夹名称必须是单个有效目录名")
+            raise ValueError(tr('Enter a single valid directory name'))
         (Path.home() / folder).mkdir(mode=0o700)
-        return f"已创建文件夹 {folder}"
-    raise ValueError("不支持此操作")
+        return tr('Created folder {}').format(folder)
+    raise ValueError(tr('Unsupported action'))

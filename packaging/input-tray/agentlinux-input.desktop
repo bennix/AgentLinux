@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Input Method Tray
+Name[zh_CN]=输入法托盘
+Exec=systemctl --user start agentlinux-input.service
+TryExec=/usr/bin/fcitx5
+OnlyShowIn=UKUI;
+NoDisplay=true
+Terminal=false

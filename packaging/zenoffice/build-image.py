@@ -1,6 +1,7 @@
 """Add the verified native ZenOffice package to an AgentLinux MyIME/WeChat ISO."""
 import argparse
 import hashlib
+import json
 from pathlib import Path
 import re
 import shutil
@@ -63,6 +64,31 @@ RemainAfterExit=yes
         shutil.copy2(overlay / rel, dest)
     shutil.copyfile(Path(__file__).resolve().parents[1] / "browser/distribution.ini",
                     root / "opt/obscura-firefox/distribution/distribution.ini")
+    smart = Path(__file__).resolve().parents[1] / "smart-routing"
+    if args.clash_verge:
+        target = root / "usr/local/lib/zenmux"
+        shutil.copy2(overlay / "usr/local/lib/zenmux/backend.py", target / "backend.py")
+        shutil.copy2(smart / "smart_routing.py", target / "smart_routing.py")
+        shutil.copy2(smart / "rules.json", target / "smart-routing.json")
+        dest = root / "etc/skel/.local/share/io.github.clash-verge-rev.clash-verge-rev/profiles"
+        dest.mkdir(parents=True)
+        rules = json.loads((smart / "rules.json").read_text())
+        (dest / "Script.js").write_text((smart / "script-template.js").read_text().replace("__DIRECT_RULES__", json.dumps(rules)))
+    packaging = Path(__file__).resolve().parents[1]
+    user_units = root / "usr/lib/systemd/user"
+    user_units.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(packaging / "input-tray/agentlinux-input.service", user_units)
+    shutil.copy2(packaging / "input-tray/agentlinux-input.desktop", root / "etc/xdg/autostart")
+    catalog = root / "usr/share/locale/zh_CN/LC_MESSAGES/agentlinux.mo"
+    catalog.parent.mkdir(parents=True, exist_ok=True)
+    run("msgfmt", "-o", catalog, packaging / "i18n/zh_CN.po")
+    for rel in ("usr/local/lib/zenmux/desktop.py", "usr/local/bin/zenmux-cage",
+                "usr/share/applications/zenmux-agent.desktop", "usr/share/applications/zenmux-cage.desktop",
+                "usr/share/applications/agentlinux-system-network.desktop"):
+        dest = root / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(overlay / rel, dest)
+    shutil.copy2(packaging / "myime/settings.py", root / "usr/bin/myime-settings")
     wifi = Path(__file__).resolve().parents[1] / "wifi"
     (root / "usr/local/bin").mkdir(parents=True, exist_ok=True)
     shutil.copy2(wifi / "ukui-control-center", root / "usr/local/bin/ukui-control-center")

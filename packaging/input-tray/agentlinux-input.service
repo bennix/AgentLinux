@@ -1,0 +1,9 @@
+[Unit]
+Description=Fcitx 5 input method and desktop tray
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/fcitx5 -D --replace --enable=notificationitem
+Restart=on-failure
+RestartSec=2
