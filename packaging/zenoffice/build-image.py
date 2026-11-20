@@ -58,7 +58,7 @@ RemainAfterExit=yes
 """)
     (wants / service).symlink_to("../" + service)
     overlay = Path(__file__).resolve().parents[2] / "overlay"
-    for rel in ("usr/local/lib/zenmux/cage-terminal", "usr/local/lib/agentlinux-network/settings", "usr/local/lib/agentlinux-network/engine", "usr/local/lib/agentlinux-network/configure", "etc/xdg/autostart/zenmux-workbench.desktop", "etc/firefox/policies/policies.json", "opt/obscura-firefox/distribution/policies.json"):
+    for rel in ("etc/NetworkManager/dispatcher.d/84-agentlinux-proxy", "usr/local/lib/zenmux/cage-terminal", "usr/local/lib/agentlinux-network/settings", "usr/local/lib/agentlinux-network/engine", "usr/local/lib/agentlinux-network/configure", "etc/xdg/autostart/zenmux-workbench.desktop", "etc/firefox/policies/policies.json", "opt/obscura-firefox/distribution/policies.json"):
         dest = root / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(overlay / rel, dest)
@@ -86,6 +86,13 @@ RemainAfterExit=yes
     user_units.mkdir(parents=True, exist_ok=True)
     shutil.copy2(packaging / "input-tray/agentlinux-input.service", user_units)
     shutil.copy2(packaging / "input-tray/agentlinux-input.desktop", root / "etc/xdg/autostart")
+    for name, directory in (
+        ("notificationitem.conf", "usr/local/share/fcitx5/addon"),
+        ("libagentlinuxnotificationitem.so", "usr/lib/x86_64-linux-gnu/fcitx5"),
+    ):
+        target = root / directory
+        target.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(packaging / "input-tray" / name, target)
     catalog = root / "usr/share/locale/zh_CN/LC_MESSAGES/agentlinux.mo"
     catalog.parent.mkdir(parents=True, exist_ok=True)
     run("msgfmt", "-o", catalog, packaging / "i18n/zh_CN.po")

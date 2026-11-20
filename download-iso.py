@@ -5,7 +5,7 @@ from pathlib import Path
 from urllib.request import urlopen
 
 ROOT = "https://github.com/bennix/AgentLinux"
-TAG = "v2026.11.20.8"
+TAG = "v2026.11.20.9"
 
 
 def digest(path):

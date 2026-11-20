@@ -6,6 +6,7 @@ import json
 import os
 import tempfile
 import threading
+import time
 import sys
 import urllib.request
 import yaml
@@ -177,14 +178,26 @@ box.add(speed)
 
 
 def test_google(button):
+    button.set_sensitive(False)
+    status.set_text(tr('Testing Google…'))
+    def finish(message):
+        button.set_sensitive(True)
+        status.set_text(message)
+
     def check():
+        # Exercise the host route, including its TUN, independently of desktop proxy settings.
+        started = time.monotonic()
         try:
             client = urllib.request.build_opener(urllib.request.ProxyHandler({}))
             with client.open("https://www.google.com/generate_204", timeout=10) as response:
-                message = tr('Google connectivity: HTTP {}').format(response.status)
-        except OSError:
-            message = tr('Google connectivity test failed. Check the connection or try another node.')
-        GLib.idle_add(status.set_text, message)
+                elapsed = round((time.monotonic() - started) * 1000)
+                if response.status == 204 and response.geturl() == "https://www.google.com/generate_204":
+                    message = tr('Google reachable · {} ms (HTTP 204)').format(elapsed)
+                else:
+                    message = tr('Unexpected Google response · HTTP {} · {} ms').format(response.status, elapsed)
+        except OSError as exc:
+            message = tr('Google test failed after {} ms · {}').format(round((time.monotonic() - started) * 1000), str(exc))
+        GLib.idle_add(finish, message)
     threading.Thread(target=check, daemon=True).start()
 
 

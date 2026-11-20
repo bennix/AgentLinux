@@ -1,0 +1,13 @@
+--- a/src/modules/notificationitem/dbusmenu.cpp
++++ b/src/modules/notificationitem/dbusmenu.cpp
+@@ -193,10 +193,6 @@
+         appendSubItem(subLayoutItems, BII_Configure, depth, propertyNames);
+         if (parent_->instance()->canRestart()) {
+             appendSubItem(subLayoutItems, BII_Restart, depth, propertyNames);
+-        }
+-        if (parent_->instance()->canRestart() &&
+-            getDesktopType() != DesktopType::DEEPIN) {
+-            appendSubItem(subLayoutItems, BII_Exit, depth, propertyNames);
+         }
+     } else if (id == BII_InputMethodGroup) {
+         int idx = BII_InputMethodGroupStart;

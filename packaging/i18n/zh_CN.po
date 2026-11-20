@@ -471,3 +471,15 @@ msgstr "本机虚拟机需要 QEMU、OVMF 和可用的 KVM。是否联网安装�
 msgid "VM tools are not fully installed. You can still open the remote workbench."
 msgstr "虚拟机工具尚未安装完成，可以先使用远程工作台。"
 
+
+msgid "Testing Google…"
+msgstr "正在测试 Google…"
+
+msgid "Google reachable · {} ms (HTTP 204)"
+msgstr "Google 可达 · 延迟 {} 毫秒（HTTP 204）"
+
+msgid "Unexpected Google response · HTTP {} · {} ms"
+msgstr "Google 响应异常 · HTTP {} · {} 毫秒"
+
+msgid "Google test failed after {} ms · {}"
+msgstr "Google 测试失败 · 已等待 {} 毫秒 · {}"

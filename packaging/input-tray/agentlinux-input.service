@@ -5,5 +5,5 @@ PartOf=graphical-session.target
 [Service]
 Type=simple
 ExecStart=/usr/bin/fcitx5 -D --replace --enable=notificationitem
-Restart=on-failure
+Restart=always
 RestartSec=2
