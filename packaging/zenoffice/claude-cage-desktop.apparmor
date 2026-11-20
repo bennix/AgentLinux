@@ -1,0 +1,7 @@
+abi <abi/4.0>,
+include <tunables/global>
+
+profile claude-cage-desktop /usr/lib/claude-cage/cage-desktop flags=(unconfined) {
+  userns,
+  include if exists <local/claude-cage-desktop>
+}

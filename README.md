@@ -1,9 +1,9 @@
 # ZenMux 中文桌面 ISO
 
-**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.20.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.20.1/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
+**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.20.2/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.20.2/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
 
-[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.20.1)
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.20.2)
 
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可通过底座安装器安装到磁盘。
 
@@ -49,7 +49,7 @@
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.20.1)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.20.2)
 
 运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。需要至少 8 GB 可用空间。Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
@@ -112,8 +112,8 @@ python3 packaging/zenoffice/build-image.py AgentLinux-24.04.5-myime-wechat-amd64
 
 ### 硬盘安装与桌面合集
 
-`AgentLinux-24.04.5-desktop-amd64.iso` 还包含原版 Clash Verge 1.3.8。联网后在“网络”菜单打开 Clash Verge，可自行添加订阅。Obscura Firefox 的书签工具栏提供“火烧云 PRO 官网”和“火烧云 PRO 邀请注册”，使用所提供品牌图中的红橙色云朵标识。
+`AgentLinux-24.04.5-desktop-amd64.iso` 还包含Clash Verge Rev 2.5.10（初始订阅列表为空）。联网后在“网络”菜单打开 Clash Verge，可自行添加订阅。在“系统网络 · 机场代理”窗口查看已连接 Wi-Fi 的 IPv4 和 IPv6 地址。Obscura Firefox 的书签工具栏提供“火烧云 PRO 官网”和“火烧云 PRO 邀请注册”，使用所提供品牌图中的红橙色云朵标识。
 
-从 U 盘进入 Live 桌面，打开 Ubuntu Kylin 安装器，选择安装目标硬盘；安装完成后拔下启动盘，从硬盘重启。镜像的标准安装源和最小安装源均包含 AgentLinux 定制层和办公应用层，安装后的主目录用于保存个人文件和应用设置。重建合集时在 ZenOffice 镜像构建命令后加入 `--clash-verge clash-verge_1.3.8_amd64.AppImage --libfuse2 libfuse2t64_2.9.9-8.1build1_amd64.deb`。
+从 U 盘进入 Live 桌面，打开 Ubuntu Kylin 安装器，选择安装目标硬盘；安装完成后拔下启动盘，从硬盘重启。镜像的标准安装源和最小安装源均包含 AgentLinux 定制层和办公应用层，安装后的主目录用于保存个人文件和应用设置。重建合集时在 ZenOffice 镜像构建命令后加入 `--clash-verge Clash.Verge_2.5.10_amd64.deb`。
 
-[Clash Verge 原版发布页](https://github.com/zzzgydi/clash-verge/releases/tag/v1.3.8)
+[Clash Verge Rev 发布页](https://github.com/clash-verge-rev/clash-verge-rev/releases/tag/v2.5.10)

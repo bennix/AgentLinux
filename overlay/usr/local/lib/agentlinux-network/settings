@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 import json
+import os
+import threading
 from pathlib import Path
 import subprocess
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import Gtk, GLib
 
 uid = "0e7b6bb9-91e3-46f6-bfc5-00f7c33a7978"
 config = Path.home() / ".config/zenmux-agent/settings.json"
@@ -20,6 +22,46 @@ box.add(status)
 
 def run(*command, **kwargs):
     return subprocess.run(command, check=True, capture_output=True, **kwargs)
+
+
+wifi = Gtk.Label(label="正在读取 Wi-Fi 地址…", selectable=True, wrap=True)
+box.pack_start(wifi, False, False, 0)
+box.reorder_child(wifi, 0)
+
+
+def wifi_addresses():
+    env = dict(os.environ, LC_ALL="C")
+    devices = run("nmcli", "-t", "-f", "DEVICE,TYPE,STATE", "device", text=True, env=env, timeout=4).stdout
+    lines = []
+    for row in devices.splitlines():
+        name, kind, state = row.rsplit(":", 2)
+        if kind != "wifi" or not state.startswith("connected"):
+            continue
+        info = json.loads(run("ip", "-j", "address", "show", "dev", name, text=True, timeout=4).stdout)
+        addresses = info[0]["addr_info"] if info else []
+        lines.append("Wi-Fi · " + name)
+        for family, label in (("inet", "IPv4"), ("inet6", "IPv6")):
+            values = [entry["local"] for entry in addresses if entry["family"] == family]
+            lines.append(label + "  " + (", ".join(values) or "尚未分配"))
+    return "\n".join(lines) or "Wi-Fi 未连接"
+
+
+def refresh_wifi():
+    def read():
+        try:
+            message = wifi_addresses()
+        except (OSError, ValueError, subprocess.SubprocessError):
+            message = "暂时无法读取 Wi-Fi 地址，正在重试"
+        GLib.idle_add(display, message)
+    def display(message):
+        wifi.set_text(message)
+        GLib.timeout_add_seconds(3, refresh_wifi)
+        return False
+    threading.Thread(target=read, daemon=True).start()
+    return False
+
+
+refresh_wifi()
 
 
 def change(button, enable):
