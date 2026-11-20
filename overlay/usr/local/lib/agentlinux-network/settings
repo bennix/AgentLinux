@@ -111,7 +111,7 @@ def load_nodes(button, local):
         imported["data"] = data
         picker.remove_all()
         for name in names:
-            picker.append_text(name)
+            picker.append(name, name)
         picker.set_active(0)
         origin = "Clash Verge 本地快照" if cached else "订阅"
         status.set_text(f"已从{origin}读取 {len(names)} 个节点，请选择后连接。")
@@ -123,6 +123,54 @@ for title, local in [("导入订阅地址", False), ("读取 Clash Verge 当前�
     btn = Gtk.Button(label=title)
     btn.connect("clicked", load_nodes, local)
     box.add(btn)
+
+
+def measure(button):
+    try:
+        data = imported.get("data") or json.loads((saved if saved.is_file() else config).read_text())["data"]
+    except (OSError, KeyError, ValueError):
+        status.set_text("请先导入订阅或读取 Clash Verge 当前配置。")
+        return
+    previous = picker.get_active_id()
+    box.set_sensitive(False)
+    status.set_text("正在逐节点测试 Google 与 ZenMux…")
+
+    def progress(done, total):
+        GLib.idle_add(status.set_text, f"节点测速 {done * 100 // total}%（{done}/{total} 项）")
+
+    def finish(rows):
+        box.set_sensitive(True)
+        if not rows:
+            status.set_text("未获得测速结果，请检查网络。")
+            return
+        # Prefer reliable Google access, then lower median Google latency.
+        rows.sort(key=lambda row: (-row[2][0], row[2][1] or float("inf"), -row[1][0], row[1][1] or float("inf")))
+        imported["data"] = data
+        picker.remove_all()
+        def result(sample):
+            hits, delay = sample
+            return f"{hits}/3 · {delay} ms" if hits else "0/3"
+        for name, zenmux, google in rows:
+            picker.append(name, f"{name}  |  Google {result(google)}  |  ZenMux {result(zenmux)}")
+        if rows[0][2][0]:
+            picker.set_active(0)
+            status.set_text("已选中 Google 测试表现最佳的节点，点击连接即可应用。")
+        else:
+            if not previous or not picker.set_active_id(previous):
+                picker.set_active(0)
+            status.set_text("所有节点的 Google 测试均未通过。")
+    def worker():
+        try:
+            rows = backend.benchmark(data, progress)
+        except (OSError, ValueError, subprocess.SubprocessError):
+            rows = []
+        GLib.idle_add(finish, rows)
+    threading.Thread(target=worker, daemon=True).start()
+
+
+speed = Gtk.Button(label="逐节点测速（Google / ZenMux）")
+speed.connect("clicked", measure)
+box.add(speed)
 
 
 def test_google(button):
@@ -140,7 +188,7 @@ def test_google(button):
 def change(button, enable):
     try:
         if enable:
-            cfg = {"data": imported["data"], "node": picker.get_active_text()} if imported else json.loads((saved if saved.is_file() else config).read_text())
+            cfg = {"data": imported["data"], "node": picker.get_active_id()} if imported else json.loads((saved if saved.is_file() else config).read_text())
             selection = {"data": cfg["data"], "node": cfg["node"]}
             if not all(selection.values()):
                 raise ValueError("请先保存代理节点")
