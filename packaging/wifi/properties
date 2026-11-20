@@ -1,0 +1,50 @@
+#!/usr/bin/python3
+import os
+import subprocess
+import gi
+gi.require_version("Gtk", "3.0")
+from gi.repository import GLib, Gtk
+
+def nm(*args):
+    return subprocess.check_output(["nmcli", "--escape", "no", *args], text=True,
+                                   timeout=3, env=dict(os.environ, LC_ALL="C")).strip()
+
+def activate(app):
+    if app.get_active_window():
+        app.get_active_window().present()
+        return
+    window = Gtk.ApplicationWindow(application=app, title="网络连接属性")
+    window.set_default_size(480, 280)
+    box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, margin=18)
+    window.add(box)
+    info = Gtk.Label(xalign=0, selectable=True, wrap=True)
+    box.pack_start(info, True, True, 0)
+    button = Gtk.Button(label="编辑网络连接…")
+    button.connect("clicked", lambda _: subprocess.Popen(["nm-connection-editor"]))
+    box.pack_end(button, False, False, 0)
+    def refresh():
+        try:
+            lines = []
+            for row in nm("-t","-f","DEVICE,TYPE,STATE","device").splitlines():
+                dev, kind, state = row.rsplit(":",2)
+                if kind not in ("wifi","ethernet") or not state.startswith("connected"):
+                    continue
+                name = nm("-g","GENERAL.CONNECTION","device","show",dev)
+                lines.append(f"{name}  ·  {dev}")
+                for field,label in [("IP4.ADDRESS","IPv4"),("IP6.ADDRESS","IPv6"),("IP4.GATEWAY","IPv4 网关"),("IP4.DNS","IPv4 DNS")]:
+                    value = nm("-g",field,"device","show",dev)
+                    lines.append(label+"   "+(", ".join(value.splitlines()) or "尚未分配"))
+                lines.append("")
+            info.set_text("\n".join(lines).strip() or "当前没有已连接的 Wi-Fi 或以太网设备。")
+        except (OSError, ValueError, subprocess.SubprocessError):
+            info.set_text("暂时无法读取网络连接信息，正在重试。")
+        return True
+    refresh()
+    timer = GLib.timeout_add_seconds(5, refresh)
+    window.connect("destroy", lambda *_: GLib.source_remove(timer))
+    window.show_all()
+    window.present()
+
+app = Gtk.Application(application_id="org.agentlinux.NetworkProperties")
+app.connect("activate", activate)
+app.run()

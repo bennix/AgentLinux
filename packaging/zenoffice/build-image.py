@@ -63,6 +63,10 @@ RemainAfterExit=yes
         shutil.copy2(overlay / rel, dest)
     shutil.copyfile(Path(__file__).resolve().parents[1] / "browser/distribution.ini",
                     root / "opt/obscura-firefox/distribution/distribution.ini")
+    wifi = Path(__file__).resolve().parents[1] / "wifi"
+    (root / "usr/local/bin").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(wifi / "ukui-control-center", root / "usr/local/bin/ukui-control-center")
+    shutil.copy2(wifi / "properties", root / "usr/local/lib/agentlinux-network/properties")
     cage = Path(__file__).resolve().parents[1] / "cage"
     shutil.copy2(cage / "proxy-setup", root / "usr/local/lib/zenmux/cage-proxy-setup")
     shutil.copy2(cage / "proxy-setup.desktop", root / "usr/share/applications/cage-proxy-setup.desktop")

@@ -1,0 +1,5 @@
+#!/bin/sh
+if [ "$#" -eq 1 ] && [ "$1" = --netconnect ]; then
+    exec /usr/local/lib/agentlinux-network/properties
+fi
+exec /usr/bin/ukui-control-center "$@"
