@@ -74,7 +74,7 @@ cp -a build/restored-overlay/. overlay/
 
 ## 系统网络连接与 Claude Code 隐私
 
-已安装 2026.11.19 发行版的用户可下载[系统网络升级包](https://github.com/bennix/AgentLinux/releases/download/v2026.11.19/agentlinux-system-network.deb)，在 AgentLinux 内运行 `sudo apt install ./agentlinux-system-network.deb`。新构建的网络版镜像已集成此功能。旧发行版的 29 个分卷仍对应原始 ISO。
+当前桌面镜像已内置系统网络设置。
 
 1. 在 ZenMux 助手中导入订阅，选择节点并保存。
 2. 在系统设置分类中打开 **系统网络 · 机场代理**，点击“使用已保存的节点连接”。首次需管理员授权，重新选择节点后可再次点击以应用。
