@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+import ipaddress
+import subprocess
 import json
 import os
 import re
@@ -10,17 +12,32 @@ runtime = Path(os.environ["RUNTIME_DIRECTORY"])
 data = json.load(sys.stdin)
 (runtime / "nodes").write_text(data["data"])
 resolver = "https://1.1.1.1/dns-query"
+# Resolve the upstream proxy hostname through the physical network before
+# encrypted DNS through that proxy can be used for application traffic.
+bootstrap = []
+routes = json.loads(subprocess.check_output(["ip", "-j", "-4", "route", "show", "default"]))
+for route in sorted(routes, key=lambda entry: entry.get("metric", 0)):
+    dev = route.get("dev")
+    if not dev:
+        continue
+    result = subprocess.run(["nmcli", "-g", "IP4.DNS", "device", "show", dev],
+                            text=True, capture_output=True)
+    for address in result.stdout.splitlines():
+        try:
+            bootstrap.append(f"udp://{ipaddress.IPv4Address(address)}#{dev}")
+        except ValueError:
+            continue
 config = {
-    "mode": "rule", "ipv6": True, "routing-mark": 53741,
+    "hosts": data.get("bootstrap_hosts", {}), "mode": "rule", "ipv6": True, "routing-mark": 53741,
     "tun": {"enable": True, "device": "agproxy0", "stack": "mixed", "auto-route": True,
             "auto-detect-interface": True, "strict-route": True, "dns-hijack": ["any:53", "tcp://any:53"]},
     "dns": {"enable": True, "ipv6": True, "enhanced-mode": "fake-ip",
-            "nameserver": [resolver + "#Selected"], "proxy-server-nameserver": [resolver]},
+            "nameserver": [resolver + "#Selected"], "proxy-server-nameserver": bootstrap or [resolver]},
     "proxy-providers": {"nodes": {"type": "file", "path": "./nodes"}},
     "proxy-groups": [{"name": "Selected", "type": "select", "use": ["nodes"],
                       "filter": "^" + re.escape(data["node"]) + "$",
                       "exclude-type": "direct|pass|dns", "empty-fallback": "REJECT"}],
     "rules": ["MATCH,Selected"]
 }
-(runtime / "config.yaml").write_text(json.dumps(config))
+(runtime / "config.yaml").write_text(json.dumps(config, ensure_ascii=False))
 os.execv(core, [core, "-d", str(runtime)])

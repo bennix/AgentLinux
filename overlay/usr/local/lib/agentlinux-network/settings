@@ -1,7 +1,13 @@
 #!/usr/bin/python3
 import json
 import os
+import tempfile
 import threading
+import sys
+import urllib.request
+import yaml
+sys.path.insert(0, "/usr/local/lib/zenmux")
+import backend
 from pathlib import Path
 import subprocess
 import gi
@@ -10,12 +16,13 @@ from gi.repository import Gtk, GLib
 
 uid = "0e7b6bb9-91e3-46f6-bfc5-00f7c33a7978"
 config = Path.home() / ".config/zenmux-agent/settings.json"
+saved = Path.home() / ".config/agentlinux-network/selection.json"
 window = Gtk.Window(title="系统网络 · 机场代理")
 box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
 box.set_border_width(20)
 window.add(box)
 status = Gtk.Label(wrap=True)
-box.add(Gtk.Label(label="从 ZenMux 助手导入订阅并保存节点后，在此连接。"))
+box.add(Gtk.Label(label="输入订阅地址，或读取 Clash Verge 当前配置，再选择节点连接。"))
 box.add(Gtk.Label(label="连接期间，本机应用默认使用同一节点；关闭连接可恢复网络。"))
 box.add(status)
 
@@ -64,14 +71,85 @@ def refresh_wifi():
 refresh_wifi()
 
 
+entry = Gtk.Entry(placeholder_text="HTTPS 订阅地址或 VLESS 链接", visibility=False)
+box.add(entry)
+picker = Gtk.ComboBoxText()
+box.add(picker)
+imported = {}
+
+
+def load_nodes(button, local):
+    source = entry.get_text().strip()
+    def worker():
+        try:
+            try:
+                if not local:
+                    data, names = backend.nodes(source)
+            except (OSError, ValueError):
+                if not source.startswith("https://"):
+                    raise
+                local_fallback = True
+            else:
+                local_fallback = False
+            if local or local_fallback:
+                folder = Path.home() / ".local/share/io.github.clash-verge-rev.clash-verge-rev"
+                profiles = yaml.safe_load((folder / "profiles.yaml").read_text())
+                items = profiles.get("items") or []
+                profile = next(i for i in items if (i["uid"] == profiles["current"] if local else i.get("url") == source))
+                path = (folder / "profiles" / profile["file"]).resolve()
+                if path.parent != (folder / "profiles").resolve():
+                    raise ValueError("配置路径无效")
+                data = path.read_text()
+                with backend.proxy(data) as (names, *_):
+                    pass
+            GLib.idle_add(loaded, data, names, local or local_fallback)
+        except Exception:
+            GLib.idle_add(status.set_text, "读取失败。可在 Clash Verge 选中有效订阅，然后读取当前配置。")
+        finally:
+            GLib.idle_add(button.set_sensitive, True)
+    def loaded(data, names, cached):
+        imported["data"] = data
+        picker.remove_all()
+        for name in names:
+            picker.append_text(name)
+        picker.set_active(0)
+        origin = "Clash Verge 本地快照" if cached else "订阅"
+        status.set_text(f"已从{origin}读取 {len(names)} 个节点，请选择后连接。")
+    button.set_sensitive(False)
+    threading.Thread(target=worker, daemon=True).start()
+
+
+for title, local in [("导入订阅地址", False), ("读取 Clash Verge 当前配置", True)]:
+    btn = Gtk.Button(label=title)
+    btn.connect("clicked", load_nodes, local)
+    box.add(btn)
+
+
+def test_google(button):
+    def check():
+        try:
+            client = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+            with client.open("https://www.google.com/generate_204", timeout=10) as response:
+                message = f"Google 连通性测试：HTTP {response.status}"
+        except OSError:
+            message = "Google 连通性测试失败，请检查连接或更换节点。"
+        GLib.idle_add(status.set_text, message)
+    threading.Thread(target=check, daemon=True).start()
+
+
 def change(button, enable):
     try:
         if enable:
-            cfg = json.loads(config.read_text())
+            cfg = {"data": imported["data"], "node": picker.get_active_text()} if imported else json.loads((saved if saved.is_file() else config).read_text())
             selection = {"data": cfg["data"], "node": cfg["node"]}
             if not all(selection.values()):
                 raise ValueError("请先保存代理节点")
             run("pkexec", "/usr/local/lib/agentlinux-network/configure", input=json.dumps(selection).encode())
+            if imported:
+                saved.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+                with tempfile.NamedTemporaryFile(mode="w", dir=saved.parent, delete=False) as f:
+                    json.dump(selection, f)
+                os.replace(f.name, saved)
             active = run("nmcli", "-t", "-f", "UUID", "connection", "show", "--active").stdout.decode().splitlines()
             if uid in active:
                 run("pkexec", "/usr/bin/systemctl", "restart", "agentlinux-tunnel.service")
@@ -84,10 +162,13 @@ def change(button, enable):
     except (KeyError, ValueError, OSError, subprocess.SubprocessError) as exc:
         status.set_text("操作失败：" + str(exc))
 
-for label, enable in [("使用已保存的节点连接", True), ("断开系统连接", False)]:
+for label, enable in [("使用所选或已保存的节点连接", True), ("断开系统连接", False)]:
     b = Gtk.Button(label=label)
     b.connect("clicked", change, enable)
     box.add(b)
+b = Gtk.Button(label="测试 Google 连接")
+b.connect("clicked", test_google)
+box.add(b)
 b = Gtk.Button(label="打开 NetworkManager 网络连接列表")
 b.connect("clicked", lambda _: subprocess.Popen(["nm-connection-editor"]))
 box.add(b)

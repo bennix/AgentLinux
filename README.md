@@ -1,9 +1,9 @@
 # ZenMux 中文桌面 ISO
 
-**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.20.4/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.20.4/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
+**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.20.5/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.20.5/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
 
-[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.20.4)
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.20.5)
 
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可通过底座安装器安装到磁盘。
 
@@ -49,7 +49,7 @@
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.20.4)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.20.5)
 
 运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。需要至少 8 GB 可用空间。Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
@@ -125,3 +125,5 @@ python3 packaging/zenoffice/build-image.py AgentLinux-24.04.5-myime-wechat-amd64
 应用菜单中的“本机终端”（Host Terminal）打开独立的宿主机 shell。Ctrl+Alt+T 仍打开默认的 Cage 终端。
 
 在系统托盘展开已连接的 Wi-Fi，点击“属性”查看当前 IP、网关和 DNS，或进入网络连接编辑器。
+
+在“系统网络 · 机场代理”中导入订阅或读取 Clash Verge 当前配置，选择节点后连接。使用“测试 Google 连接”检查 HTTPS 连通性。下载失败时，只有 URL 完全相同的已保存配置才会被用作本地快照。
