@@ -483,3 +483,12 @@ msgstr "Google 响应异常 · HTTP {} · {} 毫秒"
 
 msgid "Google test failed after {} ms · {}"
 msgstr "Google 测试失败 · 已等待 {} 毫秒 · {}"
+
+msgid "Active system node: {}"
+msgstr "当前系统节点：{}"
+
+msgid "Node saved: {}. The system tunnel is off."
+msgstr "已保存节点：{}。系统隧道当前关闭。"
+
+msgid "Select a node to apply it to the active system tunnel."
+msgstr "选择节点即可切换当前系统隧道的出口。"

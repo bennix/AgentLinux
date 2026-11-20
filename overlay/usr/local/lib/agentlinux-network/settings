@@ -116,7 +116,8 @@ def load_nodes(button, local):
         picker.remove_all()
         for name in names:
             picker.append(name, name)
-        picker.set_active(0)
+        with picker.handler_block(node_handler):
+            picker.set_active_id(last_node)
         origin = tr('local Clash Verge snapshot') if cached else tr('subscription')
         status.set_text(tr('Source: {}. Loaded {} nodes. Select one to connect.').format(origin, len(names)))
     button.set_sensitive(False)
@@ -156,13 +157,10 @@ def measure(button):
             return f"{hits}/3 · {delay} ms" if hits else "0/3"
         for name, zenmux, google in rows:
             picker.append(name, f"{name}  |  Google {result(google)}  |  ZenMux {result(zenmux)}")
-        if rows[0][2][0]:
-            picker.set_active(0)
-            status.set_text(tr('The best performing Google node is selected. Apply a routing mode to use it.'))
-        else:
-            if not previous or not picker.set_active_id(previous):
-                picker.set_active(0)
-            status.set_text(tr('No node passed the Google test.'))
+        with picker.handler_block(node_handler):
+            if not picker.set_active_id(previous or last_node):
+                picker.set_active(-1)
+        status.set_text(tr('Select a node to apply it to the active system tunnel.'))
     def worker():
         try:
             rows = backend.benchmark(data, progress)
@@ -209,17 +207,13 @@ def change(button, mode):
             if not all(selection.values()):
                 raise ValueError(tr('Save a node first'))
             run("pkexec", "/usr/local/lib/agentlinux-network/configure", input=json.dumps(selection).encode())
-            if imported:
-                saved.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
-                with tempfile.NamedTemporaryFile(mode="w", dir=saved.parent, delete=False) as f:
-                    json.dump(selection, f)
-                os.replace(f.name, saved)
             active = run("nmcli", "-t", "-f", "UUID", "connection", "show", "--active").stdout.decode().splitlines()
             if uid in active:
                 run("pkexec", "/usr/bin/systemctl", "restart", "agentlinux-tunnel.service")
             else:
                 run("nmcli", "--wait", "20", "connection", "up", "uuid", uid)
             run("gsettings", "set", "org.gnome.system.proxy", "mode", "none")
+            remember(selection)
             status.set_text(tr('System connection enabled: ') + cfg["node"] + tr('. Disconnect to restore direct access if the node is unavailable.'))
         else:
             active = run("nmcli", "-g", "UUID", "connection", "show", "--active").stdout.decode().splitlines()
@@ -229,6 +223,52 @@ def change(button, mode):
             status.set_text(tr('System tunnel disconnected.'))
     except (KeyError, ValueError, OSError, subprocess.SubprocessError) as exc:
         status.set_text(tr('Operation failed: ') + str(exc))
+
+def remember(selection):
+    global last_node
+    saved.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(mode="w", dir=saved.parent, delete=False) as f:
+        json.dump(selection, f)
+    os.replace(f.name, saved)
+    last_node = selection["node"]
+
+
+def node_changed(widget):
+    node = widget.get_active_id()
+    if not node:
+        return
+    try:
+        selection = {"data": imported["data"], "node": node}
+        if subprocess.run(["systemctl", "is-active", "--quiet", "agentlinux-tunnel.service"]).returncode == 0:
+            mode = run("pkexec", "/usr/local/lib/agentlinux-network/configure", "--switch",
+                       input=json.dumps(selection).encode()).stdout.decode().strip()
+            selection["mode"] = mode
+            message = tr('Active system node: {}')
+        else:
+            message = tr('Node saved: {}. The system tunnel is off.')
+        remember(selection)
+        status.set_text(message.format(node))
+    except (KeyError, ValueError, OSError, subprocess.SubprocessError) as exc:
+        with picker.handler_block(node_handler):
+            if not picker.set_active_id(last_node):
+                picker.set_active(-1)
+        status.set_text(tr('Operation failed: ') + str(exc))
+
+
+last_node = ""
+try:
+    previous = json.loads(saved.read_text())
+    last_node = previous["node"]
+    profile = yaml.safe_load(previous["data"])
+    entries = profile.get("proxies", []) if isinstance(profile, dict) else []
+    names = [item["name"] for item in entries if isinstance(item, dict) and isinstance(item.get("name"), str)]
+    imported["data"] = previous["data"]
+    for name in dict.fromkeys([last_node, *names]):
+        picker.append(name, name)
+    picker.set_active_id(last_node)
+except (OSError, ValueError, KeyError, yaml.YAMLError):
+    pass
+node_handler = picker.connect("changed", node_changed)
 
 for label, enable in [(tr('Smart Routing'), "smart"), (tr('Route all through proxy'), "proxy"), (tr('Direct (disconnect system tunnel)'), "direct")]:
     b = Gtk.Button(label=label)
