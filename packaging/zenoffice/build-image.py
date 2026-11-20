@@ -63,6 +63,10 @@ RemainAfterExit=yes
         shutil.copy2(overlay / rel, dest)
     shutil.copyfile(Path(__file__).resolve().parents[1] / "browser/distribution.ini",
                     root / "opt/obscura-firefox/distribution/distribution.ini")
+    cage = Path(__file__).resolve().parents[1] / "cage"
+    shutil.copy2(cage / "proxy-setup", root / "usr/local/lib/zenmux/cage-proxy-setup")
+    shutil.copy2(cage / "proxy-setup.desktop", root / "usr/share/applications/cage-proxy-setup.desktop")
+    shutil.copy2(cage / "host-terminal.desktop", root / "usr/share/applications/agentlinux-host-terminal.desktop")
     suffix = ".agent.zenoffice.squashfs"
     if args.clash_verge:
         if checksum(args.clash_verge, "sha256") != "add8564811ba4d2305da443288d23a26c5ed19674b676a0bb58b99ec4f7d13cf":

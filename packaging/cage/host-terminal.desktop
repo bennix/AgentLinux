@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Host Terminal
+Name[zh_CN]=本机终端
+Comment=Open a shell on the AgentLinux host
+Comment[zh_CN]=直接在本机运行命令
+Icon=utilities-terminal
+Exec=/usr/bin/mate-terminal.distrib --disable-factory
+TryExec=/usr/bin/mate-terminal.distrib
+Terminal=false
+Categories=System;TerminalEmulator;
+Keywords=Shell;Host;本机;终端;

@@ -1,0 +1,84 @@
+#!/usr/bin/python3
+"""Configure Cage using the local user's currently active Clash Verge profile."""
+import json
+import os
+from pathlib import Path
+import subprocess
+import tempfile
+import time
+import yaml
+
+def dialog(*args):
+    return subprocess.run(["zenity", "--title=Claude Cage · 代理设置", *args],
+                          capture_output=True, text=True)
+
+def call(op, payload=None):
+    cmd = ["claude-cage", "agent", "call", op]
+    with tempfile.NamedTemporaryFile(mode="w", dir=os.environ.get("XDG_RUNTIME_DIR")) as f:
+        if payload is not None:
+            json.dump(payload, f)
+            f.flush()
+            cmd.extend(["--input", f.name])
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=40)
+    result = json.loads(proc.stdout)
+    if result.get("status") not in ("completed", "accepted"):
+        raise ValueError("请在 Cage 工作台创建或解锁本地账户，再重新打开代理设置。")
+    return result["data"]
+
+def apply(op, payload):
+    job = call(op, payload)
+    if not job.get("id"):
+        return
+    for _ in range(60):
+        latest = call("status").get("job") or {}
+        if latest.get("id") != job["id"]:
+            raise ValueError("安装任务已变化，请返回工作台查看状态。")
+        if not latest.get("running"):
+            if latest.get("error"):
+                raise ValueError("Cage 无法应用此配置，请在工作台检查节点状态。")
+            return
+        time.sleep(1)
+    raise ValueError("操作仍在进行，请返回工作台查看进度。")
+
+def main():
+    sources = call("proxy.status").get("sources") or []
+    if not any(s.get("nodes") for s in sources):
+        folder = Path.home()/".local/share/io.github.clash-verge-rev.clash-verge-rev"
+        config = folder/"profiles.yaml"
+        if not config.exists():
+            raise ValueError("请先在 Clash Verge 导入并选中你的订阅，再回来复制节点。")
+        profiles = yaml.safe_load(config.read_text()) or {}
+        item = next((i for i in profiles.get("items") or [] if i["uid"] == profiles.get("current")), None)
+        if not item:
+            raise ValueError("请先在 Clash Verge 选中一个配置。")
+        base = (folder/"profiles").resolve()
+        path = (base/item["file"]).resolve()
+        if path.parent != base or not path.is_file():
+            raise ValueError("找不到当前配置文件。")
+        if dialog("--question","--text=将 Clash Verge 当前配置中的节点复制到本机 Cage？这是本地快照，订阅更新后可在 Cage 中重新导入。").returncode:
+            return
+        apply("proxy.import", {"name": "Clash Verge 本地配置", "content":path.read_text()})
+        sources = call("proxy.status").get("sources") or []
+    choices = [(s,n) for s in sources for n in s.get("nodes") or []]
+    if not choices:
+        raise ValueError("当前配置没有 Cage 能使用的节点。")
+    args = ["--list","--text=选择用于安装客机的节点","--column=编号","--column=节点","--column=类型","--height=420"]
+    for i, (_, node) in enumerate(choices, 1):
+        args.extend([str(i),node["name"],node["type"]])
+    result = dialog(*args)
+    if result.returncode:
+        return
+    source,node = choices[int(result.stdout.strip())-1]
+    apply("proxy.select", {"id":source["id"],"node_id":node["id"]})
+    status = call("proxy.status")
+    if not status.get("running") or not status.get("selected"):
+        raise ValueError("节点尚未启动，请查看 Cage 工作台的代理状态。")
+    dialog("--info","--text=节点已应用，代理已启动。请回到 Cage 工作台继续安装客机。")
+
+if __name__ == "__main__":
+    try:
+        main()
+    except ValueError as exc:
+        dialog("--error","--text="+(str(exc) if type(exc) is ValueError else "无法读取本地配置，请检查工作台状态。"))
+    except (KeyError, IndexError, OSError, subprocess.SubprocessError, yaml.YAMLError):
+        dialog("--error","--text=无法读取配置或联系 Cage。请先打开工作台，完成登录后再试。")
