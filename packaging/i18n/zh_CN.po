@@ -453,11 +453,11 @@ msgstr "清空学习记录"
 msgid "Smart Routing sends mainland sites and WeChat directly and other traffic through the selected node."
 msgstr "智能分流：大陆网站与微信直连；其他流量走所选节点。"
 
-msgid "Install the bundled Claude Cage 0.1.8 package? Administrator authorization is required."
-msgstr "安装镜像随附的 Claude Cage 0.1.8？系统会请求管理员授权。"
+msgid "Install the bundled Claude Cage 0.2.0-rc package? Administrator authorization is required."
+msgstr "安装镜像随附的 Claude Cage 0.2.0-rc？系统会请求管理员授权。"
 
 msgid "Package installation failed. Check the package dependencies in Host Terminal."
-msgstr "软件包未安装完成。请在终端运行 sudo apt install /opt/claude-cage-package/Cage-0.1.8-linux-amd64.deb 查看依赖信息。"
+msgstr "软件包未安装完成。请在终端运行 sudo apt install /opt/claude-cage-package/Cage-0.2.0-rc-linux-amd64.deb 查看依赖信息。"
 
 msgid "Install VM tools"
 msgstr "安装虚拟机工具"

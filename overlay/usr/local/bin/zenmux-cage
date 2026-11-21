@@ -1,8 +1,8 @@
 #!/bin/sh
 set -eu
-pkg=/opt/claude-cage-package/Cage-0.1.8-linux-amd64.deb
+pkg=/opt/claude-cage-package/Cage-0.2.0-rc-linux-amd64.deb
 if ! command -v cage-desktop >/dev/null; then
-    zenity --question --title="Claude Cage" --text="$(gettext -d agentlinux 'Install the bundled Claude Cage 0.1.8 package? Administrator authorization is required.')"
+    zenity --question --title="Claude Cage" --text="$(gettext -d agentlinux 'Install the bundled Claude Cage 0.2.0-rc package? Administrator authorization is required.')"
     pkexec /usr/bin/dpkg -i "$pkg" || {
         zenity --error --text="$(gettext -d agentlinux 'Package installation failed. Check the package dependencies in Host Terminal.')"
         exit 1

@@ -24,7 +24,7 @@ def digest(path, algorithm):
 required_payloads = (
     "opt/ZenCode/zcode",
     "opt/obscura-firefox/firefox",
-    "opt/claude-cage-package/Cage-0.1.8-linux-amd64.deb",
+    "opt/claude-cage-package/Cage-0.2.0-rc-linux-amd64.deb",
     "usr/local/lib/zenmux/mihomo",
     "usr/bin/xdotool",
     "opt/wechat/wechat",

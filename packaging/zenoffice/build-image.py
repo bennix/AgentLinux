@@ -13,7 +13,8 @@ parser.add_argument("base", type=Path)
 parser.add_argument("deb", type=Path)
 parser.add_argument("output", type=Path)
 parser.add_argument("--clash-verge", type=Path, help="Clash Verge Rev 2.5.10 official amd64 deb")
-parser.add_argument("--obscura-firefox", type=Path, required=True, help="Official Obscura Firefox 0.3.8 Linux amd64 deb")
+parser.add_argument("--obscura-firefox", type=Path, required=True, help="Official Obscura Firefox 0.3.9 Linux amd64 deb")
+parser.add_argument("--claude-cage", required=True, type=Path, help="Official Claude Cage 0.2.0-rc amd64 deb")
 args = parser.parse_args()
 if args.output.exists():
     parser.error("Select a new output file")
@@ -59,8 +60,13 @@ RemainAfterExit=yes
 """)
     (wants / service).symlink_to("../" + service)
     overlay = Path(__file__).resolve().parents[2] / "overlay"
-    if checksum(args.obscura_firefox, "sha256") != "91d448e8c617d80a4e54daac515d358d1b01257ab0ec36aeb5febb5728b52ecd":
-        raise SystemExit("Unexpected Obscura Firefox 0.3.8 amd64 package checksum")
+    if checksum(args.claude_cage, "sha256") != "ec6ca1844f717af1bd6b604dd4709a8d21665ef0b22a774c123614d73c6c005a":
+        raise SystemExit("Unexpected Claude Cage 0.2.0-rc amd64 package checksum")
+    cage_package = root / "opt/claude-cage-package/Cage-0.2.0-rc-linux-amd64.deb"
+    cage_package.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(args.claude_cage, cage_package)
+    if checksum(args.obscura_firefox, "sha256") != "1e92dbc7350e2093ee6e93ed082e29e4713ea502efbf1d9e7ce663a78d457390":
+        raise SystemExit("Unexpected Obscura Firefox 0.3.9 amd64 package checksum")
     run("dpkg-deb", "-x", args.obscura_firefox, root)
     shutil.copy2(overlay / "usr/share/applications/obscura-firefox.desktop",
                  root / "usr/share/applications/obscura-firefox.desktop")
@@ -133,14 +139,25 @@ RemainAfterExit=yes
         updates[path] = work / Path(path).name
         read.extend(["-extract", "/" + path, updates[path]])
     run(*read)
+    replacing = suffix in updates["casper/install-sources.yaml"].read_text()
+    old_size = 0
+    if replacing:
+        # Rebuild the top app layer directly from the current release.
+        previous_layer = work / "previous.squashfs"
+        run("xorriso", "-indev", args.base, "-osirrox", "on", "-extract",
+            "/casper/minimal" + suffix, previous_layer)
+        listing = subprocess.check_output(["unsquashfs", "-lln", previous_layer], text=True)
+        old_size = sum(int(line.split(None, 3)[2]) for line in listing.splitlines()
+                       if line.startswith("-"))
     for path in paths[:-1]:
         f = updates[path]
         data = f.read_text()
-        if ".agent.squashfs" not in data:
+        if (suffix if replacing else ".agent.squashfs") not in data:
             raise ValueError(f"Expected layered AgentLinux source in {path}")
-        data = data.replace(".agent.squashfs", suffix)
+        if not replacing:
+            data = data.replace(".agent.squashfs", suffix)
         if path.endswith(".yaml"):
-            data = re.sub(r"(?m)^(  size: )(\d+)$", lambda m: m[1] + str(int(m[2]) + size), data)
+            data = re.sub(r"(?m)^(  size: )(\d+)$", lambda m: m[1] + str(int(m[2]) + size - old_size), data)
         f.chmod(0o644)
         f.write_text(data)
     layers = ["casper/" + n + suffix for n in ("minimal","minimal.standard","minimal.standard.live")]
@@ -156,6 +173,8 @@ RemainAfterExit=yes
     for path, src in updates.items():
         write.extend(["-map", src, "/" + path])
     for path in layers[1:]:
+        if replacing:
+            write.extend(["-rm", "/" + path, "--"])
         write.extend(["-clone", "/" + layers[0], "/" + path])
     run(*write, "-boot_image", "any", "replay", "-commit", "-end")
     image.rename(args.output)
