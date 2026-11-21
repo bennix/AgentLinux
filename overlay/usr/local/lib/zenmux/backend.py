@@ -11,6 +11,7 @@ from pathlib import Path
 import secrets
 import socket
 import statistics
+import sys
 import subprocess
 import tempfile
 import time
@@ -166,6 +167,16 @@ TOOLS = [{"type": "function", "function": {
     "parameters": {"type": "object", "properties": props, "required": list(props),
                    "additionalProperties": False}}}
     for name, desc, props in [
+        ("network_status", tr('Inspect active NetworkManager connections and the system tunnel'), {}),
+        ("disk_usage", tr('Inspect available space on local filesystems'), {}),
+        ("failed_services", tr('List failed system and user services'), {}),
+        ("list_apps", tr('List installed desktop applications'), {}),
+        ("launch_app", tr('Launch an installed application by its desktop ID'), {"desktop_id": {"type": "string"}}),
+        ("list_windows", tr('List open desktop windows and titles'), {}),
+        ("focus_window", tr('Activate a listed desktop window'), {"window_id": {"type": "string"}}),
+        ("list_controls", tr('List visible buttons in a selected window'), {"window_id": {"type": "string"}}),
+        ("activate_control", tr('Activate a named control in a selected window'),
+         {key: {"type": "string"} for key in ("window_id", "path", "role", "label")}),
         ("open_home", tr('Open the home directory in the file manager'), {}),
         ("create_folder", tr('Create a folder in the home directory'), {"name": {"type": "string"}}),
         ("system_info", tr('Show the system name, kernel version and architecture'), {})]]
@@ -215,6 +226,47 @@ def chat(cfg, messages, use_tools):
 
 
 def action(name, args):
+    if not args and name == "network_status":
+        return subprocess.check_output(["nmcli", "-t", "-f", "NAME,TYPE,DEVICE", "connection", "show", "--active"],
+                                       text=True, timeout=5)
+    if not args and name == "disk_usage":
+        return subprocess.check_output(["df", "-lh", "-x", "tmpfs", "-x", "devtmpfs"], text=True, timeout=5)
+    if not args and name == "failed_services":
+        return "\n".join(subprocess.check_output(["systemctl", scope, "--failed", "--no-pager",
+                                                  "--plain", "--no-legend"], text=True, timeout=5)
+                         for scope in ("--system", "--user")).strip() or tr('No failed services')
+    if name in ("list_apps", "launch_app"):
+        from gi.repository import Gio
+        apps = {a.get_id(): a for a in Gio.AppInfo.get_all() if a.get_id() and a.should_show()}
+        if name == "list_apps" and not args:
+            return json.dumps({key: apps[key].get_display_name() for key in sorted(apps)}, ensure_ascii=False)
+        if name == "launch_app" and set(args) == {"desktop_id"} and args["desktop_id"] in apps:
+            app = apps[args["desktop_id"]]
+            app.launch([], None)
+            return app.get_display_name()
+    if name in ("list_windows", "focus_window", "list_controls", "activate_control"):
+        import re
+        listing = subprocess.check_output(["xprop", "-root", "_NET_CLIENT_LIST_STACKING"], text=True, timeout=3)
+        ids = re.findall(r"0x[0-9a-fA-F]+", listing)
+        if name == "list_windows" and not args:
+            windows = {}
+            for wid in ids:
+                title = subprocess.run(["xdotool", "getwindowname", wid], capture_output=True, text=True, timeout=3)
+                if title.returncode == 0:
+                    windows[wid] = title.stdout.strip()[:250]
+            return json.dumps(windows, ensure_ascii=False)
+        if name in ("list_controls", "activate_control") and args.get("window_id") in ids:
+            keys = {"window_id"} if name == "list_controls" else {"window_id", "path", "role", "label"}
+            if set(args) == keys and all(isinstance(v, str) for v in args.values()):
+                result = subprocess.run([sys.executable, str(Path(__file__).with_name("accessible.py"))],
+                                        input=json.dumps([name, args]), capture_output=True, text=True, timeout=10)
+                if result.returncode:
+                    raise ValueError(tr('The window or control is unavailable. Inspect it again.'))
+                return result.stdout.strip()
+        if name == "focus_window" and set(args) == {"window_id"} and args["window_id"] in ids:
+            wid = args["window_id"]
+            subprocess.run(["xdotool", "windowactivate", "--sync", wid], check=True, timeout=3)
+            return subprocess.check_output(["xdotool", "getwindowname", wid], text=True, timeout=3).strip()
     if name == "open_home" and not args:
         subprocess.run(["xdg-open", str(Path.home())], check=True)
         return tr('Opened home directory')

@@ -79,6 +79,7 @@ RemainAfterExit=yes
     smart = Path(__file__).resolve().parents[1] / "smart-routing"
     if args.clash_verge:
         target = root / "usr/local/lib/zenmux"
+        shutil.copy2(overlay / "usr/local/lib/zenmux/accessible.py", target / "accessible.py")
         shutil.copy2(overlay / "usr/local/lib/zenmux/backend.py", target / "backend.py")
         shutil.copy2(smart / "smart_routing.py", target / "smart_routing.py")
         shutil.copy2(smart / "rules.json", target / "smart-routing.json")

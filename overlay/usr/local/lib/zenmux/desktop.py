@@ -218,27 +218,54 @@ class Window(Gtk.Window):
         self.work(lambda: backend.chat(self.cfg, self.history, allowed),
                   lambda msg: self.answer(msg, allowed), self.write)
 
-    def answer(self, msg, allowed):
+    def answer(self, msg, allowed, rounds=0):
         content = msg.get("content") or ""
         if content:
             self.write(tr('Assistant: ') + content)
-        self.history.append({"role": "assistant", "content": content or tr('Action requested.')})
-        for call in msg.get("tool_calls", []) if allowed else []:
+        calls = msg.get("tool_calls") if allowed else None
+        if not calls:
+            self.history.append({"role": "assistant", "content": content})
+            return
+        if not all(isinstance(call, dict) and isinstance(call.get("id"), str)
+                   and isinstance(call.get("function"), dict) for call in calls):
+            self.write(tr('Invalid tool response'))
+            return
+        self.history.append({"role": "assistant", "content": content or None, "tool_calls": calls})
+        stopped = False
+        for call in calls:
+            if stopped:
+                self.history.append({"role": "tool", "tool_call_id": call["id"], "content": tr('Cancelled')})
+                continue
             try:
                 fn = call["function"]
                 args = json.loads(fn["arguments"])
                 labels = {"open_home": tr('Open home folder'), "create_folder": tr('Create a folder in your home directory'),
-                          "system_info": tr('View system information')}
+                          "system_info": tr('View system information'),
+                          "network_status": tr('Inspect active NetworkManager connections and the system tunnel'),
+                          "disk_usage": tr('Inspect available space on local filesystems'),
+                          "failed_services": tr('List failed system and user services'),
+                          "list_controls": tr('List visible buttons in a selected window'),
+                          "activate_control": tr('Activate a named control in a selected window'),
+                          "list_apps": tr('List installed desktop applications'),
+                          "launch_app": tr('Launch an installed application by its desktop ID'),
+                          "list_windows": tr('List open desktop windows and titles'),
+                          "focus_window": tr('Activate a listed desktop window')}
                 dialog = Gtk.MessageDialog(transient_for=self, modal=True, buttons=Gtk.ButtonsType.OK_CANCEL,
                                            text=labels[fn["name"]])
-                dialog.format_secondary_text(json.dumps(args, ensure_ascii=False))
+                dialog.format_secondary_text(json.dumps(args, ensure_ascii=False) + "\n" + tr("The result will be sent to your selected AI provider."))
                 ok = dialog.run() == Gtk.ResponseType.OK
                 dialog.destroy()
+                stopped = not ok
                 result = backend.action(fn["name"], args) if ok else tr('Cancelled')
             except Exception as exc:
                 result = str(exc)
             self.write(result)
-            self.history[-1]["content"] += tr('\nAction result: ') + result
+            self.history.append({"role": "tool", "tool_call_id": call["id"], "content": result})
+        if stopped:
+            return
+        more_tools = rounds < 7 and self.tools.get_active()
+        self.work(lambda: backend.chat(self.cfg, self.history, more_tools),
+                  lambda reply: self.answer(reply, more_tools, rounds + 1), self.write)
 
 
 if __name__ == "__main__":

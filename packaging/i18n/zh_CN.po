@@ -495,3 +495,42 @@ msgstr "选择节点即可切换当前系统隧道的出口。"
 
 msgid "System routing applies to desktop apps, host terminals and background services. Claude Cage uses its own proxy."
 msgstr "系统路由覆盖桌面应用、本机字符终端和后台服务。Claude Cage 使用独立代理。"
+
+msgid "List installed desktop applications"
+msgstr "列出已安装的桌面应用"
+
+msgid "Launch an installed application by its desktop ID"
+msgstr "按桌面应用 ID 启动应用"
+
+msgid "List open desktop windows and titles"
+msgstr "列出已打开的桌面窗口及标题"
+
+msgid "Activate a listed desktop window"
+msgstr "激活列表中的桌面窗口"
+
+msgid "Invalid tool response"
+msgstr "模型返回了无效的工具调用"
+
+msgid "The result will be sent to your selected AI provider."
+msgstr "操作结果将发送至当前选择的 AI 供应商。"
+
+msgid "List visible buttons in a selected window"
+msgstr "列出指定窗口中的可操作控件"
+
+msgid "Activate a named control in a selected window"
+msgstr "操作指定窗口中的具名控件"
+
+msgid "The window or control is unavailable. Inspect it again."
+msgstr "窗口或控件已变化，请重新查看。"
+
+msgid "Inspect active NetworkManager connections and the system tunnel"
+msgstr "查看当前网络连接和系统隧道"
+
+msgid "Inspect available space on local filesystems"
+msgstr "查看本机文件系统可用空间"
+
+msgid "List failed system and user services"
+msgstr "查看系统和用户服务的失败状态"
+
+msgid "No failed services"
+msgstr "没有失败的服务"

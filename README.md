@@ -1,9 +1,9 @@
 # ZenMux 中文桌面 ISO
 
-**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.21.2/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.21.2/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
+**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.21.3/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.21.3/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
 
-[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.21.2)
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.21.3)
 
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可通过底座安装器安装到磁盘。
 
@@ -11,7 +11,7 @@
 
 在应用菜单搜索 **ZenMux 桌面助手**。在设置页输入 ZenMux API Key 和平台上的完整模型 ID，点击保存。输入另一个 ID 并保存即可扩充模型列表。没有密钥时，设置页提供[邀请注册链接](https://zenmux.ai/invite/GBQMC5)。接口为 `https://zenmux.ai/api/v1/chat/completions`。
 
-勾选允许桌面操作后，可输入“打开主目录”“在主目录创建名为笔记的文件夹”或“查看系统信息”。所选模型需要支持工具调用。助手会显示操作并请求确认。中文输入使用 Fcitx 5 拼音，通常可用 Ctrl+空格切换。
+勾选允许桌面操作后，可输入“打开主目录”“在主目录创建名为笔记的文件夹”或“查看系统信息”。助手还可查询已安装应用、启动应用、列出和切换窗口、查看并激活支持辅助功能的具名按钮，以及查询网络连接、磁盘空间和失败的服务。每个工具调用都需确认，结果返回给所选模型以继续任务，单轮用户请求最多进行八轮工具调用。所选模型需要支持工具调用。助手会显示操作并请求确认。中文输入使用 Fcitx 5 拼音，通常可用 Ctrl+空格切换。
 
 ## 代理和订阅
 
@@ -49,7 +49,7 @@
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.21.2)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.21.3)
 
 运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。需要至少 8 GB 可用空间。Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
