@@ -221,6 +221,7 @@ def change(button, mode):
             if uid in active:
                 run("nmcli", "--wait", "15", "connection", "down", "uuid", uid)
             run("gsettings", "set", "org.gnome.system.proxy", "mode", "none")
+            run("pkexec", "/usr/local/lib/agentlinux-network/configure", "--direct")
             status.set_text(tr('System tunnel disconnected.'))
     except (KeyError, ValueError, OSError, subprocess.SubprocessError) as exc:
         status.set_text(tr('Operation failed: ') + str(exc))

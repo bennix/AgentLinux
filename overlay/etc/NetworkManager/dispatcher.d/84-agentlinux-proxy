@@ -1,6 +1,8 @@
 #!/bin/sh
 set -eu
 [ "${CONNECTION_UUID:-}" = 0e7b6bb9-91e3-46f6-bfc5-00f7c33a7978 ] || exit 0
+exec 9>/run/agentlinux-network-switch.lock
+flock -x 9
 case "$2" in
     pre-up|up)
         if ! nft list table inet agentlinux_proxy >/dev/null 2>&1; then
@@ -21,10 +23,21 @@ NFT
         fi
         systemctl start agentlinux-tunnel.service
         ;;
-    down)
+    down|ensure-direct)
+        # A queued down event may arrive after the user reconnects.
+        active=$(nmcli -g UUID connection show --active)
+        if printf '%s\n' "$active" | grep -Fxq "$CONNECTION_UUID"; then
+            [ "$2" = down ] && exit 0
+            exit 1
+        fi
         systemctl stop agentlinux-tunnel.service
+        if ip link show dev agproxy0 >/dev/null 2>&1; then
+            echo "AgentLinux tunnel interface is still active" >&2
+            exit 1
+        fi
         if nft list table inet agentlinux_proxy >/dev/null 2>&1; then
             nft delete table inet agentlinux_proxy
         fi
+        resolvectl flush-caches
         ;;
 esac
