@@ -15,6 +15,8 @@ parser.add_argument("output", type=Path)
 parser.add_argument("--clash-verge", type=Path, help="Clash Verge Rev 2.5.10 official amd64 deb")
 parser.add_argument("--obscura-firefox", type=Path, required=True, help="Official Obscura Firefox 0.3.10 Linux amd64 deb")
 parser.add_argument("--claude-cage", required=True, type=Path, help="Official Claude Cage 0.2.0-rc amd64 deb")
+parser.add_argument("--ukcc-deb", type=Path, help="Use a cached UKUI control center package")
+parser.add_argument("--store-deb", type=Path, help="Use a cached UKUI software center package")
 args = parser.parse_args()
 if args.output.exists():
     parser.error("Select a new output file")
@@ -59,6 +61,7 @@ ExecStart=/usr/sbin/apparmor_parser --replace /etc/apparmor.d/genoffice /etc/app
 RemainAfterExit=yes
 """)
     (wants / service).symlink_to("../" + service)
+    run("python3", Path(__file__).resolve().parents[1] / "branding/install.py", root, *(["--ukcc-deb", args.ukcc_deb] if args.ukcc_deb else []))
     overlay = Path(__file__).resolve().parents[2] / "overlay"
     if checksum(args.claude_cage, "sha256") != "ec6ca1844f717af1bd6b604dd4709a8d21665ef0b22a774c123614d73c6c005a":
         raise SystemExit("Unexpected Claude Cage 0.2.0-rc amd64 package checksum")
@@ -95,6 +98,8 @@ RemainAfterExit=yes
         (dest / "Merge.yaml").write_text("profile:\n  store-selected: true\n")
         (dest / "Script.js").write_text((smart / "script-template.js").read_text().replace("__DIRECT_RULES__", json.dumps(rules)))
     packaging = Path(__file__).resolve().parents[1]
+    run("python3", packaging / "software-center/stage.py", root, *([args.store_deb] if args.store_deb else []))
+    shutil.copy2(packaging / "ukui-menu/ukui-menu", root / "usr/bin/ukui-menu")
     user_units = root / "usr/lib/systemd/user"
     user_units.mkdir(parents=True, exist_ok=True)
     shutil.copy2(packaging / "input-tray/agentlinux-input.service", user_units)

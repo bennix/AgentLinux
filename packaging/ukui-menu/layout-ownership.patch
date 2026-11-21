@@ -1,0 +1,11 @@
+--- a/src/LetterWidget/fullletterwidget.cpp
++++ b/src/LetterWidget/fullletterwidget.cpp
+@@ -29,8 +29,6 @@
+ FullLetterWidget::~FullLetterWidget()
+ {
+     delete m_ukuiMenuInterface;
+-    delete m_letterListBottomSpacer;
+-    delete m_appListBottomSpacer;
+ }
+ 
+ /**

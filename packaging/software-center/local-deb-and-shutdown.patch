@@ -1,0 +1,48 @@
+--- a/models/enums.py
++++ b/models/enums.py
+@@ -379,6 +379,7 @@
+ 
+ # moshengren add
+ PKG_NAME = {
++    "wemeet": "wemeetapp",
+     "wps-office": "wps-office-wps",
+     "uget": "uget-gtk",
+     "eclipse-platform": "eclipse",
+--- a/ui/detailscrollwidget.py
++++ b/ui/detailscrollwidget.py
+@@ -24,6 +24,7 @@
+ 
+ 
+ import os
++import subprocess
+ from PyQt5.QtWidgets import *
+ from PyQt5.QtGui import *
+ from PyQt5.QtCore import *
+@@ -550,7 +551,15 @@
+             #self.ui.summary.setText("需要安装的依赖包: " + str(deps))
+         self.ui.summary.setText(_("Dependencies to be installed") + str(deps))
+ 
+-        if(self.debfile.is_installable):
++        package = self.debfile.name
++        arch = self.debfile.debfile._sections.get("Architecture", "all")
++        query = package if arch == "all" else package + ":" + arch
++        installed = subprocess.run(
++            ["dpkg-query", "-W", "-f=" + "${db:Status-Status} ${Version}", "--", query],
++            capture_output=True, text=True)
++        if installed.returncode == 0 and installed.stdout == "installed " + self.debfile.version:
++            self.slot_work_finished(package, AppActions.INSTALLDEBFILE)
++        elif self.debfile.is_installable:
+             self.ui.status.hide()
+             self.btns.reset_btns(self.app, PkgStates.INSTALL, self.debfile)
+             # self.ui.btnInstall.setText("安装此包")
+--- a/ubuntu-kylin-software-center.py
++++ b/ubuntu-kylin-software-center.py
+@@ -4315,7 +4315,7 @@
+ def quit(signum, frame):
+     if (Globals.DEBUG_SWITCH):
+         print('You choose to stop software-center.')
+-    sys.exit()
++    QTimer.singleShot(0, QApplication.quit)
+ def windows():
+     window = QMainWindow()
+     window.show()
