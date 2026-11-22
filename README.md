@@ -1,9 +1,9 @@
 # ZenMux 中文桌面 ISO
 
-**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.22.2/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.22.2/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
+**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.22.3/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.22.3/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
 
-[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.22.2)
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.22.3)
 
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可通过底座安装器安装到磁盘。
 
@@ -39,11 +39,11 @@ API 密钥与模型设置保存在当前用户主目录的 `~/.config/zenmux-age
 
 ## 微信操作与 Agent 工作台
 
-登录桌面后启动 ZenCode 3.14.44，也可在应用菜单或桌面助手中打开。先在 ZenCode 设置自己的模型提供商，再打开工作区，使用“手机控制”中的微信配对入口扫码，选择允许的账号和工作区。远程操作依赖该用户图形会话、网络和正在运行的 ZenCode Host。手机与桌面续接同一任务，可查看进度、回答权限请求、指定文件并通过微信接收。文件回传由上游校验工作区、接收目标、文件大小与会话令牌。原生电脑控制在 ZenCode 内开启，并受图形会话权限和应用可访问性限制。桌面助手与 ZenCode 各自管理供应商凭据。
+登录桌面后启动 ZenCode 3.14.45，也可在应用菜单或桌面助手中打开。先在 ZenCode 设置自己的模型提供商，再打开工作区，使用“手机控制”中的微信配对入口扫码，选择允许的账号和工作区。远程操作依赖该用户图形会话、网络和正在运行的 ZenCode Host。手机与桌面续接同一任务，可查看进度、回答权限请求、指定文件并通过微信接收。文件回传由上游校验工作区、接收目标、文件大小与会话令牌。原生电脑控制在 ZenCode 内开启，并受图形会话权限和应用可访问性限制。桌面助手与 ZenCode 各自管理供应商凭据。
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.22.2)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.22.3)
 
 运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。需要至少 8 GB 可用空间。Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
@@ -61,7 +61,7 @@ cp -a build/restored-overlay/. overlay/
 
 ### 上游版本 / Upstream releases
 
-- [ZenCode 3.14.44](https://github.com/bennix/ZCode/releases/tag/v3.14.44)
+- [ZenCode 3.14.45](https://github.com/bennix/ZCode/releases/tag/v3.14.45)
 - [Obscura Firefox 0.3.11](https://github.com/bennix/ObscuraFirefox/releases/tag/firefox-v0.3.11)
 - [Claude Cage 0.2.0-rc](https://github.com/Lee-xeo/Claude-Cage/releases/tag/v0.2.0-rc)
 

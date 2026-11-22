@@ -41,6 +41,9 @@ required_payloads = (
 if any(not (overlay / name).is_file() for name in required_payloads):
     raise SystemExit("Restore the complete release overlay first. See README.md.")
 
+if digest(overlay / "opt/ZenCode/resources/app.asar", "sha256") != "70cd489c11fcf3ed88b9e755f773bd82a4bc8c51012671ebd4eee8f67e7c448d":
+    raise SystemExit("Restore the ZenCode 3.14.45 amd64 release payload before building.")
+
 if digest(base, "sha256") != "8c3c89a59b50d3fc9d1affd087d19a3a670ecc5b34cc1e3ab05137bd7ec1b553":
     raise SystemExit("Base ISO checksum mismatch")
 with tempfile.TemporaryDirectory(dir=out.parent) as work:
