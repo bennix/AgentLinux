@@ -1,0 +1,7 @@
+#!/bin/sh
+set -eu
+test -s /var/lib/agentlinux-portable
+test -s /boot/iso/agentlinux-desktop.iso
+grep -q -- '--id agentlinux-install-disk' /boot/grub/grub.cfg
+/usr/sbin/grub-reboot agentlinux-install-disk
+/usr/bin/systemctl reboot

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=NetworkManager Applet
+Name[zh_CN]=网络连接
+Exec=/usr/bin/nm-applet --indicator
+OnlyShowIn=UKUI;
+NoDisplay=true
+Terminal=false

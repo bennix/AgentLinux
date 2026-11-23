@@ -126,7 +126,23 @@ RemainAfterExit=yes
     wifi = Path(__file__).resolve().parents[1] / "wifi"
     (root / "usr/local/bin").mkdir(parents=True, exist_ok=True)
     shutil.copy2(wifi / "ukui-control-center", root / "usr/local/bin/ukui-control-center")
+    shutil.copy2(packaging / "power-tray/ukui-power-manager-tray", root / "usr/local/bin/ukui-power-manager-tray")
     shutil.copy2(wifi / "properties", root / "usr/local/lib/agentlinux-network/properties")
+    portable = packaging / "portable"
+    for source, dest in (
+        (wifi / "kylin-nm.desktop", "etc/xdg/autostart/kylin-nm.desktop"),
+        (portable / "install-entry.desktop", "usr/local/share/agentlinux/agentlinux-install-to-disk.desktop"),
+        (portable / "install-shortcuts.desktop", "etc/xdg/autostart/agentlinux-install-shortcuts.desktop"),
+        (portable / "install-shortcuts", "usr/local/lib/agentlinux/install-shortcuts"),
+        (portable / "reboot-to-installer", "usr/local/lib/agentlinux/reboot-to-installer"),
+        (portable / "install-to-disk", "usr/local/bin/agentlinux-install-to-disk"),
+        (portable / "prepare-installer", "usr/local/lib/agentlinux/prepare-installer"),
+        (portable / "42_agentlinux_installer", "etc/grub.d/42_agentlinux_installer"),
+    ):
+        target = root / dest
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+
     cage = Path(__file__).resolve().parents[1] / "cage"
     shutil.copy2(cage / "proxy-setup", root / "usr/local/lib/zenmux/cage-proxy-setup")
     shutil.copy2(cage / "proxy-setup.desktop", root / "usr/share/applications/cage-proxy-setup.desktop")

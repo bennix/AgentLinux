@@ -1,0 +1,11 @@
+--- a/ukui-power-manager-tray/criticalpercentageaction.h
++++ b/ukui-power-manager-tray/criticalpercentageaction.h
+@@ -41,7 +41,7 @@
+     int             m_criticalPercentage;
+     QString         m_action;
+ 
+-    NotificationDialog *m_notificationDialog;
++    NotificationDialog *m_notificationDialog = nullptr;
+     FullScreenMask *m_fullScreenMask;
+     bool            m_criticalState;
+ 

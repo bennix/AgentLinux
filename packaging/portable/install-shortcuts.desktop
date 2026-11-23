@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=AgentLinux installer shortcuts
+Exec=/usr/local/lib/agentlinux/install-shortcuts
+OnlyShowIn=UKUI;
+NoDisplay=true

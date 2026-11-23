@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+test -d /cdrom/casper || test -s /var/lib/agentlinux-portable || exit 0
+desktop=$(xdg-user-dir DESKTOP)
+apps=${XDG_DATA_HOME:-"$HOME/.local/share"}/applications
+name=agentlinux-install-to-disk.desktop
+src=/usr/local/share/agentlinux/$name
+if [ -d /cdrom/casper ]; then
+    name=ubuntu-desktop-bootstrap_ubuntu-desktop-bootstrap.desktop
+fi
+mkdir -p "$apps"
+install -m644 "$src" "$apps/$name"
+if [ "$desktop" != "$HOME" ]; then
+    mkdir -p "$desktop"
+    install -m755 "$src" "$desktop/$name"
+    gio set "$desktop/$name" metadata::trusted true 2>/dev/null || :
+fi
+if grep -qw agentlinux.start-installer /proc/cmdline; then
+    exec /usr/local/bin/agentlinux-install-to-disk
+fi

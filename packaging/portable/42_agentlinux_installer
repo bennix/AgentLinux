@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+test -s /var/lib/agentlinux-portable && test -s /boot/iso/agentlinux-desktop.iso || exit 0
+cat <<'GRUB'
+set timeout_style=menu
+set timeout=5
+menuentry 'AgentLinux — 安装到硬盘 / Install to disk' --id agentlinux-install-disk {
+    set iso_path=/boot/iso/agentlinux-desktop.iso
+    loopback loop ($root)$iso_path
+    linux (loop)/casper/vmlinuz boot=casper agentlinux.start-installer iso-scan/filename=$iso_path layerfs-path=minimal.standard.live.agent.apps.squashfs quiet splash ---
+    initrd (loop)/casper/initrd
+}
+GRUB

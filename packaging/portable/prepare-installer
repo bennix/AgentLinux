@@ -1,0 +1,17 @@
+#!/bin/sh
+# Run in the installed portable system (or chroot), with the ISO as argument.
+set -eu
+test "$(id -u)" = 0
+test -s /var/lib/agentlinux-portable
+test -f "$1" || test -b "$1"
+: "${2:?expected ISO SHA-256 required}"
+dir=/boot/iso
+mkdir -p "$dir"
+tmp=$(mktemp "$dir/.installer.XXXXXX")
+trap 'rm -f "$tmp"' EXIT
+dd if="$1" of="$tmp" bs=4M status=progress
+printf '%s  %s\n' "$2" "$tmp" | sha256sum -c -
+chmod 644 "$tmp"
+mv "$tmp" "$dir/agentlinux-desktop.iso"
+update-grub
+grep -q -- '--id agentlinux-install-disk' /boot/grub/grub.cfg

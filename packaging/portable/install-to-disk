@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+if [ -d /cdrom/casper ]; then
+    if /snap/bin/ubuntu-desktop-bootstrap; then exit 0; else status=$?; fi
+    case $status in
+        134|139) exec env GTK_IM_MODULE=xim LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=softpipe /snap/bin/ubuntu-desktop-bootstrap ;;
+        *) exit "$status" ;;
+    esac
+fi
+case ${LC_ALL:-${LC_MESSAGES:-${LANG:-}}} in
+    zh*) missing='此 U 盘还缺少安装介质。请先补齐 U 盘上的安装镜像。'; prompt='现在重启并打开硬盘安装程序？请先保存工作。' ;;
+    *) missing='The installer image is missing from this USB drive.'; prompt='Restart into the disk installer now? Save your work first.' ;;
+esac
+if ! test -s /boot/iso/agentlinux-desktop.iso || ! test -s /var/lib/agentlinux-portable; then
+    exec zenity --error --text="$missing"
+fi
+zenity --question --text="$prompt" || exit 0
+exec pkexec /usr/local/lib/agentlinux/reboot-to-installer
