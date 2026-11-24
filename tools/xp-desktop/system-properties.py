@@ -377,6 +377,38 @@ def show_devices(_button):
         device_properties(tree, path, column)
         return True
 
+    def device_menu(tree, event=None):
+        if event is not None:
+            if event.button != 3:
+                return False
+            hit = tree.get_path_at_pos(int(event.x), int(event.y))
+            if hit is None:
+                return False
+            tree.set_cursor(hit[0], hit[1], False)
+        path, column = tree.get_cursor()
+        if path is None or not model[path][1]:
+            return False
+        reference = Gtk.TreeRowReference.new(model, path)
+        menu = Gtk.Menu()
+        entry = Gtk.MenuItem(label=tr("属性", "Properties"))
+
+        def open_properties(_entry):
+            if reference.valid():
+                device_properties(tree, reference.get_path(), column)
+
+        entry.connect("activate", open_properties)
+        menu.append(entry)
+        menu.attach_to_widget(tree, None)
+        menu.connect("selection-done", lambda widget: widget.detach())
+        menu.show_all()
+        if event is None:
+            menu.popup_at_widget(tree, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
+        else:
+            menu.popup_at_pointer(event)
+        return True
+
+    view.connect("button-press-event", device_menu)
+    view.connect("popup-menu", device_menu)
     view.connect("key-press-event", device_key)
     view.connect("row-activated", device_properties)
     model.set_sort_column_id(0, Gtk.SortType.ASCENDING)
