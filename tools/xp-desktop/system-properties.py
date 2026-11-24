@@ -240,6 +240,8 @@ def show_devices(_button):
     icon_names = dict(zip((categories[key] for key in ("01", "02", "03", "04", "0c03")),
                           ("drive_disk", "net_lan", "monitor", "hardware_mm", "hardware_pcb")))
     icon_names[tr("USB 设备", "USB devices")] = "hardware"
+    icon_names[tr("键盘", "Keyboards")] = "keyboard"
+    icon_names[tr("鼠标和其他指针设备", "Mice and other pointing devices")] = "mouse"
     icons = {}
     for icon_name in set(icon_names.values()) | {"hardware_pcb", "computer"}:
         filename = Path("/usr/share/icons/luna/res/16x16") / (icon_name + ".png")
