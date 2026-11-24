@@ -2,6 +2,7 @@
 import fnmatch
 import os
 import threading
+import time
 from pathlib import Path
 from queue import Empty, Full, Queue
 
@@ -51,7 +52,7 @@ stop.set_sensitive(False)
 buttons.add(start)
 buttons.add(stop)
 sidebar.add(buttons)
-model = Gtk.ListStore(str, str, Gio.Icon, GObject.TYPE_INT64, str)
+model = Gtk.ListStore(str, str, Gio.Icon, GObject.TYPE_INT64, str, float, str)
 results = Gtk.TreeView(model=model)
 for i, title in enumerate([tr("名称", "Name"), tr("所在文件夹", "In Folder")]):
     column = Gtk.TreeViewColumn(title)
@@ -70,6 +71,10 @@ size_column = Gtk.TreeViewColumn(tr("大小", "Size"), size_cell, text=4)
 size_column.set_sort_column_id(3)
 size_column.set_resizable(True)
 results.append_column(size_column)
+modified_column = Gtk.TreeViewColumn(tr("修改日期", "Date Modified"), Gtk.CellRendererText(), text=6)
+modified_column.set_sort_column_id(5)
+modified_column.set_resizable(True)
+results.append_column(modified_column)
 scroll = Gtk.ScrolledWindow()
 scroll.add(results)
 panes.pack2(scroll, True, False)
@@ -115,13 +120,19 @@ def search(_widget):
                 if fnmatch.fnmatchcase(name.casefold(), pattern):
                     content_type = "inode/directory" if name in folder_names else Gio.content_type_guess(name, None)[0]
                     size = -1
-                    if name not in folder_names:
-                        try:
-                            size = os.stat(os.path.join(directory, name), follow_symlinks=False).st_size
-                        except OSError:
-                            pass
+                    modified = float("-inf")
+                    modified_text = ""
+                    try:
+                        info = os.stat(os.path.join(directory, name), follow_symlinks=False)
+                        if name not in folder_names:
+                            size = info.st_size
+                        modified = info.st_mtime
+                        modified_text = time.strftime("%x %H:%M", time.localtime(modified))
+                    except (OSError, OverflowError, ValueError):
+                        pass
                     size_text = (f"{(size + 1023) // 1024:,} KB" if size >= 0 else "")
-                    batch.append((name, directory, Gio.content_type_get_icon(content_type), size, size_text))
+                    batch.append((name, directory, Gio.content_type_get_icon(content_type), size, size_text,
+                                  modified, modified_text))
                     if len(batch) == 100:
                         send(batch)
                         batch = []
