@@ -71,7 +71,12 @@ static gboolean file_action(AtkAction *action, gint index)
     return TRUE;
 }
 
-static gint action_count(AtkAction *action) { return 2; }
+static gint action_count(AtkAction *action)
+{
+    FileItem *item = (FileItem *)action;
+    g_autoptr(WinTCCtlListView) view = current_view(item);
+    return view && gtk_tree_row_reference_valid(item->row) ? 2 : 0;
+}
 static const gchar *action_name(AtkAction *action, gint index)
 {
     const gchar *names[] = {"select", "open"};
