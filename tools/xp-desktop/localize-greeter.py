@@ -19,7 +19,7 @@ labels = {
 if english:
     labels = {"To begin, click your user name": "Click your user name"}
 for filename in ("welcphs1.ui", "welcphs2.ui", "welcphs3.ui", "welcome.ui", "useritem.ui"):
-    if english and filename != "welcphs2.ui":
+    if english and filename not in ("welcphs2.ui", "useritem.ui"):
         continue
     path = "/uk/oddmatics/wintc/logonui/" + filename
     root = ET.fromstring(subprocess.check_output(["gresource", "extract", binary, path]))
@@ -29,6 +29,14 @@ for filename in ("welcphs1.ui", "welcphs2.ui", "welcphs3.ui", "welcome.ui", "use
             if source in labels:
                 prop.text = labels[source]
                 prop.set("translatable", "no")
+    if filename == "useritem.ui":
+        for widget_id, name in (
+            ("entry-password", "Password" if english else "密码"),
+            ("button-go", "Log on" if english else "登录"),
+        ):
+            widget = root.find(f".//object[@id='{widget_id}']")
+            accessible = ET.SubElement(ET.SubElement(widget, "child", {"internal-child": "accessible"}), "object", {"class": "AtkObject"})
+            ET.SubElement(accessible, "property", name="accessible-name").text = name
     ET.ElementTree(root).write(destination / filename, encoding="UTF-8")
 
 if not english:

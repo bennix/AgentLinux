@@ -136,7 +136,7 @@
                         <style>
                           <class name="password-box" />
                         </style>
-                      </object>
+                      <child internal-child="accessible"><object class="AtkObject"><property name="accessible-name">密码</property></object></child></object>
                     </child>
 
                     <child>
@@ -148,7 +148,7 @@
                           <class name="go" />
                           <class name="undecorated" />
                         </style>
-                      </object>
+                      <child internal-child="accessible"><object class="AtkObject"><property name="accessible-name">登录</property></object></child></object>
                     </child>
                   </object>
                 </child>
