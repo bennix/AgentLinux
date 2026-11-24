@@ -515,6 +515,8 @@ def browse_share(target, parent=None):
             env[key] = ":".join(entries)
         else:
             env.pop(key, None)
+    # UKUI exposes the desktop's Luna icon theme to Qt's file manager.
+    env["QT_QPA_PLATFORMTHEME"] = "ukui"
     subprocess.Popen(["peony", "--show-folders", target], env=env)
 
 

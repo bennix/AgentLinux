@@ -51,3 +51,4 @@ for file in "$work/accesskeys" "$work/libwintc-comctl.so.1" "$work/peony/libpeon
     mv "$stage" "$output"
 done
 install -m644 /var/lib/dpkg/info/libpeony3t64.md5sums "$dest/libpeony3t64.md5sums"
+install -m644 /usr/share/locale-langpack/zh_CN/LC_MESSAGES/gtk30.mo "$dest/gtk30-zh_CN.mo"
