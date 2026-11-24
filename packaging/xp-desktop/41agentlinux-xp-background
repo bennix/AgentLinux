@@ -1,0 +1,4 @@
+# Match the welcome screen until the desktop paints the user's wallpaper.
+if [ "${DESKTOP_SESSION##*/}" = ukui ] && [ -n "${DISPLAY:-}" ]; then
+    xsetroot -solid '#5A7EDC' || :
+fi
