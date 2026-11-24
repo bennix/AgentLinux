@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 import os
 import subprocess
+from functools import lru_cache
+
+import cairo
 
 from network_details import address_fields
 from dns_properties import dns_properties
@@ -14,6 +17,27 @@ from gi.repository import Gdk, Gio, GLib, GObject, Gtk, NM, Pango
 
 AP_FLAGS = getattr(NM, "80211ApFlags")
 SECURITY = getattr(NM, "80211ApSecurityFlags")
+
+@lru_cache(maxsize=6)
+def signal_bars(level):
+    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 20, 16)
+    brush = cairo.Context(surface)
+    for bar in range(5):
+        height = 3 + 3 * bar
+        color = (0.13, 0.48, 0.12) if bar < level else (0.68, 0.68, 0.68)
+        brush.set_source_rgb(*color)
+        brush.rectangle(4 * bar, 16 - height, 3, height)
+        brush.fill()
+    return Gdk.pixbuf_get_from_surface(surface, 0, 0, 20, 16)
+
+
+def render_signal(column, cell, model, row, data):
+    strength = model[row][2]
+    if isinstance(cell, Gtk.CellRendererPixbuf):
+        cell.set_property("pixbuf", signal_bars((strength + 19) // 20))
+    else:
+        cell.set_property("text", f"{strength}%")
+
 
 def tr(zh, en):
     return zh if os.getenv("LANGUAGE", os.getenv("LANG", "")).startswith("zh") else en
@@ -149,7 +173,7 @@ class Wireless(Gtk.Application):
         self.list.get_accessible().set_name(tr("可用无线网络", "Available wireless networks"))
         scroll.add(self.list)
         for i, name in enumerate([tr("无线网络", "Wireless network"), tr("安全性", "Security"), tr("信号", "Signal")]):
-            cell = Gtk.CellRendererProgress() if i == 2 else Gtk.CellRendererText()
+            cell = Gtk.CellRendererText()
             if i < 2:
                 cell.set_property("ellipsize", Pango.EllipsizeMode.END)
                 cell.set_property("width-chars", 10 if i == 0 else 8)
@@ -160,8 +184,15 @@ class Wireless(Gtk.Application):
                 icon = Gtk.CellRendererPixbuf()
                 icon.set_property("icon-name", "network-wireless")
                 col.pack_start(icon, False)
+            if i == 2:
+                bars = Gtk.CellRendererPixbuf()
+                col.pack_start(bars, False)
+                col.set_cell_data_func(bars, render_signal)
             col.pack_start(cell, True)
-            col.add_attribute(cell, "value" if i == 2 else "text", i)
+            if i == 2:
+                col.set_cell_data_func(cell, render_signal)
+            else:
+                col.add_attribute(cell, "text", i)
             if i == 0:
                 col.add_attribute(cell, "weight", 5)
             col.set_expand(i == 0)
