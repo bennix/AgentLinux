@@ -144,13 +144,14 @@ else:
     speed = tab("速度", "Speed")
     repeat = toggle(speed, "repeat", "按住键时重复输入", "Repeat characters when a key is held down")
     delay = scale(speed, "delay", "重复延迟", "Repeat delay", 150, 1000)
-    interval = scale(speed, "rate", "重复速度", "Repeat rate", 10, 250)
-    for slider, left, right in ((delay, tr("长", "Long"), tr("短", "Short")),
-                                (interval, tr("慢", "Slow"), tr("快", "Fast"))):
-        slider.set_inverted(True)
+    rate = scale(speed, "rate", "重复速度", "Repeat rate", 10, 250)
+    delay.set_inverted(True)
+    for slider, low, high in ((delay, tr("短", "Short"), tr("长", "Long")),
+                              (rate, tr("慢", "Slow"), tr("快", "Fast"))):
+        slider.set_flippable(False)
         slider.set_draw_value(False)
-        slider.add_mark(slider.get_adjustment().get_upper(), Gtk.PositionType.BOTTOM, left)
-        slider.add_mark(slider.get_adjustment().get_lower(), Gtk.PositionType.BOTTOM, right)
+        slider.add_mark(slider.get_adjustment().get_lower(), Gtk.PositionType.BOTTOM, low)
+        slider.add_mark(slider.get_adjustment().get_upper(), Gtk.PositionType.BOTTOM, high)
         repeat.bind_property("active", slider, "sensitive", GObject.BindingFlags.SYNC_CREATE)
     test = Gtk.Entry(placeholder_text=tr("在此测试键盘重复速度", "Click here and hold down a key to test repeat rate"))
     speed.pack_start(test, False, False, 0)
