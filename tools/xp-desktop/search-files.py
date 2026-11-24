@@ -46,10 +46,17 @@ stop.set_sensitive(False)
 buttons.add(start)
 buttons.add(stop)
 sidebar.add(buttons)
-model = Gtk.ListStore(str, str)
+model = Gtk.ListStore(str, str, Gio.Icon)
 results = Gtk.TreeView(model=model)
 for i, title in enumerate([tr("名称", "Name"), tr("所在文件夹", "In Folder")]):
-    column = Gtk.TreeViewColumn(title, Gtk.CellRendererText(), text=i)
+    column = Gtk.TreeViewColumn(title)
+    if i == 0:
+        icon = Gtk.CellRendererPixbuf()
+        column.pack_start(icon, False)
+        column.add_attribute(icon, "gicon", 2)
+    text = Gtk.CellRendererText()
+    column.pack_start(text, True)
+    column.add_attribute(text, "text", i)
     column.set_resizable(True)
     column.set_sort_column_id(i)
     results.append_column(column)
@@ -91,11 +98,13 @@ def search(_widget):
         for directory, folders, files in os.walk(root):
             if cancel.is_set():
                 return
+            folder_names = set(folders)
             for name in folders + files:
                 if cancel.is_set():
                     return
                 if fnmatch.fnmatchcase(name.casefold(), pattern):
-                    batch.append((name, directory))
+                    content_type = "inode/directory" if name in folder_names else Gio.content_type_guess(name, None)[0]
+                    batch.append((name, directory, Gio.content_type_get_icon(content_type)))
                     if len(batch) == 100:
                         send(batch)
                         batch = []
@@ -127,7 +136,7 @@ def search(_widget):
 
 
 def open_result(_tree, path, _column):
-    name, directory = model[path]
+    name, directory, _icon = model[path]
     try:
         Gio.AppInfo.launch_default_for_uri(Path(directory, name).as_uri(), None)
     except GLib.Error as exc:
