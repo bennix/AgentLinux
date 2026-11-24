@@ -10,7 +10,7 @@ import subprocess
 import tempfile
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import Gdk, Gtk
 
 host = "/usr/lib/myime/MyIMEHost"
 config = Path(os.getenv("XDG_CONFIG_HOME") or Path.home()/".config")/"myime/preferences.json"
@@ -25,13 +25,21 @@ def save():
         json.dump(prefs, f)
     os.replace(f.name, config)
 win = Gtk.Window(title=tr('MyIME Settings'))
-win.set_default_size(500, 560)
+display = Gdk.Display.get_default()
+monitor = display.get_primary_monitor() or display.get_monitor(0)
+area = monitor.get_workarea()
+win.set_default_size(min(500, area.width - 24), min(560, area.height - 48))
+win.set_icon_name("input-keyboard")
 win.connect("destroy", Gtk.main_quit)
 tabs = Gtk.Notebook()
+tabs.set_scrollable(True)
 win.add(tabs)
 def page(title):
     item = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, margin=12)
-    tabs.append_page(item, Gtk.Label(label=title))
+    scroll = Gtk.ScrolledWindow()
+    scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+    scroll.add(item)
+    tabs.append_page(scroll, Gtk.Label(label=title))
     return item
 def toggle(box, label, value, change):
     widget = Gtk.CheckButton(label=label)
