@@ -9,6 +9,8 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gio, GLib, Gtk
 
+from task_pane import add_task_pane, fit_window
+
 zh = GLib.get_language_names()[0].startswith("zh")
 
 
@@ -18,18 +20,16 @@ def tr(chinese, english):
 
 window = Gtk.Window(title=tr("搜索结果", "Search Results"))
 window.set_icon_name("system-search")
-display = window.get_display()
-area = (display.get_primary_monitor() or display.get_monitor(0)).get_workarea()
-window.set_default_size(min(800, area.width - 24), min(540, area.height - 64))
+fit_window(window, 800, 540)
 layout = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
 window.add(layout)
 panes = Gtk.Paned()
 layout.pack_start(panes, True, True, 0)
-sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, border_width=12)
-panes.pack1(sidebar, False, False)
-header = Gtk.Label(xalign=0)
-header.set_markup("<b>" + tr("搜索助理", "Search Companion") + "</b>")
-sidebar.add(header)
+panel = Gtk.Box()
+panes.pack1(panel, False, False)
+tasks = add_task_pane(panel, tr("搜索助理", "Search Companion"))
+sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, border_width=8)
+tasks.add(sidebar)
 sidebar.add(Gtk.Label(label=tr("全部或部分文件名", "All or part of the file name"), xalign=0))
 query = Gtk.Entry()
 sidebar.add(query)
