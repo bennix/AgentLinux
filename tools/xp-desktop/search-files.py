@@ -7,7 +7,8 @@ from queue import Empty, Full, Queue
 
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gio, GLib, Gtk
+gi.require_version("Gdk", "3.0")
+from gi.repository import Gdk, Gio, GLib, Gtk
 
 from task_pane import add_task_pane, fit_window
 
@@ -141,8 +142,12 @@ def search(_widget):
 
 def open_result(_tree, path, _column):
     name, directory, _icon = model[path]
+    launch_path(Path(directory, name))
+
+
+def launch_path(target):
     try:
-        Gio.AppInfo.launch_default_for_uri(Path(directory, name).as_uri(), None)
+        Gio.AppInfo.launch_default_for_uri(target.as_uri(), None)
     except GLib.Error as exc:
         dialog = Gtk.MessageDialog(transient_for=window, modal=True, message_type=Gtk.MessageType.ERROR,
                                    buttons=Gtk.ButtonsType.CLOSE, text=exc.message)
@@ -150,6 +155,44 @@ def open_result(_tree, path, _column):
         dialog.destroy()
 
 
+def result_menu(event=None):
+    selected_model, row = results.get_selection().get_selected()
+    if row is None:
+        return False
+    name, directory, _icon = selected_model[row]
+    menu = Gtk.Menu()
+    menu.attach_to_widget(results, None)
+    for label, target in [(tr("打开", "Open"), Path(directory, name)),
+                          (tr("打开所在文件夹", "Open Containing Folder"), Path(directory))]:
+        item = Gtk.MenuItem(label=label)
+        item.connect("activate", lambda _, path=target: launch_path(path))
+        menu.append(item)
+    menu.connect("selection-done", lambda widget: widget.destroy())
+    menu.show_all()
+    if event is not None:
+        menu.popup_at_pointer(event)
+    else:
+        path = selected_model.get_path(row)
+        rect = results.get_cell_area(path, results.get_column(0))
+        menu.popup_at_rect(results.get_bin_window(), rect, Gdk.Gravity.SOUTH_WEST,
+                           Gdk.Gravity.NORTH_WEST, None)
+        menu.select_first(True)
+    return True
+
+
+def result_click(tree, event):
+    if event.button != 3:
+        return False
+    hit = tree.get_path_at_pos(int(event.x), int(event.y))
+    if hit is None:
+        return False
+    tree.grab_focus()
+    tree.set_cursor(hit[0])
+    return result_menu(event)
+
+
+results.connect("button-press-event", result_click)
+results.connect("popup-menu", lambda _: result_menu())
 start.connect("clicked", search)
 query.connect("activate", search)
 stop.connect("clicked", lambda _: active and active.set())
