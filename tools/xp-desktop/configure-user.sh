@@ -120,7 +120,7 @@ ENTRY
 if [ ! -e "$HOME/.local/bin/taskmgr" ] && [ ! -L "$HOME/.local/bin/taskmgr" ]; then
     ln -s "$assets/task-manager.sh" "$HOME/.local/bin/taskmgr"
 fi
-for name in control control.exe calc calc.exe notepad.exe taskmgr.exe winver fsmgmt.msc diskmgmt.msc devmgmt.msc sysdm.cpl mmsys.cpl powercfg.cpl main.cpl ncpa.cpl timedate.cpl nusrmgr.cpl desk.cpl appwiz.cpl access.cpl intl.cpl; do
+for name in control control.exe calc calc.exe explorer.exe notepad.exe taskmgr.exe winver fsmgmt.msc diskmgmt.msc devmgmt.msc sysdm.cpl mmsys.cpl powercfg.cpl main.cpl ncpa.cpl timedate.cpl nusrmgr.cpl desk.cpl appwiz.cpl access.cpl intl.cpl; do
     target="$HOME/.local/bin/$name"
     if [ ! -e "$target" ] && [ ! -L "$target" ]; then
         ln -s "$assets/control-command.sh" "$target"

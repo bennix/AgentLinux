@@ -5,6 +5,7 @@ if [ "$name" = control ] || [ "$name" = control.exe ]; then
     name=$(printf '%s' "${1:-panel}" | LC_ALL=C tr '[:upper:]' '[:lower:]')
 fi
 case "$name" in
+    explorer.exe) exec "$HOME/.local/share/agentlinux-xp/explorer-launch.sh" "$@" ;;
     notepad.exe) exec "$HOME/.local/share/agentlinux-xp/notepad" "$@" ;;
     taskmgr.exe) exec "$HOME/.local/share/agentlinux-xp/task-manager.sh" "$@" ;;
     calc|calc.exe) exec /usr/bin/mate-calc "$@" ;;

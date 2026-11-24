@@ -164,7 +164,7 @@ record.write_text("\n".join(entries) + "\n")
 commands = {"run": "run-dialog.sh", "exo-open": "menu-open.sh", "system-config-printer": "printers.py", "wintc-exitwin": "session-dialog.py",
             "xfce4-settings-manager": "control-panel.py"}
 links = {user_assets / "menu-commands" / name: "../" + script for name, script in commands.items()}
-for name in ("control", "control.exe", "calc", "calc.exe", "notepad.exe", "taskmgr.exe", "winver", "fsmgmt.msc", "diskmgmt.msc", "devmgmt.msc", "sysdm.cpl",
+for name in ("control", "control.exe", "calc", "calc.exe", "explorer.exe", "notepad.exe", "taskmgr.exe", "winver", "fsmgmt.msc", "diskmgmt.msc", "devmgmt.msc", "sysdm.cpl",
              "mmsys.cpl", "powercfg.cpl", "main.cpl", "ncpa.cpl", "timedate.cpl", "nusrmgr.cpl",
              "desk.cpl", "appwiz.cpl", "access.cpl", "intl.cpl"):
     links[Path("etc/skel/.local/bin") / name] = "../share/agentlinux-xp/control-command.sh"
