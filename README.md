@@ -1,11 +1,11 @@
 # AgentLinux
 
-XP 风格候选版提供中英文控制面板、无线网络连接和添加打印机向导。已在 KVM 中安装到 UEFI 硬盘，移除安装介质后成功登录中文桌面。下方链接指向当前公开发行版。
+XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。已在 KVM 中安装到 UEFI 硬盘，移除安装介质后成功登录中文桌面。
 
-**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.23.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.23.1/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
+**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.25.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.25.1/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
 
-[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.23.1)
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html)
 
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可通过底座安装器安装到磁盘。
 
@@ -27,9 +27,9 @@ API 密钥与模型设置保存在当前用户主目录的 `~/.config/zenmux-age
 
 需要 Python 3.9+、xorriso 和支持 xz 的 squashfs-tools。将[官方底包](https://cdimage.ubuntu.com/ubuntukylin/releases/24.04/release/ubuntukylin-24.04.5-desktop-amd64.iso)放在 `build/base.iso`。项目中的 `overlay/` 包含已准备好的 ZenCode、Obscura Firefox、Cage 安装包、输入法配置和系统集成文件。运行 `python3 build-iso.py`。脚本验证底包 SHA-256，生成附加 SquashFS 层，更新 Live 引导参数、两种安装源和校验清单，输出 ISO 和 SHA-256 文件。
 
-### 检查 XP 候选镜像的构建层
+### 检查 XP 镜像的构建层
 
-上面的 `build-iso.py` 生成基础 Agent 层。XP 候选版另外打入桌面组件、登录界面和启动主题。要从已有 XP 镜像核对实际打包内容，可在一个新建目录中执行：
+上面的 `build-iso.py` 生成基础 Agent 层。XP 版本另外打入桌面组件、登录界面和启动主题。要从已有 XP 镜像核对实际打包内容，可在一个新建目录中执行：
 
 ```sh
 xorriso -indev /path/to/AgentLinux-XP.iso -osirrox on -extract /casper/minimal.standard.agent.apps.xp.squashfs xp-standard.squashfs
@@ -56,7 +56,7 @@ unsquashfs -ll xp-standard.squashfs
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.23.1)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.25.1)
 
 运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。需要至少 8 GB 可用空间。Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
