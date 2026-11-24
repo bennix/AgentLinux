@@ -102,7 +102,8 @@ for resource in Path(__file__).with_name("boot").joinpath("theme").iterdir():
     files.append((resource, boot_theme / resource.name, 0o644))
 
 archives = []
-for package in ("python3-packaging", "xfwm4", "xfconf", "libxfconf-0-3", "libgarcon-common", "libgarcon-1-0", "libgarcon-gtk3-1-0",
+for package in ("exo-utils", "libexo-2-0", "libexo-common", "xfce4-helpers", "xfce4-settings",
+                "python3-packaging", "xfwm4", "xfconf", "libxfconf-0-3", "libgarcon-common", "libgarcon-1-0", "libgarcon-gtk3-1-0",
                 "libxfce4ui-2-0", "libxfce4ui-common", "libxfce4util7", "libxfce4util-common"):
     archive = args.debs.parent / "ubuntu-debs" / (package + ".deb")
     archives.append(archive)
