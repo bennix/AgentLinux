@@ -37,14 +37,27 @@ def draw_clock(_, ctx):
         ctx.line_to(0, -55 if tick % 5 == 0 else -60)
         ctx.stroke()
         ctx.restore()
+    ctx.select_font_face("Sans")
+    ctx.set_font_size(11)
+    for hour in range(1, 13):
+        angle = hour * math.tau / 12
+        label = str(hour)
+        left, top, width, height, _, _ = ctx.text_extents(label)
+        ctx.move_to(46 * math.sin(angle) - left - width / 2,
+                    -46 * math.cos(angle) - top - height / 2)
+        ctx.show_text(label)
     for fraction, length, width in [((now.hour + now.minute / 60) / 12, 34, 5), (now.minute / 60, 49, 3), (now.second / 60, 54, 1)]:
         ctx.save()
         ctx.rotate(fraction * math.tau)
+        if width == 1:
+            ctx.set_source_rgb(.69, .15, .12)
         ctx.set_line_width(width)
         ctx.move_to(0, 5)
         ctx.line_to(0, -length)
         ctx.stroke()
         ctx.restore()
+    ctx.arc(0, 0, 3, 0, math.tau)
+    ctx.fill()
 
 window = Gtk.Dialog(title=tr("日期和时间 属性", "Date and Time Properties"))
 window.set_icon_name("appointment-new")
