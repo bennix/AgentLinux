@@ -15,6 +15,7 @@ assets = Path(__file__).resolve().parents[2] / "tools/xp-desktop"
 user_assets = Path("etc/skel/.local/share/agentlinux-xp")
 installer_assets = Path("usr/share/desktop-provision")
 files = [
+    (Path(__file__).with_name("mimeapps.list"), Path("etc/skel/.config/mimeapps.list"), 0o644),
     (args.components / "gtk30-zh_CN.mo", Path("usr/share/locale-langpack/zh_CN/LC_MESSAGES/gtk30.mo"), 0o644),
     (args.components / "libpeony.so.3.2.2", Path("usr/lib/x86_64-linux-gnu/libpeony.so.3.2.2"), 0o644),
     (args.components / "agentlinux-volume-control", Path("usr/local/libexec/ukui-volume-control-applet-qt"), 0o755),
