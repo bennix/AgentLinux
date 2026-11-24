@@ -92,7 +92,7 @@ def smb_uri(text, tr):
     target = text.strip()
     if len(target) >= 2 and target[0] == target[-1] == '"':
         target = target[1:-1]
-    if target.startswith("\\\\"):
+    if target.startswith(("\\\\", "//")):
         host, separator, path = target[2:].replace("\\", "/").partition("/")
         if host.startswith("[") and host.endswith("]"):
             host = f"[{ipaddress.IPv6Address(host[1:-1])}]"
