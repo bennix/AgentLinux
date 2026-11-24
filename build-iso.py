@@ -62,7 +62,10 @@ with tempfile.TemporaryDirectory(dir=out.parent) as work:
         f.chmod(0o644)
         value = f.read_text()
         if path.endswith(".cfg"):
-            value = value.replace("quiet splash", "layerfs-path=minimal.standard.live.agent.squashfs quiet splash").replace("set timeout=30", "set timeout=5")
+            value = value.replace("Try or Install Ubuntu Kylin", "Try or install AgentLinux")
+            value = value.replace("Ubuntu Kylin (safe graphics)", "AgentLinux (safe graphics)")
+            value = value.replace("\ngrub_platform\n", "\n")
+            value = value.replace("quiet splash", "userfullname=AgentLinux layerfs-path=minimal.standard.live.agent.squashfs quiet splash").replace("set timeout=30", "set timeout=5")
         else:
             value = value.replace(".squashfs", ".agent.squashfs")
             import re
@@ -71,6 +74,7 @@ with tempfile.TemporaryDirectory(dir=out.parent) as work:
         f.write_text(value)
         updates[path] = f
     layers = ["casper/" + name + ".agent.squashfs" for name in ("minimal", "minimal.standard", "minimal.standard.live")]
+    updates[".disk/info"] = root / "packaging/xp-desktop/installer/disc-info"
     checks = {p: digest(f, "md5") for p, f in updates.items()}
     checks.update(dict.fromkeys(layers, digest(layer, "md5")))
     md5 = tmp / "md5sum.txt"

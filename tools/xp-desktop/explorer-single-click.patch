@@ -1,0 +1,28 @@
+--- a/src/lstvwctl.c
++++ b/src/lstvwctl.c
+@@ -2160,6 +2160,7 @@
+     //
+     if (
+         e->type == GDK_2BUTTON_PRESS &&
++        !g_getenv("AGENTLINUX_EXPLORER_SINGLE_CLICK") &&
+         list_view->hit_icon &&
+         list_view->hit_icon == list_view->hit_icon_last
+     )
+@@ -2241,6 +2242,17 @@
+         // Didn't drag? Store hit icon for a potential double-click
+         //
+         list_view->hit_icon_last = list_view->hit_icon;
++        if (list_view->hit_icon && list_view->hit_started &&
++            g_getenv("AGENTLINUX_EXPLORER_SINGLE_CLICK") &&
++            !(e->state & gtk_accelerator_get_default_mod_mask()) &&
++            !gtk_drag_check_threshold(widget, list_view->motion_rect.x, list_view->motion_rect.y, e->x, e->y) &&
++            wintc_ctl_list_view_hit_test(list_view, e->x, e->y, NULL) == list_view->hit_icon)
++        {
++            WinTCCtlListViewIcon* activated = list_view->hit_icon;
++            wintc_ctl_list_view_reset_hit_state(list_view);
++            wintc_ctl_list_view_emit_item_activated(list_view, activated);
++            return TRUE;
++        }
+     }
+ 
+     wintc_ctl_list_view_reset_hit_state(list_view);

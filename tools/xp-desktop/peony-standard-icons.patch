@@ -1,0 +1,99 @@
+--- a/peony-qt-desktop/desktop-item-proxy-model.cpp
++++ b/peony-qt-desktop/desktop-item-proxy-model.cpp
+@@ -28,6 +28,7 @@
+ #include "global-settings.h"
+ 
+ #include <QDir>
++#include <QFileSystemWatcher>
+ #include <QDebug>
+ 
+ #include <QLocale>
+@@ -52,6 +53,13 @@
+ 
+ DesktopItemProxyModel::DesktopItemProxyModel(QObject *parent) : QSortFilterProxyModel(parent)
+ {
++    const QString iconDir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)
++                            + "/agentlinux-xp/desktop-icons";
++    QDir().mkpath(iconDir);
++    auto watcher = new QFileSystemWatcher(QStringList{iconDir}, this);
++    connect(watcher, &QFileSystemWatcher::directoryChanged, this, [this]() {
++        invalidateFilter();
++    });
+     //enable number sort, like 100 is after 99
+     comparer.setNumericMode(true);
+ 
+@@ -121,6 +129,15 @@
+         if (! QFile::exists(QUrl(uri).path()))
+            return false;
+     }
++
++    QString standardIcon;
++    if (uri == "computer:///") standardIcon = "computer";
++    else if (uri == "trash:///") standardIcon = "trash";
++    else if (QUrl(uri).toLocalFile() == QDir::homePath() || uri == QDir::homePath()) standardIcon = "home";
++    if (!standardIcon.isEmpty() && QFile::exists(
++            QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)
++            + "/agentlinux-xp/desktop-icons/" + standardIcon + ".hidden"))
++        return false;
+ 
+     if (!GlobalSettings::getInstance()->getValue(DISPLAY_STANDARD_ICONS).toBool()) {
+         if (uri == "computer:///"
+--- a/peony-qt-desktop/desktop-item-model.cpp
++++ b/peony-qt-desktop/desktop-item-model.cpp
+@@ -573,6 +573,18 @@
+ 
+     //qDebug()<<"data"<<m_files.at(index.row())->uri();
+     auto info = m_files.at(index.row());
++    if (role == Qt::DisplayRole || role == Qt::ToolTipRole) {
++        const QString uri = info->uri();
++        const bool computer = uri == "computer:///";
++        const bool trash = uri == "trash:///";
++        if (computer || trash) {
++            const QByteArray language = qgetenv("LANGUAGE").split(':').first();
++            const bool chinese = language.isEmpty() ? QLocale().language() == QLocale::Chinese
++                                                   : language.startsWith("zh");
++            if (computer) return chinese ? QStringLiteral("我的电脑") : QStringLiteral("My Computer");
++            return chinese ? QStringLiteral("回收站") : QStringLiteral("Recycle Bin");
++        }
++    }
+     switch (role) {
+     case Qt::DisplayRole:{
+         QString displayName = info->displayName();
+@@ -592,16 +604,6 @@
+             return QVariant(displayName);
+     }
+     case Qt::ToolTipRole: {
+-        // fix #80257
+-        switch (index.row()) {
+-        case 0:
+-            return tr("Computer");
+-        case 1:
+-            return tr("Trash");
+-        default:
+-            break;
+-        }
+-
+         //fix bug#53504, desktop files not show same name issue
+         if (info->isDesktopFile())
+         {
+--- a/peony-qt-desktop/desktop-item-model.cpp
++++ b/peony-qt-desktop/desktop-item-model.cpp
+@@ -611,6 +611,18 @@
+         return info->displayName();
+     }
+     case Qt::DecorationRole: {
++        QString resource;
++        const QString uri = info->uri();
++        if (uri == "computer:///")
++            resource = "computer";
++        else if (uri == "trash:///")
++            resource = info->iconName().contains("full") ? "bin_full" : "bin";
++        else if (QUrl(uri).toLocalFile() == QDir::homePath() || uri == QDir::homePath())
++            resource = "folder_documents";
++        if (!resource.isEmpty()) {
++            const QString path = "/usr/share/icons/luna/res/48x48/" + resource + ".png";
++            if (QFileInfo::exists(path)) return QIcon(path);
++        }
+         auto thumbnail = ThumbnailManager::getInstance()->tryGetThumbnail(info->uri());
+         if (!thumbnail.isNull()) {
+             return thumbnail;

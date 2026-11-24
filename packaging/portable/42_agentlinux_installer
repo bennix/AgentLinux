@@ -7,7 +7,11 @@ set timeout=5
 menuentry 'AgentLinux — 安装到硬盘 / Install to disk' --id agentlinux-install-disk {
     set iso_path=/boot/iso/agentlinux-desktop.iso
     loopback loop ($root)$iso_path
-    linux (loop)/casper/vmlinuz boot=casper agentlinux.start-installer iso-scan/filename=$iso_path layerfs-path=minimal.standard.live.agent.apps.squashfs quiet splash ---
+    set installer_layer=minimal.standard.live.agent.apps.squashfs
+    if [ -f (loop)/casper/minimal.standard.live.agent.apps.xp.squashfs ]; then
+        set installer_layer=minimal.standard.live.agent.apps.xp.squashfs
+    fi
+    linux (loop)/casper/vmlinuz boot=casper userfullname=AgentLinux agentlinux.start-installer iso-scan/filename=$iso_path layerfs-path=$installer_layer quiet splash ---
     initrd (loop)/casper/initrd
 }
 GRUB

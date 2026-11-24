@@ -1,0 +1,26 @@
+- default: false
+  description:
+    en: AgentLinux with the XP-style desktop and a minimal application set.
+    zh_CN: 安装 XP 风格桌面和精简应用。
+  id: ubuntukylin-desktop-minimal
+  locale_support: langpack
+  name:
+    en: AgentLinux Desktop (minimal)
+    zh_CN: AgentLinux 桌面（精简安装）
+  path: minimal.agent.apps.xp.squashfs
+  size: 13040034173
+  type: fsimage-layered
+  variant: desktop
+- default: true
+  description:
+    en: AgentLinux with the XP-style desktop and the standard application set.
+    zh_CN: 安装 XP 风格桌面和标准应用。
+  id: ubuntukylin-desktop
+  locale_support: langpack
+  name:
+    en: AgentLinux Desktop
+    zh_CN: AgentLinux 桌面（标准安装）
+  path: minimal.standard.agent.apps.xp.squashfs
+  size: 13343973757
+  type: fsimage-layered
+  variant: desktop

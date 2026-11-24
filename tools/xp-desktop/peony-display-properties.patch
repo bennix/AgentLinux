@@ -1,0 +1,86 @@
+--- a/peony-qt-desktop/peony-desktop-application.cpp
++++ b/peony-qt-desktop/peony-desktop-application.cpp
+@@ -44,6 +44,7 @@
+ #include <QCommandLineOption>
+ #include <QTimer>
+ 
++#include <QDir>
+ #include <QProcess>
+ #include <QFile>
+ #include <QLabel>
+@@ -400,30 +401,12 @@
+ 
+ void PeonyDesktopApplication::gotoSetBackground()
+ {
+-    QProcess p;
+-    p.setProgram("ukui-control-center");
+-    //old version use -b, new version use -m Wallpaper as para
+-    p.setArguments(QStringList()<<"-m" <<"Wallpaper");
+-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+-    p.startDetached();
+-#else
+-    p.startDetached("ukui-control-center", QStringList()<<"-m" <<"Wallpaper");
+-#endif
+-    p.waitForFinished(-1);
++    QProcess::startDetached(QDir::homePath() + "/.local/bin/desk.cpl", QStringList() << "--desktop");
+ }
+ 
+ void PeonyDesktopApplication::gotoSetResolution()
+ {
+-    QProcess p;
+-    p.setProgram("ukui-control-center");
+-    p.setArguments(QStringList()<<"-m" <<"display");
+-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+-    p.startDetached();
+-#else
+-    p.startDetached("ukui-control-center", QStringList()<<"-m" <<"display");
+-#endif
+-    p.waitForFinished(-1);
+-
++    QProcess::startDetached(QDir::homePath() + "/.local/bin/desk.cpl", QStringList() << "--settings");
+ }
+ 
+ void PeonyDesktopApplication::relocateIconView(const KScreen::OutputPtr &output)
+--- a/peony-qt-desktop/desktop-menu.cpp
++++ b/peony-qt-desktop/desktop-menu.cpp
+@@ -684,6 +684,8 @@
+         });
+     }
+ 
++    if (args.isEmpty()) return;
++
+     QProcess p;
+ #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+     p.setProgram("peony");
+@@ -696,14 +698,5 @@
+ 
+ void DesktopMenu::gotoAboutComputer()
+ {
+-    QProcess p;
+-    p.setProgram("ukui-control-center");
+-    //-m About para to show about computer infos, related to bug#88258
+-    p.setArguments(QStringList()<<"-m" << "About");
+-#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+-    p.startDetached();
+-#else
+-    p.startDetached("ukui-control-center", QStringList()<<"-m" << "About");
+-#endif
+-    p.waitForFinished(-1);
+-}
++    QProcess::startDetached(QDir::homePath() + "/.local/bin/sysdm.cpl", QStringList());
++}
+--- a/peony-qt-desktop/desktop-menu.cpp
++++ b/peony-qt-desktop/desktop-menu.cpp
+@@ -654,6 +654,12 @@
+ 
+ void DesktopMenu::showProperties(const QStringList &uris)
+ {
++    const QString places = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)
++                         + "/agentlinux-xp-places.desktop";
++    if (uris.size() == 1 && QUrl(uris.first()).toLocalFile() == places) {
++        QProcess::startDetached(QDir::homePath() + "/.local/bin/ncpa.cpl", QStringList());
++        return;
++    }
+     QStringList args;
+     for (auto arg : uris) {
+         QUrl url = arg;

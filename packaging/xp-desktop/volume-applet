@@ -1,0 +1,23 @@
+#!/usr/bin/python3
+"""Launch ukui-media after the panel can supply the geometry its Qt UI needs."""
+import os
+import time
+
+import dbus
+
+
+def panel_ready(bus):
+    try:
+        panel = bus.get_object("org.ukui.panel", "/panel/position", introspect=False)
+        geometry = panel.GetPrimaryScreenGeometry(dbus_interface="org.ukui.panel", timeout=2)
+    except dbus.DBusException:
+        return False
+    return (len(geometry) >= 5 and all(isinstance(value, int) for value in geometry[:5])
+            and geometry[2] > 0 and geometry[3] > 0)
+
+
+if __name__ == "__main__":
+    bus = dbus.SessionBus()
+    while not panel_ready(bus):
+        time.sleep(2)
+    os.execl("/usr/local/libexec/ukui-volume-control-applet-qt", "ukui-volume-control-applet-qt")

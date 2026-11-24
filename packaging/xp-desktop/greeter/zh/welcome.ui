@@ -1,0 +1,187 @@
+<interface>
+  <template class="WinTCWelcomeUI" parent="GtkBox">
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+
+        <child>
+          <object class="GtkBox" id="box-header">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="orientation">horizontal</property>
+            <property name="height-request">71</property>
+
+            <style>
+              <class name="header" />
+            </style>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+
+            <style>
+              <class name="header-separator" />
+            </style>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+
+        <child>
+          <object class="GtkBox" id="box-body">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="orientation">horizontal</property>
+
+            <child>
+              <object class="GtkStack" id="stack-main">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+
+            <style>
+              <class name="content" />
+            </style>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+
+            <style>
+              <class name="footer-separator" />
+            </style>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
+
+        <child>
+          <object class="GtkBox" id="box-footer">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="orientation">horizontal</property>
+            <property name="height-request">93</property>
+
+            <child>
+              <object class="GtkButton" id="button-shutdown">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="orientation">horizontal</property>
+
+                    <child>
+                      <object class="GtkImage">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="resource">/uk/oddmatics/wintc/logonui/shtdbtn.png</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="no">关闭计算机</property>
+                        <property name="xalign">0.0</property>
+                        <property name="yalign">0.48</property>
+
+                        <style>
+                          <class name="bg-text" />
+                          <class name="bg-text-lg" />
+                          <class name="wintc-ml-md" />
+                        </style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                </child>
+
+                <style>
+                  <class name="undecorated" />
+                  <class name="wintc-ml-lg" />
+                </style>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+
+            <child>
+              <object class="GtkLabel" id="label-shutdown">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="no">登录后，可以在控制面板的“用户帐户”中添加或更改帐户。</property>
+
+                <style>
+                  <class name="bg-text" />
+                  <class name="wintc-mr-lg" />
+                </style>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+                <property name="pack-type">end</property>
+              </packing>
+            </child>
+
+            <style>
+              <class name="footer" />
+            </style>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">4</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

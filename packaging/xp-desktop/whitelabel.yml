@@ -1,0 +1,15 @@
+mode: standard
+flavor: kylin
+app-name: AgentLinux
+theme:
+  light:
+    accent-color: "#245EDB"
+  dark:
+    accent-color: "#6495ED"
+pages:
+  locale:
+    image: college-emblem.png
+  try-or-install:
+    image: college-emblem.png
+  done:
+    image: college-emblem.png

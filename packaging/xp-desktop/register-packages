@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+set --
+for archive in /usr/local/share/agentlinux-xp/packages/*.deb; do
+    case ${archive##*/} in
+        ukui-media_*.deb)
+            installed=$(dpkg-query -W -f='${db:Status-Status} ${Version}' ukui-media 2>/dev/null) || installed=
+            version=$(dpkg-deb -f "$archive" Version)
+            if [ "${installed%% *}" != installed ] || dpkg --compare-versions "${installed#* }" lt "$version"; then
+                set -- "$@" "$archive"
+            fi
+            continue ;;
+    esac
+    package=${archive##*/}
+    status=$(dpkg-query -W -f='${db:Status-Status}' "${package%.deb}" 2>/dev/null) || status=
+    if [ "$status" != installed ]; then
+        set -- "$@" "$archive"
+    fi
+done
+if [ "$#" -gt 0 ]; then
+    lists=$(mktemp -d)
+    trap 'rm -rf "$lists"' EXIT
+    mkdir "$lists/partial"
+    DEBIAN_FRONTEND=noninteractive apt-get -y -o DPkg::Lock::Timeout=120 \
+        -o Dir::State::lists="$lists" --no-install-recommends --no-remove install "$@"
+fi
+touch /var/lib/agentlinux-xp/packages-configured

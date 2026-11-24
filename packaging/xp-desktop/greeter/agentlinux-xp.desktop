@@ -1,0 +1,4 @@
+[Desktop Entry]
+Name=AgentLinux XP
+Type=Application
+Exec=/usr/local/libexec/agentlinux-xp-greeter

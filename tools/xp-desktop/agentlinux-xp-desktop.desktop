@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=AgentLinux XP Desktop
+Name[zh_CN]=AgentLinux XP 桌面
+Exec=/usr/local/libexec/agentlinux-xp-desktop
+NoDisplay=true

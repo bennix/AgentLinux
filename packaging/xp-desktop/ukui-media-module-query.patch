@@ -1,0 +1,46 @@
+--- a/ukui-volume-control-applet-qt/ukmedia_volume_control.h
++++ b/ukui-volume-control-applet-qt/ukmedia_volume_control.h
+@@ -111,7 +111,7 @@
+     bool getSourceMute(); //获取输入设备静音状态
+     int getSourceVolume(); //获取输入设备音量值
+     bool getSinkInputMuted(QString description);
+-    int getModuleIndexByName(QString name);
++    void getModuleIndexByName(QString name);
+ 
+     int getDefaultSinkIndex();
+     int getSinkInputVolume(const gchar *name); //根据name获取sink input的音量值
+--- a/ukui-volume-control-applet-qt/ukmedia_volume_control.cpp
++++ b/ukui-volume-control-applet-qt/ukmedia_volume_control.cpp
+@@ -284,10 +284,12 @@
+ /*
+  * 根据模块名称获取对应模块索引
+  */
+-int UkmediaVolumeControl::getModuleIndexByName(QString name)
++void UkmediaVolumeControl::getModuleIndexByName(QString name)
+ {
+     findModuleStr = name;
+-    pa_context_get_module_info_list(getContext(), moduleInfoCb,this);
++    pa_operation *operation = pa_context_get_module_info_list(getContext(), moduleInfoCb, this);
++    if (operation)
++        pa_operation_unref(operation);
+ }
+ 
+ /*
+--- a/ukui-volume-control-applet-qt/ukmedia_volume_control.cpp
++++ b/ukui-volume-control-applet-qt/ukmedia_volume_control.cpp
+@@ -2600,6 +2600,7 @@
+             return "";
+         }
+     }
++    return {};
+ }
+ 
+ 
+@@ -2618,6 +2619,7 @@
+             return "";
+         }
+     }
++    return {};
+ }
+ 
+ /**

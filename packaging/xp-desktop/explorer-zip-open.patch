@@ -1,0 +1,194 @@
+--- a/shell/shext/zip/src/vwzip.c
++++ b/shell/shext/zip/src/vwzip.c
+@@ -118,11 +118,7 @@
+     const gchar* zip_file_path,
+     const gchar* rel_entry_path
+ );
+-static gboolean zip_entry_is_in_dir(
+-    const gchar* this_dir,
+-    const gchar* entry,
+-    gint*        name_offset
+-);
++
+ 
+ static void clear_view_item(
+     WinTCShextViewItem* item
+@@ -206,10 +202,35 @@
+     WINTC_UNUSED(WinTCViewZip* self)
+ ) {}
+ 
++static gboolean extract_archive(WinTCIShextView* view, WinTCShextOperation* operation,
++                                GtkWindow* window, GError** error)
++{
++    WinTCViewZip* zip = WINTC_VIEW_ZIP(view);
++    gchar* argv[] = {"/usr/bin/engrampa", "--extract", "--",
++                     zip->zip_uri + strlen("file://"), NULL};
++    return g_spawn_async(NULL, argv, NULL, G_SPAWN_DEFAULT, NULL, NULL, NULL, error);
++}
++
++static WinTCShextOperation* spawn_zip_operation(WinTCIShextView* view, gint id,
++                                                GList* targets, GError** error)
++{
++    g_list_free(targets);
++    if (id != WINTC_SHEXT_OP_CUSTOM)
++    {
++        g_set_error_literal(error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "Unknown ZIP operation");
++        return NULL;
++    }
++    WinTCShextOperation* operation = g_new0(WinTCShextOperation, 1);
++    operation->view = view;
++    operation->func = extract_archive;
++    return operation;
++}
++
+ static void wintc_view_zip_ishext_view_interface_init(
+     WinTCIShextViewInterface* iface
+ )
+ {
++    iface->spawn_operation = spawn_zip_operation;
+     iface->activate_item           = wintc_view_zip_activate_item;
+     iface->compare_items           = wintc_view_zip_compare_items;
+     iface->drag_execute            = wintc_view_zip_drag_execute;
+@@ -339,17 +360,13 @@
+         return TRUE;
+     }
+ 
+-    // TODO: We'll need to extract files first to tmp to be able to open
+-    //       them - deal with in a separate issue
+-    //
+-    g_set_error(
+-        error,
+-        WINTC_GENERAL_ERROR,
+-        WINTC_GENERAL_ERROR_NOTIMPL,
+-        "ZIP file extraction not implemented yet."
+-    );
+-
+-    return FALSE;
++    gchar* argv[] = {
++        "/usr/local/libexec/agentlinux-open-zip-member",
++        view_zip->zip_uri + strlen("file://"),
++        item->priv,
++        NULL
++    };
++    return g_spawn_async(NULL, argv, NULL, G_SPAWN_DEFAULT, NULL, NULL, NULL, error);
+ }
+ 
+ static gint wintc_view_zip_compare_items(
+@@ -657,26 +674,37 @@
+     //
+     gint64 n_entries = zip_get_num_entries(zip_file, 0);
+ 
++    const gchar* prefix = view_zip->rel_path ? view_zip->rel_path : "";
++    gsize name_offset = strlen(prefix);
+     for (gint64 i = 0; i < n_entries; i++)
+     {
+         const gchar* entry_name = zip_get_name(zip_file, (guint64) i, 0);
+ 
+-        // Only want to add the entries in the current relative dir
+-        //
+-        gint name_offset = 0;
+-
+-        if (!zip_entry_is_in_dir(view_zip->rel_path, entry_name, &name_offset))
+-        {
++        if (!entry_name || !g_str_has_prefix(entry_name, prefix))
+             continue;
+-        }
+-
+-        gchar*              entry_copy = g_strdup(entry_name);
+-        WinTCShextViewItem* item       = g_new(WinTCShextViewItem, 1);
+-
++        const gchar* child = entry_name + name_offset;
++        if (!*child || *child == '/')
++            continue;
++
++        // A ZIP may contain a descendant without a directory entry for its parent.
++        const gchar* slash = strchr(child, '/');
++        g_autofree gchar* visible_path = slash
++            ? g_strndup(entry_name, slash + 1 - entry_name)
++            : g_strdup(entry_name);
++        guint hash = zip_entry_hash(path, visible_path);
++        WinTCShextViewItem* existing;
++        while ((existing = g_hash_table_lookup(view_zip->map_items, GUINT_TO_POINTER(hash))) &&
++               g_strcmp0(existing->priv, visible_path))
++            ++hash;
++        if (existing)
++            continue;
++
++        gchar* entry_copy = g_steal_pointer(&visible_path);
++        WinTCShextViewItem* item = g_new0(WinTCShextViewItem, 1);
+         item->display_name = entry_copy + name_offset;
+-        item->is_leaf      = !g_str_has_suffix(entry_name, G_DIR_SEPARATOR_S);
++        item->is_leaf      = slash == NULL;
+         item->icon_name    = item->is_leaf ? "empty" : "inode-directory";
+-        item->hash         = zip_entry_hash(path, entry_name);
++        item->hash         = hash;
+         item->priv         = entry_copy;
+ 
+         g_hash_table_insert(
+@@ -751,55 +779,7 @@
+     return hash;
+ }
+ 
+-static gboolean zip_entry_is_in_dir(
+-    const gchar* this_dir,
+-    const gchar* entry,
+-    gint*        name_offset
+-)
+-{
+-    const gchar* next_ds;
+-
+-    *name_offset = 0;
+-
+-    // If we're at the root of the zip, then we just scrub off any file that is
+-    // in a subdir, nothing else needed
+-    //
+-    if (!this_dir)
+-    {
+-        next_ds = strchr(entry, G_DIR_SEPARATOR);
+-
+-        return !next_ds || next_ds == (entry + strlen(entry) - 1);
+-    }
+-
+-    // Exclude the dir itself
+-    //
+-    if (g_strcmp0(entry, this_dir) == 0)
+-    {
+-        return FALSE;
+-    }
+-
+-    // We're in a subdir, so any file not in this subdir is obviously binned
+-    //
+-    if (!g_str_has_prefix(entry, this_dir))
+-    {
+-        return FALSE;
+-    }
+-
+-    // Finally, check that there are no more directory components after our
+-    // path
+-    //
+-    const gchar* entry_in_dir = entry + strlen(this_dir);
+-
+-    next_ds = strchr(entry_in_dir, G_DIR_SEPARATOR);
+-
+-    if (!next_ds || next_ds == (entry + strlen(entry) - 1))
+-    {
+-        *name_offset = entry_in_dir - entry;
+-        return TRUE;
+-    }
+-
+-    return FALSE;
+-}
++
+ 
+ //
+ // CALLBACKS
+--- a/shell/shext/zip/src/res/amzipvw.ui
++++ b/shell/shext/zip/src/res/amzipvw.ui
+@@ -6,6 +6,7 @@
+ 
+       <item>
+         <attribute name="label">Extract all files</attribute>
++        <attribute name="operation" type="i">100</attribute>
+         <attribute name="icon">application-x-archive</attribute>
+       </item>
+     </section>

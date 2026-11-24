@@ -1,0 +1,13 @@
+[Unit]
+Description=Register the bundled AgentLinux XP desktop packages
+After=local-fs.target
+Before=apt-daily.service apt-daily-upgrade.service
+ConditionPathExists=!/var/lib/agentlinux-xp/packages-configured
+
+[Service]
+Type=oneshot
+StateDirectory=agentlinux-xp
+ExecStart=/usr/local/libexec/agentlinux-xp-register-packages
+
+[Install]
+WantedBy=multi-user.target

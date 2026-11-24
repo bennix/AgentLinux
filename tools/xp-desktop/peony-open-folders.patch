@@ -1,0 +1,16 @@
+--- a/peony-qt-desktop/desktop-icon-view.cpp
++++ b/peony-qt-desktop/desktop-icon-view.cpp
+@@ -903,4 +903,13 @@
+                                       tr("Open directory failed, you have no permission!"));
+                 return;
++            }
++
++            const QString path = QUrl(uri).toLocalFile();
++            if (!path.isEmpty() && QFileInfo(path).isDir()) {
++                const QString launcher = QDir::homePath() + "/.local/share/agentlinux-xp/explorer-launch.sh";
++                if (QProcess::startDetached(launcher, QStringList() << path)) {
++                    clearSelection();
++                    return;
++                }
+             }
+ 

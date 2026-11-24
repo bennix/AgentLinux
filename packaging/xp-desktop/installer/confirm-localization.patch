@@ -1,0 +1,49 @@
+diff --git a/packages/ubuntu_bootstrap/lib/l10n/ubuntu_bootstrap_en.arb b/packages/ubuntu_bootstrap/lib/l10n/ubuntu_bootstrap_en.arb
+index bed9b2b..4fb84dc 100644
+--- a/packages/ubuntu_bootstrap/lib/l10n/ubuntu_bootstrap_en.arb
++++ b/packages/ubuntu_bootstrap/lib/l10n/ubuntu_bootstrap_en.arb
+@@ -483,6 +483,7 @@
+   },
+   "confirmProprietarySoftwareCodecs": "Codecs",
+   "confirmProprietarySoftwareCodecsDrivers": "Codecs & drivers",
++  "confirmProprietarySoftwareNone": "None",
+   "confirmProprietarySoftwareDrivers": "Drivers",
+   "confirmInstallButton": "Install",
+   "installationCompleteTitle": "Installation complete",
+diff --git a/packages/ubuntu_bootstrap/lib/l10n/ubuntu_bootstrap_zh.arb b/packages/ubuntu_bootstrap/lib/l10n/ubuntu_bootstrap_zh.arb
+index dabca2f..c12af53 100644
+--- a/packages/ubuntu_bootstrap/lib/l10n/ubuntu_bootstrap_zh.arb
++++ b/packages/ubuntu_bootstrap/lib/l10n/ubuntu_bootstrap_zh.arb
+@@ -932,6 +932,7 @@
+   "@confirmDiskEncryptionTPM": {},
+   "confirmEntryApplications": "应用程序",
+   "@confirmEntryApplications": {},
++  "confirmProprietarySoftwareNone": "无",
+   "confirmProprietarySoftwareDrivers": "驱动程序",
+   "@confirmProprietarySoftwareDrivers": {},
+   "rebootToConfigure": "已将 **{system}** 复制到磁盘",
+diff --git a/packages/ubuntu_bootstrap/lib/l10n/ubuntu_bootstrap_zh_TW.arb b/packages/ubuntu_bootstrap/lib/l10n/ubuntu_bootstrap_zh_TW.arb
+index ad88d15..b7f04e3 100644
+--- a/packages/ubuntu_bootstrap/lib/l10n/ubuntu_bootstrap_zh_TW.arb
++++ b/packages/ubuntu_bootstrap/lib/l10n/ubuntu_bootstrap_zh_TW.arb
+@@ -939,6 +939,7 @@
+   "@confirmSectionSecurityAndMoreTitle": {},
+   "confirmProprietarySoftwareCodecs": "影音編解碼器",
+   "@confirmProprietarySoftwareCodecs": {},
++  "confirmProprietarySoftwareNone": "無",
+   "confirmProprietarySoftwareDrivers": "驅動程式",
+   "@confirmProprietarySoftwareDrivers": {},
+   "rebootToConfigure": "**{system}** 已經被複製進磁碟中",
+diff --git a/packages/ubuntu_bootstrap/lib/pages/confirm/confirm_page.dart b/packages/ubuntu_bootstrap/lib/pages/confirm/confirm_page.dart
+index 38b1e8d..ff8b124 100644
+--- a/packages/ubuntu_bootstrap/lib/pages/confirm/confirm_page.dart
++++ b/packages/ubuntu_bootstrap/lib/pages/confirm/confirm_page.dart
+@@ -305,7 +305,7 @@ class _ProprietarySoftware extends ConsumerWidget {
+         (codecs: true, drivers: false) => lang.confirmProprietarySoftwareCodecs,
+         (codecs: false, drivers: true) =>
+           lang.confirmProprietarySoftwareDrivers,
+-        _ => 'None',
++        _ => lang.confirmProprietarySoftwareNone,
+       },
+     );
+   }

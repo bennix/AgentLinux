@@ -1,0 +1,49 @@
+--- a/peony-qt-desktop/desktop-icon-view.cpp
++++ b/peony-qt-desktop/desktop-icon-view.cpp
+@@ -80,6 +80,7 @@
+ #include <QPixmap>
+ #include <QPainter>
+ #include <QClipboard>
++#include <QFileInfo>
+ 
+ #include <QtX11Extras/QX11Info>
+ #include <kstartupinfo.h>
+@@ -948,8 +949,19 @@
+     job->queryAsync();
+ }
+ 
++static bool singleClickDesktop()
++{
++    const QString config = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
++    return QFileInfo::exists(config + QStringLiteral("/agentlinux-xp/explorer-single-click"));
++}
++
+ void DesktopIconView::initDoubleClick()
+ {
++    connect(this, &QListView::clicked, this, [this](const QModelIndex &index) {
++        if (singleClickDesktop() && QApplication::keyboardModifiers() == Qt::NoModifier &&
++            !style()->styleHint(QStyle::SH_ItemView_ActivateItemOnSingleClick, nullptr, this))
++            openFileByUri(index.data(FileItemModel::UriRole).toString());
++    });
+     connect(this, &QListView::activated, this, [=](const QModelIndex &index) {
+         qDebug() << "double click" << index.data(FileItemModel::UriRole);
+         auto uri = index.data(FileItemModel::UriRole).toString();
+@@ -1818,7 +1830,7 @@
+             auto index = indexAt(e->pos());
+             m_last_index = index;
+             //fix rename state has no menuRequest issue, bug#44107
+-            if (! m_is_edit)
++            if (!m_is_edit && !singleClickDesktop())
+             {
+                 clearAllIndexWidgets();
+                 //force to recreate new DesktopIndexWidget, to fix not show name issue
+@@ -1876,7 +1888,8 @@
+ 
+ void DesktopIconView::mouseDoubleClickEvent(QMouseEvent *event)
+ {
+-    QListView::mouseDoubleClickEvent(event);
++    if (!singleClickDesktop())
++        QListView::mouseDoubleClickEvent(event);
+     m_real_do_edit = false;
+ }
+ 

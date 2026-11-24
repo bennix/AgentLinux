@@ -1,9 +1,14 @@
 #!/bin/sh
 set -eu
 if [ -d /cdrom/casper ]; then
-    if /snap/bin/ubuntu-desktop-bootstrap; then exit 0; else status=$?; fi
+    set -- /snap/bin/ubuntu-desktop-bootstrap
+    helper=/usr/local/libexec/agentlinux-xp-install-ui
+    if [ -x "$helper" ]; then
+        set -- snap run --shell ubuntu-desktop-bootstrap -c "exec $helper"
+    fi
+    if "$@"; then exit 0; else status=$?; fi
     case $status in
-        134|139) exec env GTK_IM_MODULE=xim LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=softpipe /snap/bin/ubuntu-desktop-bootstrap ;;
+        134|139) exec env GTK_IM_MODULE=xim LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=softpipe "$@" ;;
         *) exit "$status" ;;
     esac
 fi

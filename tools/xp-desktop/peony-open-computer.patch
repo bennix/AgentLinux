@@ -1,0 +1,42 @@
+--- a/peony-qt-desktop/desktop-icon-view.cpp
++++ b/peony-qt-desktop/desktop-icon-view.cpp
+@@ -873,6 +873,12 @@
+ 
+ void DesktopIconView::openFileByUri(QString uri)
+ {
++    if (uri == QStringLiteral("computer:///") &&
++        QProcess::startDetached(QStringLiteral("gtk-launch"),
++                                QStringList() << QStringLiteral("agentlinux-xp-computer"))) {
++        clearSelection();
++        return;
++    }
+     auto info = FileInfo::fromUri(uri);
+     auto job = new FileInfoJob(info);
+     job->setAutoDelete();
+@@ -908,7 +914,7 @@
+             QProcess p;
+             QUrl url = uri;
+             p.setProgram("peony");
+-            p.setArguments(QStringList() << url.toEncoded() <<"%U&");
++            p.setArguments(QStringList() << url.toEncoded());
+             qint64 pid;
+             p.startDetached(&pid);
+ 
+@@ -936,7 +942,7 @@
+                 }
+             }
+ 
+-            p.startDetached("peony", QStringList()<<strq<<"%U&");
++            p.startDetached("peony", QStringList()<<strq);
+ #endif
+         } else {
+             if (!(info->isDesktopFile() && execSharedFileLink(uri))) {
+@@ -2455,7 +2461,7 @@
+                             strq += uri[i];
+                         }
+                     }
+-                    p.startDetached("peony", QStringList()<<strq<<"%U&");
++                    p.startDetached("peony", QStringList()<<strq);
+ #endif
+                     return true;
+                 }

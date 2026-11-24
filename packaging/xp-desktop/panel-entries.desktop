@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=AgentLinux XP Control Panel Setup
+Exec=/usr/local/libexec/agentlinux-xp-panel-setup
+NoDisplay=true
+Hidden=true

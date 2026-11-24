@@ -1,0 +1,24 @@
+--- a/libpeony-qt/model/side-bar-abstract-item.cpp
++++ b/libpeony-qt/model/side-bar-abstract-item.cpp
+@@ -47,13 +47,15 @@
+ 
+ void SideBarAbstractItem::clearChildren()
+ {
+-    m_model->removeRows(0, m_children->count(), firstColumnIndex());
+-    for (auto child : *m_children) {
+-        m_children->removeOne(child);
++    if (m_children->isEmpty())
++        return;
++
++    QVector<SideBarAbstractItem *> removed;
++    m_model->beginRemoveRows(firstColumnIndex(), 0, m_children->size() - 1);
++    removed.swap(*m_children);
++    m_model->endRemoveRows();
++    for (auto child : removed)
+         child->deleteLater();
+-    }
+-    m_children->clear();
+-    //qDebug()<<"clear children has children"<<m_model->hasChildren(firstColumnIndex());
+ }
+ 
+ QModelIndex SideBarAbstractItem::firstColumnIndex()

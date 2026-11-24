@@ -1,0 +1,39 @@
+. "$HOME/.local/share/agentlinux-xp/session-env.sh"
+case "${XDG_SESSION_DESKTOP:-${DESKTOP_SESSION:-}}" in
+    ukui|UKUI)
+        /usr/local/libexec/agentlinux-xp-screensaver-defaults
+        if [ -z "$(dconf read /org/gnome/desktop/interface/toolkit-accessibility)" ]; then
+            gsettings set org.gnome.desktop.interface toolkit-accessibility true
+        fi
+        for lid_key in button-lid-ac button-lid-battery; do
+            if [ -z "$(dconf read "/org/ukui/power-manager/$lid_key")" ]; then
+                gsettings set org.ukui.power-manager "$lid_key" blank
+            fi
+        done
+        if [ -r "/usr/share/sounds/Windows XP Default/index.theme" ]; then
+            if [ -z "$(dconf read /org/ukui/sound/theme-name)" ]; then
+                gsettings set org.ukui.sound theme-name 'Windows XP Default'
+            fi
+            if [ -z "$(dconf read /org/gnome/desktop/sound/theme-name)" ]; then
+                gsettings set org.gnome.desktop.sound theme-name 'Windows XP Default'
+            fi
+        fi
+        if [ -r /usr/share/icons/standard-with-shadow/cursors/left_ptr ] &&
+           [ -z "$(dconf read /org/ukui/desktop/peripherals/mouse/cursor-theme)" ]; then
+            gsettings set org.ukui.peripherals-mouse cursor-theme standard-with-shadow
+        fi
+        if [ -r /usr/share/backgrounds/college-bliss.svg ] &&
+           [ -z "$(dconf read /org/mate/desktop/background/picture-filename)" ]; then
+            gsettings set org.mate.background picture-filename /usr/share/backgrounds/college-bliss.svg
+            if [ -z "$(dconf read /org/mate/desktop/background/picture-options)" ]; then
+                gsettings set org.mate.background picture-options stretched
+            fi
+        fi
+        if [ -x "$HOME/.local/share/agentlinux-xp/peony-qt-desktop" ] &&
+           [ -x /usr/local/libexec/agentlinux-xp-desktop ] &&
+           [ -r /usr/share/applications/agentlinux-xp-desktop.desktop ] &&
+           [ -z "$(dconf read /org/ukui/desktop/session/required-components/filemanager)" ]; then
+            gsettings set org.ukui.session.required-components filemanager agentlinux-xp-desktop
+        fi
+        "$HOME/.local/share/agentlinux-xp/login-start.sh" >>"$HOME/.local/share/agentlinux-xp/login-start.log" 2>&1 & ;;
+esac

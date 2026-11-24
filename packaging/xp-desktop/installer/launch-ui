@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+# The branded Flutter snapshot was built for amd64 revision 572.
+if [ "${SNAP_REVISION:-}" != 572 ]; then
+    exec "$SNAP/bin/launcher" "$SNAP/bin/ubuntu_bootstrap" "$@"
+fi
+bundle=$(mktemp -d)
+trap 'rm -rf "$bundle"' EXIT
+mkdir "$bundle/lib"
+cp "$SNAP/bin/ubuntu_bootstrap" "$bundle/"
+ln -s "$SNAP/bin/data" "$bundle/data"
+for lib in "$SNAP"/bin/lib/*; do
+    name=${lib##*/}
+    [ "$name" = libapp.so ] || ln -s "$lib" "$bundle/lib/$name"
+done
+ln -s /usr/local/share/agentlinux-xp/installer/libapp.so "$bundle/lib/libapp.so"
+"$SNAP/bin/launcher" "$bundle/ubuntu_bootstrap" "$@"

@@ -1,10 +1,10 @@
 [Desktop Entry]
 Type=Application
-Name=Install AgentLinux to disk
-Name[zh_CN]=安装 AgentLinux 到硬盘
+Name=Install to Disk
+Name[zh_CN]=安装到硬盘
 Comment=Open the AgentLinux disk installer
 Comment[zh_CN]=打开 AgentLinux 硬盘安装程序
-Icon=system-software-install
+Icon=drive-harddisk
 Exec=/usr/local/bin/agentlinux-install-to-disk
 Terminal=false
 Categories=System;

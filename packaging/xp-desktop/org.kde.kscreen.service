@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.kde.KScreen
+Exec=/usr/bin/env QT_QPA_PLATFORMTHEME=generic /usr/lib/x86_64-linux-gnu/libexec/kf5/kscreen_backend_launcher
+SystemdService=plasma-kscreen.service
