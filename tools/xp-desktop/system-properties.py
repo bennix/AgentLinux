@@ -332,6 +332,11 @@ def show_devices(_button):
         details.add(selector)
         values = {}
         if is_input:
+            # Linux input uevents expose bus/vendor/product/version as PRODUCT.
+            for entry in read(device / "uevent").splitlines():
+                if entry.startswith("PRODUCT="):
+                    values[tr("硬件 ID", "Hardware IDs")] = entry.removeprefix("PRODUCT=")
+                    break
             values[tr("设备节点", "Device node")] = location
         elif vendor and product:
             prefix, vendor_key, product_key = ("USB", "VID", "PID") if is_usb else ("PCI", "VEN", "DEV")
