@@ -11,7 +11,7 @@ gboolean wintc_launch_command(const gchar *command, GError **error)
         address[length - 1] = '\0';
         address++;
     }
-    gboolean unc = g_str_has_prefix(address, "\\\\");
+    gboolean unc = g_str_has_prefix(address, "\\\\") || g_str_has_prefix(address, "//");
     if (!unc && g_ascii_strncasecmp(address, "smb://", 6)) {
         typedef gboolean (*LaunchCommand)(const gchar *, GError **);
         LaunchCommand launch = (LaunchCommand)dlsym(RTLD_NEXT, "wintc_launch_command");
