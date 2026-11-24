@@ -144,6 +144,15 @@ def configure():
     slider = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0, 100, 1)
     slider.get_accessible().set_name(tr("设备音量", "Device volume"))
     slider.set_digits(0)
+    slider.connect("format-value", lambda _slider, value: f"{value:.0f}%")
+
+    def mark_volume_range(adjustment):
+        slider.clear_marks()
+        slider.add_mark(0, Gtk.PositionType.BOTTOM, tr("低", "Low"))
+        slider.add_mark(adjustment.get_upper(), Gtk.PositionType.BOTTOM, tr("高", "High"))
+
+    slider.get_adjustment().connect("notify::upper", lambda adjustment, _: mark_volume_range(adjustment))
+    mark_volume_range(slider.get_adjustment())
     master.add(slider)
     mute = Gtk.CheckButton(label=tr("静音", "Mute"))
     master.add(mute)
