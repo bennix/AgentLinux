@@ -5,7 +5,8 @@ import subprocess
 
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gio, GLib, GObject, Gtk
+gi.require_version("Gdk", "3.0")
+from gi.repository import Gdk, Gio, GLib, GObject, Gtk
 from task_pane import fit_window, add_task_pane, task_button
 
 
@@ -71,7 +72,16 @@ find = task_button(tr("查找已安装的程序", "Find an installed program"))
 side.add(find)
 search = Gtk.SearchEntry(placeholder_text=tr("搜索程序、软件包或 .deb 文件名", "Search programs, packages or .deb filenames"))
 main.add(search)
-find.connect("clicked", lambda _: search.grab_focus())
+def focus_search(_button):
+    search.grab_focus()
+    search.select_region(0, -1)
+
+
+shortcuts = Gtk.AccelGroup()
+window.add_accel_group(shortcuts)
+find.connect("clicked", focus_search)
+find.add_accelerator("clicked", shortcuts, Gdk.KEY_f, Gdk.ModifierType.CONTROL_MASK, Gtk.AccelFlags.VISIBLE)
+find.set_tooltip_text(find.get_label() + " (Ctrl+F)")
 order = Gtk.ComboBoxText()
 order.append("name", tr("名称", "Name"))
 order.append("size", tr("软件包大小（从大到小）", "Package size (largest first)"))
@@ -257,6 +267,8 @@ def selected(selection):
 table.get_selection().connect("changed", selected)
 refresh = task_button(tr("刷新列表", "Refresh list"))
 refresh.connect("clicked", reload_apps)
+refresh.add_accelerator("clicked", shortcuts, Gdk.KEY_F5, 0, Gtk.AccelFlags.VISIBLE)
+refresh.set_tooltip_text(refresh.get_label() + " (F5)")
 side.add(refresh)
 monitor = Gio.AppInfoMonitor.get()
 monitor.connect("changed", reload_apps)
