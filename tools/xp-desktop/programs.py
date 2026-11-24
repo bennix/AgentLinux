@@ -140,10 +140,12 @@ def reload_apps(*_):
 
     pending = worker.submit(package_index)
     pending.add_done_callback(lambda job: GLib.idle_add(load_sizes, job))
+    selected(selection)
 
 
 filtered = rows.filter_new()
 search_package = None
+archive_job = None
 
 
 def matches_program(model, item, _data):
@@ -160,18 +162,23 @@ def read_package_name(path):
 
 
 def use_package_name(job, original):
-    global search_package
-    if search.get_text().strip() == original:
+    global search_package, archive_job
+    if job is archive_job and search.get_text().strip() == original:
+        archive_job = None
         try:
             search_package = job.result()
         except (OSError, ValueError, subprocess.SubprocessError):
-            return False
+            pass
         filtered.refilter()
+        selected(table.get_selection())
     return False
 
 
 def update_search(_entry):
-    global search_package
+    global search_package, archive_job
+    if archive_job:
+        archive_job.cancel()
+        archive_job = None
     original = search.get_text().strip()
     search_package = None
     if original.lower().endswith(".deb"):
@@ -180,9 +187,10 @@ def update_search(_entry):
         if path.parent == Path(".") and downloads_folder:
             path = Path(downloads_folder) / path
         if path.is_absolute() and path.is_file():
-            job = worker.submit(read_package_name, path)
-            job.add_done_callback(lambda done: GLib.idle_add(use_package_name, done, original))
+            archive_job = worker.submit(read_package_name, path)
+            archive_job.add_done_callback(lambda done: GLib.idle_add(use_package_name, done, original))
     filtered.refilter()
+    selected(table.get_selection())
 
 
 downloads_folder = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOWNLOAD)
@@ -231,9 +239,10 @@ def size_label(size):
 
 
 def load_sizes(job):
-    global packages
+    global packages, pending
     if job is not pending:
         return False
+    pending = None
     try:
         packages = job.result()
     except (OSError, subprocess.SubprocessError) as exc:
@@ -251,7 +260,13 @@ def load_sizes(job):
 def selected(selection):
     model, item = selection.get_selected()
     if item is None:
-        detail.set_text("")
+        message = ""
+        if search.get_text().strip() and model.get_iter_first() is None:
+            if pending or archive_job:
+                message = tr("正在读取软件包信息…", "Reading package information…")
+            else:
+                message = tr("没有匹配的已安装程序。", "No matching installed programs.")
+        detail.set_text(message)
         return
     name, filename = model[item][0], model[item][1]
     info = packages.get(filename)
