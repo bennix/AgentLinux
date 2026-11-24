@@ -62,6 +62,8 @@ with tempfile.TemporaryDirectory(dir=out.parent) as work:
         f.chmod(0o644)
         value = f.read_text()
         if path.endswith(".cfg"):
+            palette = (root / "packaging/xp-desktop/boot/menu-colors.cfg").read_text()
+            value = value.replace("menuentry ", palette + "\nmenuentry ", 1)
             value = value.replace("Try or Install Ubuntu Kylin", "Try or install AgentLinux")
             value = value.replace("Ubuntu Kylin (safe graphics)", "AgentLinux (safe graphics)")
             value = value.replace("\ngrub_platform\n", "\n")
