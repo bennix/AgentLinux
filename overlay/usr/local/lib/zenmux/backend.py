@@ -167,6 +167,11 @@ TOOLS = [{"type": "function", "function": {
     "parameters": {"type": "object", "properties": props, "required": list(props),
                    "additionalProperties": False}}}
     for name, desc, props in [
+        ("list_components", tr("Discover installed apps and system components by stable ID"), {}),
+        ("inspect_component", tr("Read system status or inspect an installed app and its launch interface"),
+         {"component": {"type": "string"}}),
+        ("create_office_file", tr("Create a LibreOffice document, spreadsheet (cell A1), or presentation with the supplied text"),
+         {"kind": {"type": "string", "enum": ["writer", "calc", "impress"]}, "text": {"type": "string"}}),
         ("network_status", tr('Inspect active NetworkManager connections and the system tunnel'), {}),
         ("disk_usage", tr('Inspect available space on local filesystems'), {}),
         ("failed_services", tr('List failed system and user services'), {}),
@@ -174,9 +179,11 @@ TOOLS = [{"type": "function", "function": {
         ("launch_app", tr('Launch an installed application by its desktop ID'), {"desktop_id": {"type": "string"}}),
         ("list_windows", tr('List open desktop windows and titles'), {}),
         ("focus_window", tr('Activate a listed desktop window'), {"window_id": {"type": "string"}}),
-        ("list_controls", tr('List visible buttons in a selected window'), {"window_id": {"type": "string"}}),
+        ("list_controls", tr('List visible controls and slider values in a selected window'), {"window_id": {"type": "string"}}),
         ("activate_control", tr('Activate a named control in a selected window'),
          {key: {"type": "string"} for key in ("window_id", "path", "role", "label")}),
+        ("set_slider_value", tr('Set a named slider in a selected window'),
+         {**{key: {"type": "string"} for key in ("window_id", "path", "role", "label")}, "value": {"type": "number"}}),
         ("open_home", tr('Open the home directory in the file manager'), {}),
         ("create_folder", tr('Create a folder in the home directory'), {"name": {"type": "string"}}),
         ("system_info", tr('Show the system name, kernel version and architecture'), {})]]
@@ -226,6 +233,15 @@ def chat(cfg, messages, use_tools):
 
 
 def action(name, args):
+    if name == "create_office_file" and set(args) == {"kind", "text"}:
+        from office import create_file
+        return str(create_file(**args))
+    if name == "list_components" and not args:
+        from components import catalog
+        return json.dumps(catalog(), ensure_ascii=False)
+    if name == "inspect_component" and set(args) == {"component"} and isinstance(args["component"], str):
+        from components import describe
+        return json.dumps(describe(args["component"]), ensure_ascii=False)
     if not args and name == "network_status":
         return subprocess.check_output(["nmcli", "-t", "-f", "NAME,TYPE,DEVICE", "connection", "show", "--active"],
                                        text=True, timeout=5)
@@ -244,10 +260,13 @@ def action(name, args):
             app = apps[args["desktop_id"]]
             app.launch([], None)
             return app.get_display_name()
-    if name in ("list_windows", "focus_window", "list_controls", "activate_control"):
+    if name in ("list_windows", "focus_window", "list_controls", "activate_control", "set_slider_value"):
         import re
         listing = subprocess.check_output(["xprop", "-root", "_NET_CLIENT_LIST_STACKING"], text=True, timeout=3)
         ids = re.findall(r"0x[0-9a-fA-F]+", listing)
+        if not ids:
+            listing = subprocess.check_output(["xprop", "-root", "_NET_CLIENT_LIST"], text=True, timeout=3)
+            ids = re.findall(r"0x[0-9a-fA-F]+", listing)
         if name == "list_windows" and not args:
             windows = {}
             for wid in ids:
@@ -255,9 +274,12 @@ def action(name, args):
                 if title.returncode == 0:
                     windows[wid] = title.stdout.strip()[:250]
             return json.dumps(windows, ensure_ascii=False)
-        if name in ("list_controls", "activate_control") and args.get("window_id") in ids:
+        if name in ("list_controls", "activate_control", "set_slider_value") and args.get("window_id") in ids:
             keys = {"window_id"} if name == "list_controls" else {"window_id", "path", "role", "label"}
-            if set(args) == keys and all(isinstance(v, str) for v in args.values()):
+            expected = keys | {"value"} if name == "set_slider_value" else keys
+            if name == "set_slider_value" and type(args.get("value")) not in (int, float):
+                raise ValueError(tr('Unsupported action'))
+            if set(args) == expected and all(isinstance(args[k], str) for k in keys):
                 result = subprocess.run([sys.executable, str(Path(__file__).with_name("accessible.py"))],
                                         input=json.dumps([name, args]), capture_output=True, text=True, timeout=10)
                 if result.returncode:

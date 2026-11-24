@@ -534,3 +534,18 @@ msgstr "查看系统和用户服务的失败状态"
 
 msgid "No failed services"
 msgstr "没有失败的服务"
+
+msgid "List visible controls and slider values in a selected window"
+msgstr "列出所选窗口的可见控件和滑块数值"
+
+msgid "Set a named slider in a selected window"
+msgstr "调整所选窗口内指定滑块的数值"
+
+msgid "Discover installed apps and system components by stable ID"
+msgstr "按组件标识查找已安装的应用和系统组件"
+
+msgid "Read system status or inspect an installed app and its launch interface"
+msgstr "查看系统状态或已安装应用的启动方式"
+
+msgid "Create a LibreOffice document, spreadsheet (cell A1), or presentation with the supplied text"
+msgstr "用提供的文字创建 LibreOffice 文档、电子表格（写入 A1）或演示文稿"

@@ -1,0 +1,23 @@
+#!/usr/bin/python3
+"""List, inspect, or launch AgentLinux components through the same backend as ZenMux Desktop."""
+import argparse
+import sys
+
+sys.path.insert(0, "/usr/local/lib/zenmux")
+from backend import action
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("component", nargs="?", help="component ID from the catalog")
+parser.add_argument("--launch", action="store_true", help="open the selected app in the current desktop session")
+args = parser.parse_args()
+if args.launch and not (args.component and args.component.startswith("app/")):
+    parser.error("--launch requires an app/ component ID from the catalog")
+try:
+    if args.launch:
+        print(action("launch_app", {"desktop_id": args.component[4:]}))
+    elif args.component:
+        print(action("inspect_component", {"component": args.component}))
+    else:
+        print(action("list_components", {}))
+except (OSError, ValueError) as error:
+    parser.exit(1, str(error) + "\n")

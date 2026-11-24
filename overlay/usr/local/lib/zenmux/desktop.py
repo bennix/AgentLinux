@@ -28,7 +28,10 @@ def button(label, callback):
 class Window(Gtk.Window):
     def __init__(self):
         super().__init__(title=tr('ZenMux Desktop Assistant'))
-        self.set_default_size(680, 610)
+        display = self.get_display()
+        monitor = display.get_primary_monitor() or display.get_monitor(0)
+        area = monitor.get_workarea()
+        self.set_default_size(min(680, area.width - 24), min(610, area.height - 64))
         self.cfg = backend.load()
         self.history = [{"role": "system", "content": tr('Respond in English. Use the available tools when the user requests desktop actions.')}]
         self.book = Gtk.Notebook()
@@ -190,10 +193,14 @@ class Window(Gtk.Window):
             self.log.get_buffer().set_text("")
         if provider not in self.profiles:
             self.provider.append_text(provider)
+        apply_proxy = self.cfg.get("desktop_proxy") or cfg["desktop_proxy"]
         self.profiles = profiles
         self.cfg = cfg
         if added:
             self.model.append_text(model)
+        if not apply_proxy:
+            self.status.set_text(tr('Settings saved locally'))
+            return
         restart = subprocess.run(["systemctl", "--user", "restart", "zenmux-network.service"],
                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.status.set_text(tr('Settings saved locally') if restart.returncode == 0 else tr('Settings saved. The desktop proxy service failed to start.'))
@@ -239,17 +246,7 @@ class Window(Gtk.Window):
             try:
                 fn = call["function"]
                 args = json.loads(fn["arguments"])
-                labels = {"open_home": tr('Open home folder'), "create_folder": tr('Create a folder in your home directory'),
-                          "system_info": tr('View system information'),
-                          "network_status": tr('Inspect active NetworkManager connections and the system tunnel'),
-                          "disk_usage": tr('Inspect available space on local filesystems'),
-                          "failed_services": tr('List failed system and user services'),
-                          "list_controls": tr('List visible buttons in a selected window'),
-                          "activate_control": tr('Activate a named control in a selected window'),
-                          "list_apps": tr('List installed desktop applications'),
-                          "launch_app": tr('Launch an installed application by its desktop ID'),
-                          "list_windows": tr('List open desktop windows and titles'),
-                          "focus_window": tr('Activate a listed desktop window')}
+                labels = {tool["function"]["name"]: tool["function"]["description"] for tool in backend.TOOLS}
                 dialog = Gtk.MessageDialog(transient_for=self, modal=True, buttons=Gtk.ButtonsType.OK_CANCEL,
                                            text=labels[fn["name"]])
                 dialog.format_secondary_text(json.dumps(args, ensure_ascii=False) + "\n" + tr("The result will be sent to your selected AI provider."))

@@ -9,7 +9,7 @@ gi.require_version("Atspi", "2.0")
 from gi.repository import Atspi
 
 ROLES = {Atspi.Role.PUSH_BUTTON, Atspi.Role.CHECK_BOX, Atspi.Role.RADIO_BUTTON,
-         Atspi.Role.TOGGLE_BUTTON, Atspi.Role.PAGE_TAB, Atspi.Role.MENU_ITEM}
+         Atspi.Role.TOGGLE_BUTTON, Atspi.Role.PAGE_TAB, Atspi.Role.SLIDER, Atspi.Role.MENU_ITEM}
 
 
 def selected_window(wid):
@@ -26,6 +26,14 @@ def selected_window(wid):
     raise ValueError("Window unavailable or ambiguous")
 
 
+def tab_selector(obj):
+    if obj.get_role() == Atspi.Role.PAGE_TAB:
+        parent = obj.get_parent()
+        if parent and parent.get_role() == Atspi.Role.PAGE_TAB_LIST and "Selection" in parent.get_interfaces():
+            return parent
+    return None
+
+
 def controls(window):
     queue = deque([(window, "")])
     visited = 0
@@ -35,7 +43,11 @@ def controls(window):
         states = obj.get_state_set()
         if obj.get_role() in ROLES and states.contains(Atspi.StateType.SHOWING) and states.contains(Atspi.StateType.ENABLED):
             label = obj.get_name()
-            if label and obj.get_n_actions() == 1:
+            if label and obj.get_role() == Atspi.Role.SLIDER and "Value" in obj.get_interfaces():
+                yield obj, {"path": path, "role": obj.get_role_name(), "label": label[:200],
+                            "value": obj.get_current_value(), "minimum": obj.get_minimum_value(),
+                            "maximum": obj.get_maximum_value()}
+            elif label and (tab_selector(obj) or ("Action" in obj.get_interfaces() and obj.get_n_actions() == 1)):
                 yield obj, {"path": path, "role": obj.get_role_name(), "label": label[:200]}
         for i in range(min(obj.get_child_count(), 1200 - visited - len(queue))):
             child = obj.get_child_at_index(i)
@@ -51,7 +63,23 @@ def main():
         return
     for obj, info in items:
         if all(info[k] == args[k] for k in ("path", "role", "label")):
-            if obj.do_action(0):
+            if operation == "set_slider_value":
+                if "value" not in info or not info["minimum"] <= args["value"] <= info["maximum"]:
+                    break
+                if not obj.set_current_value(args["value"]):
+                    break
+                info["value"] = obj.get_current_value()
+                print(json.dumps(info, ensure_ascii=False))
+                return
+            if "value" in info:
+                break
+            parent = tab_selector(obj)
+            if parent:
+                index = obj.get_index_in_parent()
+                success = index >= 0 and parent.get_child_at_index(index) == obj and parent.select_child(index)
+            else:
+                success = obj.do_action(0)
+            if success:
                 print(json.dumps(info, ensure_ascii=False))
                 return
             break
