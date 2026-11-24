@@ -2,6 +2,7 @@
 import os
 import subprocess
 from functools import lru_cache
+from pathlib import Path
 
 import cairo
 
@@ -418,6 +419,9 @@ class Wireless(Gtk.Application):
         ipv4 = profile.get_setting_ip4_config() if profile else None
         properties.set_sensitive(bool(ipv4 and ipv4.get_method() in ("auto", "manual")))
         properties.connect("clicked", lambda _: dns_properties(dialog, profile, tr))
+        statistics = Path("/sys/class/net") / dev.get_iface() / "statistics"
+        sent = Gtk.Label(selectable=True, xalign=0)
+        received = Gtk.Label(selectable=True, xalign=0)
         page(tr("常规", "General"), [
             (tr("网络名称", "Network name"), name),
             (tr("接入点地址", "Access point address"), bssid),
@@ -426,6 +430,8 @@ class Wireless(Gtk.Application):
             (tr("状态", "Status"), tr("已连接", "Connected")),
             (tr("连接速度", "Link speed"), speed),
             (tr("信号强度", "Signal strength"), signal),
+            (tr("发送的数据包", "Packets sent"), sent),
+            (tr("收到的数据包", "Packets received"), received),
         ], properties)
         copy = Gtk.Button(label=tr("复制网络详情", "Copy network details"))
         support = page(tr("支持", "Support"), [], copy)
@@ -443,6 +449,12 @@ class Wireless(Gtk.Application):
         def refresh_addresses():
             nonlocal displayed
             update_access_point()
+            for field, counter in ((sent, "tx_packets"), (received, "rx_packets")):
+                try:
+                    count = int((statistics / counter).read_text())
+                    field.set_text(f"{count:,}")
+                except (OSError, ValueError):
+                    field.set_text(tr("未知", "Unknown"))
             fields = address_fields(dev, tr)
             if fields != displayed:
                 for child in support.get_children():
