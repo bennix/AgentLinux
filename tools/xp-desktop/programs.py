@@ -133,17 +133,51 @@ def reload_apps(*_):
 
 
 filtered = rows.filter_new()
+search_package = None
+
+
 def matches_program(model, item, _data):
-    query = search.get_text().strip().casefold()
-    if query.endswith(".deb"):
-        query = Path(query).name[:-4].partition("_")[0]
+    if search_package is not None:
         info = packages.get(model[item][1])
-        return bool(info and info[0].partition(":")[0].casefold() == query)
-    return query in model[item][2]
+        return bool(info and info[0].partition(":")[0].casefold() == search_package)
+    return search.get_text().strip().casefold() in model[item][2]
 
 
+def read_package_name(path):
+    result = subprocess.run(["dpkg-deb", "--field", str(path), "Package"], capture_output=True,
+                            text=True, check=True, timeout=5)
+    return result.stdout.strip().casefold()
+
+
+def use_package_name(job, original):
+    global search_package
+    if search.get_text().strip() == original:
+        try:
+            search_package = job.result()
+        except (OSError, ValueError, subprocess.SubprocessError):
+            return False
+        filtered.refilter()
+    return False
+
+
+def update_search(_entry):
+    global search_package
+    original = search.get_text().strip()
+    search_package = None
+    if original.lower().endswith(".deb"):
+        path = Path(original)
+        search_package = path.stem.partition("_")[0].casefold()
+        if path.parent == Path(".") and downloads_folder:
+            path = Path(downloads_folder) / path
+        if path.is_absolute() and path.is_file():
+            job = worker.submit(read_package_name, path)
+            job.add_done_callback(lambda done: GLib.idle_add(use_package_name, done, original))
+    filtered.refilter()
+
+
+downloads_folder = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOWNLOAD)
 filtered.set_visible_func(matches_program)
-search.connect("search-changed", lambda _: filtered.refilter())
+search.connect("search-changed", update_search)
 table = Gtk.TreeView(model=filtered)
 column = Gtk.TreeViewColumn(tr("名称", "Name"))
 icon = Gtk.CellRendererPixbuf()
