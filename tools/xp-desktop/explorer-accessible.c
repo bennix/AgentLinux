@@ -37,6 +37,28 @@ static const gchar *file_name(AtkObject *object)
     return item->label;
 }
 
+static AtkStateSet *file_states(AtkObject *object)
+{
+    FileItem *item = (FileItem *)object;
+    AtkStateSet *states = ATK_OBJECT_CLASS(file_item_parent_class)->ref_state_set(object);
+    g_autoptr(WinTCCtlListView) view = current_view(item);
+    g_autoptr(GtkTreePath) path = gtk_tree_row_reference_get_path(item->row);
+    if (!view || !path) {
+        atk_state_set_add_state(states, ATK_STATE_DEFUNCT);
+        return states;
+    }
+    atk_state_set_add_state(states, ATK_STATE_SELECTABLE);
+    GList *selected = wintc_ctl_list_view_get_selected_items(view);
+    for (GList *entry = selected; entry; entry = entry->next) {
+        if (gtk_tree_path_compare(entry->data, path) == 0) {
+            atk_state_set_add_state(states, ATK_STATE_SELECTED);
+            break;
+        }
+    }
+    g_list_free_full(selected, (GDestroyNotify)gtk_tree_path_free);
+    return states;
+}
+
 static gboolean file_action(AtkAction *action, gint index)
 {
     FileItem *item = (FileItem *)action;
@@ -74,6 +96,7 @@ static void file_item_class_init(FileItemClass *klass)
 {
     G_OBJECT_CLASS(klass)->finalize = file_finalize;
     ATK_OBJECT_CLASS(klass)->get_name = file_name;
+    ATK_OBJECT_CLASS(klass)->ref_state_set = file_states;
 }
 static void file_item_init(FileItem *item)
 {
