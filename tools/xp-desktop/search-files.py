@@ -8,7 +8,7 @@ from queue import Empty, Full, Queue
 import gi
 gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
-from gi.repository import Gdk, Gio, GLib, Gtk
+from gi.repository import Gdk, Gio, GLib, GObject, Gtk
 
 from task_pane import add_task_pane, fit_window
 
@@ -51,7 +51,7 @@ stop.set_sensitive(False)
 buttons.add(start)
 buttons.add(stop)
 sidebar.add(buttons)
-model = Gtk.ListStore(str, str, Gio.Icon)
+model = Gtk.ListStore(str, str, Gio.Icon, GObject.TYPE_INT64, str)
 results = Gtk.TreeView(model=model)
 for i, title in enumerate([tr("名称", "Name"), tr("所在文件夹", "In Folder")]):
     column = Gtk.TreeViewColumn(title)
@@ -65,6 +65,11 @@ for i, title in enumerate([tr("名称", "Name"), tr("所在文件夹", "In Folde
     column.set_resizable(True)
     column.set_sort_column_id(i)
     results.append_column(column)
+size_cell = Gtk.CellRendererText(xalign=1)
+size_column = Gtk.TreeViewColumn(tr("大小", "Size"), size_cell, text=4)
+size_column.set_sort_column_id(3)
+size_column.set_resizable(True)
+results.append_column(size_column)
 scroll = Gtk.ScrolledWindow()
 scroll.add(results)
 panes.pack2(scroll, True, False)
@@ -109,7 +114,14 @@ def search(_widget):
                     return
                 if fnmatch.fnmatchcase(name.casefold(), pattern):
                     content_type = "inode/directory" if name in folder_names else Gio.content_type_guess(name, None)[0]
-                    batch.append((name, directory, Gio.content_type_get_icon(content_type)))
+                    size = -1
+                    if name not in folder_names:
+                        try:
+                            size = os.stat(os.path.join(directory, name), follow_symlinks=False).st_size
+                        except OSError:
+                            pass
+                    size_text = (f"{(size + 1023) // 1024:,} KB" if size >= 0 else "")
+                    batch.append((name, directory, Gio.content_type_get_icon(content_type), size, size_text))
                     if len(batch) == 100:
                         send(batch)
                         batch = []
@@ -141,7 +153,7 @@ def search(_widget):
 
 
 def open_result(_tree, path, _column):
-    name, directory, _icon = model[path]
+    name, directory, *_ = model[path]
     launch_path(Path(directory, name))
 
 
@@ -159,7 +171,7 @@ def result_menu(event=None):
     selected_model, row = results.get_selection().get_selected()
     if row is None:
         return False
-    name, directory, _icon = selected_model[row]
+    name, directory, *_ = selected_model[row]
     menu = Gtk.Menu()
     menu.attach_to_widget(results, None)
     for label, target in [(tr("打开", "Open"), Path(directory, name)),
