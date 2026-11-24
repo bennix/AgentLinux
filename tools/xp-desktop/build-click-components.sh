@@ -52,3 +52,4 @@ for file in "$work/accesskeys" "$work/libwintc-comctl.so.1" "$work/peony/libpeon
 done
 install -m644 /var/lib/dpkg/info/libpeony3t64.md5sums "$dest/libpeony3t64.md5sums"
 install -m644 /usr/share/locale-langpack/zh_CN/LC_MESSAGES/gtk30.mo "$dest/gtk30-zh_CN.mo"
+localedef --no-archive -i en_US -f UTF-8 "$dest/en_US.utf8"

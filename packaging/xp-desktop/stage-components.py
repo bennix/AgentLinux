@@ -30,6 +30,11 @@ files = [
     (assets.parents[1] / "packaging/branding/greeter-logo.png", installer_assets / "images/college-emblem.png", 0o644),
 ]
 slides = Path(__file__).with_name("installer") / "slides"
+for category in ("ADDRESS", "COLLATE", "CTYPE", "IDENTIFICATION", "MEASUREMENT",
+                 "MESSAGES/SYS_LC_MESSAGES", "MONETARY", "NAME", "NUMERIC", "PAPER",
+                 "TELEPHONE", "TIME"):
+    relative = Path("en_US.utf8") / ("LC_" + category)
+    files.append((args.components / relative, Path("usr/lib/locale") / relative, 0o644))
 for slide in sorted(slides.glob("*/*.html")):
     files.append((slide, installer_assets / "slides" / slide.relative_to(slides), 0o644))
 for relative in ("accesskeys", "clock-entry.so", "start-actions.so", "task-manager-run.so", "taskmgr-localized", "notepad", "mount-compat.so", "run-shortcut",
