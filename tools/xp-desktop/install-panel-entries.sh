@@ -72,6 +72,15 @@ access|Accessibility Options|辅助功能选项|preferences-desktop-accessibilit
 fonts|Fonts|字体|preferences-desktop-font
 userinfo|User Accounts|用户帐户|preferences-desktop-personal
 ITEMS
+cat > "$apps/agentlinux-xp-search.desktop" <<ENTRY
+[Desktop Entry]
+Type=Application
+Name=Search for Files and Folders
+Name[zh_CN]=搜索文件和文件夹
+Exec=/usr/bin/python3 "$assets/search-files.py"
+Icon=system-search
+NoDisplay=true
+ENTRY
 cat > "$apps/agentlinux-xp-wifi.desktop" <<ENTRY
 [Desktop Entry]
 Type=Application

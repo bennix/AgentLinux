@@ -54,6 +54,7 @@ int main(void)
         {XK_r, super, "agentlinux-xp-run", 0},
         {XK_Escape, ControlMask | ShiftMask, "agentlinux-xp-taskmgr", 0},
         {XK_e, super, "agentlinux-xp-computer", 0},
+        {XK_f, super, "agentlinux-xp-search", 0},
         {XK_Pause, super, "agentlinux-xp-system", 0},
     };
     XSetErrorHandler(grab_error);
