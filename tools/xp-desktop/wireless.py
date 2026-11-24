@@ -354,10 +354,11 @@ class Wireless(Gtk.Application):
         def fill_grid(grid, fields):
             for row, (label, value) in enumerate(fields):
                 grid.attach(Gtk.Label(label=label, xalign=0), 0, row, 1, 1)
-                field = value if isinstance(value, Gtk.Label) else Gtk.Label(label=value, selectable=True, xalign=0)
-                field.set_line_wrap(True)
-                field.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
-                field.set_max_width_chars(40)
+                field = value if isinstance(value, Gtk.Widget) else Gtk.Label(label=value, selectable=True, xalign=0)
+                if isinstance(field, Gtk.Label):
+                    field.set_line_wrap(True)
+                    field.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
+                    field.set_max_width_chars(40)
                 grid.attach(field, 1, row, 1, 1)
         def page(title, fields, footer=None):
             grid = Gtk.Grid(row_spacing=8, column_spacing=16, border_width=12)
@@ -376,7 +377,11 @@ class Wireless(Gtk.Application):
             return grid
 
         speed = Gtk.Label(selectable=True, xalign=0)
-        signal = Gtk.Label(selectable=True, xalign=0)
+        signal = Gtk.Box(spacing=6)
+        bars = Gtk.Image()
+        percentage = Gtk.Label(selectable=True, xalign=0)
+        signal.pack_start(bars, False, False, 0)
+        signal.pack_start(percentage, False, False, 0)
 
         def update_speed(*_):
             bitrate = dev.get_bitrate()
@@ -399,7 +404,9 @@ class Wireless(Gtk.Application):
             mhz = current.get_frequency() if current else 0
             frequency.set_text(f"{mhz} MHz" if mhz else unknown)
             security.set_text(security_label(current) if current else unknown)
-            signal.set_text(f"{current.get_strength()}%" if current else unknown)
+            strength = current.get_strength() if current else 0
+            bars.set_from_pixbuf(signal_bars((strength + 19) // 20))
+            percentage.set_text(f"{strength}%" if current else unknown)
 
         update_speed()
         update_access_point()
