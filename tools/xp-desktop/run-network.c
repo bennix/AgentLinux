@@ -30,7 +30,7 @@ gboolean wintc_launch_command(const gchar *command, GError **error)
                 if (!g_strcmp0(resolved, dispatcher)) {
                     g_autofree gchar *quoted = g_shell_quote(alias);
                     g_autofree gchar *normalized = g_strconcat(quoted, start + len, NULL);
-                    return launch(normalized, error);
+                    return g_spawn_command_line_async(normalized, error);
                 }
             }
             return launch(command, error);

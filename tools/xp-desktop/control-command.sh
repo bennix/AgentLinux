@@ -5,6 +5,8 @@ if [ "$name" = control ] || [ "$name" = control.exe ]; then
     name=$(printf '%s' "${1:-panel}" | LC_ALL=C tr '[:upper:]' '[:lower:]')
 fi
 case "$name" in
+    notepad.exe) exec "$HOME/.local/share/agentlinux-xp/notepad" "$@" ;;
+    taskmgr.exe) exec "$HOME/.local/share/agentlinux-xp/task-manager.sh" "$@" ;;
     calc|calc.exe) exec /usr/bin/mate-calc "$@" ;;
     access.cpl|accessibility) app=access ;;
     intl.cpl|international) exec "$HOME/.local/share/agentlinux-xp/control-panel.py" --language ;;
