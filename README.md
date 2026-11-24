@@ -27,6 +27,17 @@ API 密钥与模型设置保存在当前用户主目录的 `~/.config/zenmux-age
 
 需要 Python 3.9+、xorriso 和支持 xz 的 squashfs-tools。将[官方底包](https://cdimage.ubuntu.com/ubuntukylin/releases/24.04/release/ubuntukylin-24.04.5-desktop-amd64.iso)放在 `build/base.iso`。项目中的 `overlay/` 包含已准备好的 ZenCode、Obscura Firefox、Cage 安装包、输入法配置和系统集成文件。运行 `python3 build-iso.py`。脚本验证底包 SHA-256，生成附加 SquashFS 层，更新 Live 引导参数、两种安装源和校验清单，输出 ISO 和 SHA-256 文件。
 
+### 检查 XP 候选镜像的构建层
+
+上面的 `build-iso.py` 生成基础 Agent 层。XP 候选版另外打入桌面组件、登录界面和启动主题。要从已有 XP 镜像核对实际打包内容，可在一个新建目录中执行：
+
+```sh
+xorriso -indev /path/to/AgentLinux-XP.iso -osirrox on -extract /casper/minimal.standard.agent.apps.xp.squashfs xp-standard.squashfs
+unsquashfs -ll xp-standard.squashfs
+```
+
+标准硬盘安装使用上述 XP 层。Live 桌面和最小安装分别使用 `minimal.standard.live.agent.apps.xp.squashfs` 和 `minimal.agent.apps.xp.squashfs`。桌面组件的打包映射见 [stage-components.py](packaging/xp-desktop/stage-components.py)，Live 启动主题的生成步骤见 [build-live-initrd.py](packaging/xp-desktop/boot/build-live-initrd.py)。
+
 ## Claude Cage
 
 应用菜单中的 **Claude Cage 隔离工作台设置** 使用镜像随附的官方 0.2.0-rc amd64 安装包。首次打开时确认安装，随后可选择联网安装本机虚拟机组件。工作台以普通用户运行。使用本机客机需要可读写的 /dev/kvm、虚拟磁盘空间及首次客机下载；在 Apple Silicon 上模拟 x86 桌面无法提供该 x86 KVM 环境。账号使用须遵循服务商规则。详见[官方项目](https://github.com/Lee-xeo/Claude-Cage)。
