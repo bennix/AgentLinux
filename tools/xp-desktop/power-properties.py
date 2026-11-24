@@ -106,9 +106,14 @@ def refresh():
     batteries = 0
     for device in sorted(Path("/sys/class/power_supply").glob("*")):
         try:
+            try:
+                if (device / "scope").read_text().strip() == "Device":
+                    continue
+            except FileNotFoundError:
+                pass
             kind = (device / "type").read_text().strip()
             if kind != "Battery":
-                if kind in ("Mains", "USB", "USB_C", "USB_PD", "Wireless"):
+                if kind in ("Mains", "Wireless") or kind.startswith("USB"):
                     supplies.append(int((device / "online").read_text()))
                 continue
             capacity = int((device / "capacity").read_text())
