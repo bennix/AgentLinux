@@ -44,12 +44,21 @@ event_names = {
 def pactl(*args):
     return subprocess.run(["pactl", *args], env={**os.environ, "LC_ALL": "C"}, encoding="utf-8", capture_output=True, check=True, timeout=5).stdout.strip()
 
+def device_label(description):
+    # PulseAudio constructs these labels in the server's login language.
+    for zh, en in (("内置音频 模拟立体声", "Built-in Audio Analog Stereo"),
+                   ("监听设备：", "Monitor of "),
+                   (" (回声消除参考：", " (echo cancelled with ")):
+        description = description.replace(en, tr(zh, en)).replace(zh, tr(zh, en))
+    return description
+
+
 def devices(kind):
     found = {}
     for block in re.split(r"(?m)^\S+ #\d+\s*$", pactl("list", kind)):
         fields = dict(re.findall(r"(?m)^\t(Name|Description): (.+)$", block))
         if "Name" in fields:
-            found[fields["Name"]] = fields.get("Description", fields["Name"])
+            found[fields["Name"]] = device_label(fields.get("Description", fields["Name"]))
     return found
 
 dialog = Gtk.Dialog(title=tr("声音和音频设备 属性", "Sounds and Audio Devices Properties"))
