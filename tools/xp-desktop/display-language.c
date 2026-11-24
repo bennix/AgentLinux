@@ -901,7 +901,7 @@ static gboolean on_map(GSignalInvocationHint *hint, guint count, const GValue *v
             g_signal_connect_object(select, "activate", G_CALLBACK(select_display_page), widget, 0);
             g_action_map_add_action(G_ACTION_MAP(app), G_ACTION(select));
             const char *requested = g_getenv("AGENTLINUX_DISPLAY_PAGE");
-            if (g_strcmp0(requested, "1") == 0 || g_strcmp0(requested, "4") == 0)
+            if (requested && requested[0] >= '0' && requested[0] <= '4' && !requested[1])
                 gtk_notebook_set_current_page(GTK_NOTEBOOK(widget), requested[0] - '0');
         }
         if (GTK_IS_SCALE(widget) && GTK_IS_APPLICATION_WINDOW(window)) {

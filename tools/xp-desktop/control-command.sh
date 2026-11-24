@@ -15,10 +15,11 @@ case "$name" in
     nusrmgr.cpl|userpasswords) app=userinfo ;;
     folders) exec "$HOME/.local/share/agentlinux-xp/control-panel.py" --folder-options ;;
     fonts) app=fonts ;;
-    desk.cpl|desktop|desk.cpl,,1|desk.cpl,,4)
+    desk.cpl|desktop|desk.cpl,,[0-4])
         case "$name:${1:-}" in
-            desk.cpl,,1:*|*:--desktop) export AGENTLINUX_DISPLAY_PAGE=1 ;;
-            desk.cpl,,4:*|*:--settings) export AGENTLINUX_DISPLAY_PAGE=4 ;;
+            desk.cpl,,[0-4]:*) export AGENTLINUX_DISPLAY_PAGE=${name##*,} ;;
+            *:--desktop) export AGENTLINUX_DISPLAY_PAGE=1 ;;
+            *:--settings) export AGENTLINUX_DISPLAY_PAGE=4 ;;
         esac
         if [ -n "${AGENTLINUX_DISPLAY_PAGE:-}" ] &&
            gdbus call --session --dest org.freedesktop.DBus --object-path /org/freedesktop/DBus \
