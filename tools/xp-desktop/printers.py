@@ -100,11 +100,17 @@ def refresh(*_, select_name=None, background=False):
     last_queue_status = status
 
 
+queue_windows = {}
+
+
 def open_queue(*_):
     model, item = table.get_selection().get_selected()
     if item is None:
         return
     name = model[item][0]
+    if name in queue_windows:
+        queue_windows[name].present()
+        return
     queue = Gtk.Window(title=name, transient_for=window, destroy_with_parent=True)
     queue.set_icon_name("printer")
     monitor = window.get_display().get_monitor_at_window(window.get_window())
@@ -306,7 +312,12 @@ def open_queue(*_):
     reload_jobs()
     update_actions()
     timer = GLib.timeout_add_seconds(3, reload_jobs)
-    queue.connect("destroy", lambda *_: GLib.source_remove(timer))
+    def queue_closed(*_):
+        GLib.source_remove(timer)
+        del queue_windows[name]
+
+    queue_windows[name] = queue
+    queue.connect("destroy", queue_closed)
     queue.show_all()
 
 
