@@ -1,6 +1,6 @@
 # AgentLinux
 
-XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。v2026.11.25.4 已在 BIOS 和 UEFI 虚拟机中从只读 USB 启动至中文桌面。v2026.11.25.3 已在 UEFI 虚拟机中完成硬盘安装，并在移除 ISO 后登录中文桌面。
+XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。v2026.11.25.4 已在 BIOS 和 UEFI 虚拟机中从只读 USB 启动至中文桌面。v2026.11.25.4 已在 UEFI 虚拟机中完成硬盘安装，并在移除 ISO 后登录中文桌面。
 
 **[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.25.4/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.25.4/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
