@@ -9,7 +9,7 @@ from queue import Empty, Full, Queue
 import gi
 gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
-from gi.repository import Gdk, Gio, GLib, GObject, Gtk
+from gi.repository import Gdk, Gio, GLib, GObject, Gtk, Pango
 
 from task_pane import add_task_pane, fit_window
 
@@ -70,11 +70,25 @@ for i, title in enumerate([tr("名称", "Name"), tr("所在文件夹", "In Folde
         column.pack_start(icon, False)
         column.add_attribute(icon, "gicon", 2)
     text = Gtk.CellRendererText()
+    text.set_property("ellipsize", Pango.EllipsizeMode.MIDDLE)
+    column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+    column.set_fixed_width(135 if i == 0 else 120)
     column.pack_start(text, True)
     column.add_attribute(text, "text", i)
     column.set_resizable(True)
     column.set_sort_column_id(i)
     results.append_column(column)
+def result_tooltip(tree, x, y, keyboard, tooltip):
+    found, _, _, data, path, row = tree.get_tooltip_context(x, y, keyboard)
+    if not found:
+        return False
+    tooltip.set_text(os.path.join(data[row][1], data[row][0]))
+    tree.set_tooltip_row(tooltip, path)
+    return True
+
+
+results.set_has_tooltip(True)
+results.connect("query-tooltip", result_tooltip)
 size_cell = Gtk.CellRendererText(xalign=1)
 size_column = Gtk.TreeViewColumn(tr("大小", "Size"), size_cell, text=4)
 size_column.set_sort_column_id(3)
