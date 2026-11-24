@@ -130,8 +130,13 @@ def reload_apps(*_):
                             names.append(translations.get_locale_string("Desktop Entry", key, language))
             except GLib.Error:
                 pass
+            cached = packages.get(filename)
+            size = cached[2] if cached else -1
+            if cached:
+                names.append(cached[0])
             rows.append([display_name, filename, "\n".join(names).casefold(),
-                         app.get_icon() or Gio.ThemedIcon.new("application-x-executable"), -1, "—"])
+                         app.get_icon() or Gio.ThemedIcon.new("application-x-executable"), size,
+                         size_label(size) if cached else "—"])
     if previous:
         for row in filtered:
             if row[1] == previous:
@@ -251,8 +256,10 @@ def load_sizes(job):
     # Updating a sorted column can move a row during iteration.
     items = [(row.iter, packages[row[1]]) for row in rows if row[1] in packages]
     for item, (package, _, size) in items:
-        terms = rows[item][2] + "\n" + package.casefold()
-        rows.set(item, 2, terms, 4, size, 5, size_label(size))
+        terms = rows[item][2].splitlines()
+        if package.casefold() not in terms:
+            terms.append(package.casefold())
+        rows.set(item, 2, "\n".join(terms), 4, size, 5, size_label(size))
     selected(table.get_selection())
     return False
 
