@@ -20,6 +20,15 @@ def tr(chinese, english):
     return chinese if zh else english
 
 
+def type_description(content_type):
+    labels = {
+        "inode/directory": tr("文件夹", "File Folder"),
+        "text/plain": tr("文本文档", "Text Document"),
+        "application/octet-stream": tr("文件", "File"),
+    }
+    return labels.get(content_type) or Gio.content_type_get_description(content_type)
+
+
 window = Gtk.Window(title=tr("搜索结果", "Search Results"))
 window.set_icon_name("system-search")
 fit_window(window, 800, 540)
@@ -52,7 +61,7 @@ stop.set_sensitive(False)
 buttons.add(start)
 buttons.add(stop)
 sidebar.add(buttons)
-model = Gtk.ListStore(str, str, Gio.Icon, GObject.TYPE_INT64, str, float, str)
+model = Gtk.ListStore(str, str, Gio.Icon, GObject.TYPE_INT64, str, float, str, str)
 results = Gtk.TreeView(model=model)
 for i, title in enumerate([tr("名称", "Name"), tr("所在文件夹", "In Folder")]):
     column = Gtk.TreeViewColumn(title)
@@ -71,6 +80,10 @@ size_column = Gtk.TreeViewColumn(tr("大小", "Size"), size_cell, text=4)
 size_column.set_sort_column_id(3)
 size_column.set_resizable(True)
 results.append_column(size_column)
+type_column = Gtk.TreeViewColumn(tr("类型", "Type"), Gtk.CellRendererText(), text=7)
+type_column.set_sort_column_id(7)
+type_column.set_resizable(True)
+results.append_column(type_column)
 modified_column = Gtk.TreeViewColumn(tr("修改日期", "Date Modified"), Gtk.CellRendererText(), text=6)
 modified_column.set_sort_column_id(5)
 modified_column.set_resizable(True)
@@ -132,7 +145,7 @@ def search(_widget):
                         pass
                     size_text = (f"{(size + 1023) // 1024:,} KB" if size >= 0 else "")
                     batch.append((name, directory, Gio.content_type_get_icon(content_type), size, size_text,
-                                  modified, modified_text))
+                                  modified, modified_text, type_description(content_type)))
                     if len(batch) == 100:
                         send(batch)
                         batch = []
