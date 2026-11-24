@@ -1,5 +1,14 @@
 --- a/src/lstvwctl.c
 +++ b/src/lstvwctl.c
+@@ -8,2 +8,4 @@
+ #include "../public/lstvwctl.h"
+ 
++GType file_list_get_type(void);
++
+@@ -401,1 +403,3 @@
++    gtk_widget_class_set_accessible_type(widget_class, file_list_get_type());
++    gtk_widget_class_set_accessible_role(widget_class, ATK_ROLE_LIST);
+     gtk_widget_class_set_css_name(widget_class, "listview");
 @@ -2160,6 +2160,7 @@
      //
      if (

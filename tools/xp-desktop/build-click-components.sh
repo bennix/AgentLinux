@@ -16,6 +16,7 @@ cp -R "$wintc/shared/comctl" "$work/comctl"
 (
     cd "$work/comctl"
     patch --batch --forward -p1 < "$assets/explorer-single-click.patch"
+    cp "$assets/explorer-accessible.c" src/
     (cd src/res && glib-compile-resources --target=../resources.c --generate resources.xml)
     cc -O2 -fPIC -shared -Wl,-soname,libwintc-comctl.so.1 src/*.c \
         $(pkg-config --cflags --libs gtk+-3.0 wintc-comgtk wintc-shcommon wintc-shlang) \
