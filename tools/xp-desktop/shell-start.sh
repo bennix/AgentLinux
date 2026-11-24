@@ -19,6 +19,15 @@ xfwm_ready() {
     wm_window=$(xprop -root _NET_SUPPORTING_WM_CHECK | awk '/window id/ {print $NF}')
     [ -n "$wm_window" ] && xprop -id "$wm_window" _NET_WM_NAME 2>/dev/null | grep -q '"Xfwm4"'
 }
+# Prepare launchers and display settings while UKUI starts its session.
+if [ "${1:-}" = --login ]; then
+    for attempt in $(seq 1 60); do
+        if xdotool search --onlyvisible --name '^UKUI Panel$' >/dev/null 2>&1; then
+            break
+        fi
+        sleep 1
+    done
+fi
 if ! xfwm_ready; then
     xfwm4 --replace --compositor=on 9>&- &
     wm_pid=$!
@@ -58,6 +67,12 @@ fi
 # Either panel can be mapped again while the session manager finishes startup.
 # Recheck on window-list changes, including the initial value reported by xprop.
 (
+    # A dock can join the client list before it becomes viewable.
+    while ! taskbar_visible; do
+        xprop -root _NET_CLIENT_LIST >/dev/null 2>&1 || exit 0
+        sleep 0.25
+    done
+    xdotool search --onlyvisible --name '^UKUI Panel$' windowunmap %@ || true
     xprop -spy -root _NET_CLIENT_LIST | while IFS= read -r event; do
         if taskbar_visible; then
             xdotool search --onlyvisible --name '^UKUI Panel$' windowunmap %@ || true
