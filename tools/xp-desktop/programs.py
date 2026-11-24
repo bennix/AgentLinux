@@ -104,15 +104,23 @@ def reload_apps(*_):
     for app in sorted(Gio.AppInfo.get_all(), key=lambda a: a.get_display_name().casefold()):
         if isinstance(app, Gio.DesktopAppInfo) and app.should_show():
             filename = app.get_filename()
-            names = [app.get_display_name(), app.get_string("Name") or ""]
+            display_name = app.get_display_name()
+            name = app.get_string("Name") or ""
+            generic = app.get_string("GenericName") or ""
+            if generic and display_name == f"{name} {generic}":
+                display_name = f"{app.get_name()} {app.get_locale_string('GenericName') or generic}"
+            names = [display_name, app.get_display_name(), name]
             translations = GLib.KeyFile()
             try:
                 translations.load_from_file(filename, GLib.KeyFileFlags.KEEP_TRANSLATIONS)
+                translation_keys, _ = translations.get_keys("Desktop Entry")
                 for language in ("zh_CN", "en_US"):
-                    names.append(translations.get_locale_string("Desktop Entry", "Name", language))
+                    for key in ("Name", "GenericName", "X-GNOME-FullName"):
+                        if key in translation_keys:
+                            names.append(translations.get_locale_string("Desktop Entry", key, language))
             except GLib.Error:
                 pass
-            rows.append([app.get_display_name(), filename, "\n".join(names).casefold(),
+            rows.append([display_name, filename, "\n".join(names).casefold(),
                          app.get_icon() or Gio.ThemedIcon.new("application-x-executable"), -1, "—"])
     if previous:
         for row in filtered:
