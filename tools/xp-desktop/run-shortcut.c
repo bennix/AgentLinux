@@ -1,5 +1,6 @@
 /* Passive X11 grabs for the XP desktop shortcuts. */
 #include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #include <X11/keysym.h>
 #include <X11/XKBlib.h>
 #include <signal.h>
@@ -31,6 +32,29 @@ static int claim_shortcuts(Display *display, Window root)
     return available;
 }
 
+/* Xfwm may bind only one accelerator for its show-desktop action. */
+static void toggle_desktop(Display *display, Window root)
+{
+    Atom property = XInternAtom(display, "_NET_SHOWING_DESKTOP", False);
+    Atom type;
+    int format;
+    unsigned long count, remaining;
+    unsigned char *value = NULL;
+    int status = XGetWindowProperty(display, root, property, 0, 1, False, XA_CARDINAL,
+                                    &type, &format, &count, &remaining, &value);
+    int showing = status == Success && type == XA_CARDINAL && format == 32 &&
+                  count == 1 && *(unsigned long *)value != 0;
+    if (value) XFree(value);
+    XEvent message = {0};
+    message.xclient.type = ClientMessage;
+    message.xclient.window = root;
+    message.xclient.message_type = property;
+    message.xclient.format = 32;
+    message.xclient.data.l[0] = !showing;
+    XSendEvent(display, root, False, SubstructureRedirectMask | SubstructureNotifyMask, &message);
+    XFlush(display);
+}
+
 int main(void)
 {
     Display *display = XOpenDisplay(NULL);
@@ -54,6 +78,7 @@ int main(void)
         {XK_r, super, "agentlinux-xp-run", 0},
         {XK_Escape, ControlMask | ShiftMask, "agentlinux-xp-taskmgr", 0},
         {XK_e, super, "agentlinux-xp-computer", 0},
+        {XK_d, super, NULL, 0},
         {XK_f, super, "agentlinux-xp-search", 0},
         {XK_Pause, super, "agentlinux-xp-system", 0},
     };
@@ -82,6 +107,10 @@ int main(void)
             if (event.xkey.keycode != shortcuts[i].key ||
                 (event.xkey.state & (0xffu & ~(LockMask | numlock))) != shortcuts[i].modifiers)
                 continue;
+            if (shortcuts[i].symbol == XK_d) {
+                toggle_desktop(display, root);
+                break;
+            }
             if (fork() == 0) {
                 close(ConnectionNumber(display));
                 if (shortcuts[i].entry)
