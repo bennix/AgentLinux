@@ -1,0 +1,29 @@
+--- a/lnkwiz.c
++++ b/lnkwiz.c
+@@ -771,5 +771,5 @@
+                 g_free(msg);
+ 
+-                if (response == WINTC_RESPONSE_NO)
++                if (response != WINTC_RESPONSE_YES)
+                 {
+                     goto cleanup_finish;
+@@ -833,4 +833,5 @@
+     // Try to find an available name on FS for this
+     //
++    g_autofree gchar* directory = g_path_get_dirname(lnkwiz->path);
+     gchar* dest_path = NULL;
+     gchar* test_name = NULL;
+@@ -844,5 +845,5 @@
+ 
+         dest_path =
+-            g_strdup_printf("%s/%s", lnkwiz->path, test_name);
++            g_strdup_printf("%s/%s.desktop", directory, test_name);
+ 
+         if (!g_file_test(dest_path, G_FILE_TEST_EXISTS))
+@@ -852,5 +853,5 @@
+ 
+         g_clear_pointer(&test_name, (GDestroyNotify) g_free);
+-        g_free(dest_path);
++        g_clear_pointer(&dest_path, g_free);
+     }
+ 
