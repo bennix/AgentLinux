@@ -3,14 +3,18 @@ import subprocess
 
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import GObject, Gtk
 
 
-def dns_properties(parent, profile, tr):
+def dns_properties(parent, profile, tr, device):
+    active = device.get_active_connection()
+    if not active or active.get_uuid() != profile.get_uuid():
+        return
     ipv4 = profile.get_setting_ip4_config()
     servers = [ipv4.get_dns(i) for i in range(ipv4.get_num_dns())]
     automatic = not ipv4.get_ignore_auto_dns() and not servers
     dialog = Gtk.Dialog(title=tr("Internet 协议 (TCP/IPv4) 属性", "Internet Protocol (TCP/IPv4) Properties"), transient_for=parent, modal=True)
+    dialog.set_destroy_with_parent(True)
     dialog.add_button(tr("取消", "Cancel"), Gtk.ResponseType.CANCEL)
     dialog.add_button(tr("确定", "OK"), Gtk.ResponseType.OK)
     grid = Gtk.Grid(border_width=14, column_spacing=12, row_spacing=8)
@@ -60,6 +64,11 @@ def dns_properties(parent, profile, tr):
     manual.connect("toggled", sensitivity)
     manual.set_active(not automatic)
     sensitivity()
+    def connection_changed(*_):
+        if device.get_active_connection() != active:
+            dialog.destroy()
+
+    handler = device.connect("notify::active-connection", connection_changed)
     dialog.show_all()
     try:
         while dialog.run() == Gtk.ResponseType.OK:
@@ -103,4 +112,5 @@ def dns_properties(parent, profile, tr):
                 break
             note.set_text(result.stderr.strip())
     finally:
+        GObject.signal_handler_disconnect(device, handler)
         dialog.destroy()

@@ -347,7 +347,7 @@ class Wireless(Gtk.Application):
     def edit_selected_ip(self, *_):
         profile = self.selected_ip_profile()
         if profile:
-            dns_properties(self.window, profile, tr)
+            dns_properties(self.window, profile, tr, self.selected()[1])
 
     def show_status(self, *_):
         ap, dev = self.selected()
@@ -436,7 +436,7 @@ class Wireless(Gtk.Application):
 
         def edit_profile(_button):
             if profile := current_profile():
-                dns_properties(dialog, profile, tr)
+                dns_properties(dialog, profile, tr, dev)
 
         def update_state(*_):
             state = dev.get_state()

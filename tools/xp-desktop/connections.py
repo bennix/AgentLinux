@@ -72,7 +72,7 @@ def show_properties(parent, device):
     ipv4 = Gtk.Button(label=tr("Internet 协议 (TCP/IPv4) 属性…", "Internet Protocol (TCP/IPv4) Properties…"))
     config = profile.get_setting_ip4_config() if profile else None
     ipv4.set_sensitive(bool(config and config.get_method() in ("auto", "manual")))
-    ipv4.connect("clicked", lambda _: dns_properties(dialog, profile, tr))
+    ipv4.connect("clicked", lambda _: dns_properties(dialog, profile, tr, device))
     general.add(ipv4)
     advanced = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, border_width=12)
     pages.append_page(advanced, Gtk.Label(label=tr("高级", "Advanced")))
@@ -96,9 +96,10 @@ def active_profile(device):
 
 
 def edit_dns(*_):
-    profile = active_profile(selected())
+    device = selected()
+    profile = active_profile(device)
     if profile and profile.get_setting_ip4_config():
-        dns_properties(window, profile, tr)
+        dns_properties(window, profile, tr, device)
 
 
 def wireless(*_):
