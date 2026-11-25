@@ -45,7 +45,8 @@ def show_sample(*_):
     if font is None:
         return
     dialog = Gtk.Dialog(title=font.get_family(), transient_for=window, modal=True)
-    dialog.add_button("关闭" if chinese else "Close", Gtk.ResponseType.CLOSE)
+    dialog.add_button("关闭(_C)" if chinese else "_Close", Gtk.ResponseType.CLOSE)
+    dialog.set_default_response(Gtk.ResponseType.CLOSE)
     dialog.set_default_size(560, 320)
     scroll = Gtk.ScrolledWindow()
     scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
@@ -97,7 +98,7 @@ box.pack_end(actions, False, False, 0)
 candidate = Gtk.Button(label="预览输入法候选字体（默认宋体）" if chinese else "Preview input method font (Song style by default)")
 candidate.connect("clicked", preview_candidates)
 actions.pack_start(candidate, False, False, 0)
-preview = Gtk.Button(label="字体样张…" if chinese else "Font sample…")
+preview = Gtk.Button.new_with_mnemonic("字体样张(_P)…" if chinese else "Font sam_ple…")
 preview.connect("clicked", show_sample)
 actions.pack_start(preview, False, False, 0)
 close = Gtk.Button.new_with_mnemonic("关闭(_C)" if chinese else "_Close")
