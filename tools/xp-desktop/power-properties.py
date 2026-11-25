@@ -153,11 +153,15 @@ def refresh():
             batteries += 1
         except (OSError, ValueError):
             continue
+    window.set_icon_name("ac-adapter" if any(supplies) else "battery")
     if supplies:
         source = tr("外部电源已连接", "External power connected") if any(supplies) else tr("外部电源未连接", "External power disconnected")
         label = Gtk.Label(label=source, xalign=0)
-        meter.pack_start(label, False, False, 0)
-        meter.reorder_child(label, 0)
+        source_row = Gtk.Box(spacing=8)
+        source_row.pack_start(Gtk.Image.new_from_icon_name(window.get_icon_name(), Gtk.IconSize.LARGE_TOOLBAR), False, False, 0)
+        source_row.pack_start(label, False, False, 0)
+        meter.pack_start(source_row, False, False, 0)
+        meter.reorder_child(source_row, 0)
     if not batteries:
         meter.add(Gtk.Label(label=tr("未检测到电池", "No battery detected")))
     meter.show_all()
