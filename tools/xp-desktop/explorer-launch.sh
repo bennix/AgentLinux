@@ -7,7 +7,7 @@ fi
 export GTK_MODULES="${GTK_MODULES:+$GTK_MODULES:}$assets/explorer-toolbar.so"
 case "${LANGUAGE:-${LC_ALL:-${LC_MESSAGES:-${LANG:-}}}}" in
     zh_CN*|zh:*)
-        export G_RESOURCE_OVERLAYS="/uk/oddmatics/wintc/explorer=$assets/explorer-zh:/uk/oddmatics/wintc/shell=$assets/shell-zh${G_RESOURCE_OVERLAYS:+:$G_RESOURCE_OVERLAYS}" ;;
+        export G_RESOURCE_OVERLAYS="/uk/oddmatics/wintc/explorer=$assets/explorer-zh:/uk/oddmatics/wintc/shell=$assets/shell-zh:/uk/oddmatics/wintc/appwiz=$assets/appwiz-zh:/uk/oddmatics/wintc/wizard97=$assets/wizard97-zh${G_RESOURCE_OVERLAYS:+:$G_RESOURCE_OVERLAYS}" ;;
 esac
 export LD_PRELOAD="$assets/mount-compat.so${LD_PRELOAD:+:$LD_PRELOAD}"
 if [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/agentlinux-xp/explorer-single-click" ]; then

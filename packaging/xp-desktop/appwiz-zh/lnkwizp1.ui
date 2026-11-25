@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<interface>
+  <object class="WinTCWizard97Page" id="page">
+    <property name="visible">True</property>
+    <property name="is-exterior-page">True</property>
+    <property name="orientation">vertical</property>
+
+    <child>
+      <object class="GtkLabel">
+        <property name="label">此向导可为本地或网络上的程序、文件、文件夹、计算机及网址创建快捷方式。</property>
+        <property name="visible">True</property>
+        <property name="max-width-chars">18</property>
+        <property name="wrap">True</property>
+        <property name="xalign">0.0</property>
+
+        <style>
+          <class name="wintc-mb-lg" />
+        </style>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkLabel">
+        <property name="label">请输入项目的位置：</property>
+        <property name="visible">True</property>
+        <property name="xalign">0.0</property>
+
+        <style>
+          <class name="wintc-mb-sm" />
+          <class name="wintc-mt-lg" />
+        </style>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="orientation">horizontal</property>
+
+        <child>
+          <object class="GtkEntry" id="entry-target">
+            <property name="visible">True</property>
+
+            <style>
+              <class name="wintc-mr-md" />
+            </style>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="button-browse">
+            <property name="visible">True</property>
+            <property name="label">浏览…</property>
+          </object>
+        </child>
+
+        <style>
+          <class name="wintc-mb-lg" />
+        </style>
+      </object>
+    </child>
+
+    <child>
+      <object class="GtkLabel">
+        <property name="label">单击“下一步”继续。</property>
+        <property name="visible">True</property>
+        <property name="xalign">0.0</property>
+
+        <style>
+          <class name="wintc-mt-lg" />
+        </style>
+      </object>
+    </child>
+  </object>
+</interface>
