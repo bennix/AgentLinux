@@ -311,7 +311,10 @@ def show(category=None):
             if item == previous:
                 focus = button
     else:
-        items = entries if classic else [by_name[name] for name in category[2]]
+        if classic:
+            items = sorted(entries, key=lambda item: GLib.utf8_collate_key(tr(*item[:2]), -1))
+        else:
+            items = [by_name[name] for name in category[2]]
         for zh, en, icon, desktop in items:
             button = tile(tr(zh, en), icon)
             if desktop:
