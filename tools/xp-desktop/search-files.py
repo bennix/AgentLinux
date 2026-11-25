@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 import fnmatch
+import locale
 import os
+import re
 import threading
 import time
 from pathlib import Path
@@ -62,6 +64,22 @@ buttons.add(start)
 buttons.add(stop)
 sidebar.add(buttons)
 model = Gtk.ListStore(str, str, Gio.Icon, GObject.TYPE_INT64, str, float, str, str)
+def filename_key(name):
+    # Compare digit runs by length and digits, including very long numeric names.
+    parts = re.split(r"([0-9]+)", name.casefold())
+    return tuple(locale.strxfrm(part) if index % 2 == 0 else
+                 (len(part.lstrip("0")), part.lstrip("0"), len(part))
+                 for index, part in enumerate(parts))
+
+
+def compare_names(data, first, second, _unused):
+    left = filename_key(data.get_value(first, 0))
+    right = filename_key(data.get_value(second, 0))
+    return (left > right) - (left < right)
+
+
+model.set_sort_func(0, compare_names, None)
+model.set_sort_column_id(0, Gtk.SortType.ASCENDING)
 results = Gtk.TreeView(model=model)
 for i, title in enumerate([tr("名称", "Name"), tr("所在文件夹", "In Folder")]):
     column = Gtk.TreeViewColumn(title)
