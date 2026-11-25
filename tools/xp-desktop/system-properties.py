@@ -41,6 +41,19 @@ dialog.set_default_response(Gtk.ResponseType.OK)
 tabs = Gtk.Notebook(border_width=8)
 dialog.get_content_area().pack_start(tabs, True, True, 0)
 
+def cycle_property_pages(_dialog, event):
+    modifiers = event.state & Gtk.accelerator_get_default_mod_mask()
+    ctrl = Gdk.ModifierType.CONTROL_MASK
+    shift = Gdk.ModifierType.SHIFT_MASK
+    if event.keyval not in (Gdk.KEY_Tab, Gdk.KEY_ISO_Left_Tab) or modifiers not in (ctrl, ctrl | shift):
+        return False
+    step = -1 if modifiers & shift else 1
+    tabs.set_current_page((tabs.get_current_page() + step) % tabs.get_n_pages())
+    tabs.grab_focus()
+    return True
+
+dialog.connect("key-press-event", cycle_property_pages)
+
 def page(zh, en):
     box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, border_width=16)
     tabs.append_page(box, Gtk.Label(label=tr(zh, en)))
