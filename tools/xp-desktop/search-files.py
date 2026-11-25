@@ -56,6 +56,21 @@ folder.set_current_folder(str(Path.home()))
 folder.set_filename(str(Path.home()))
 folder_label.set_mnemonic_widget(folder)
 sidebar.add(folder)
+size_section = Gtk.Expander(label=tr("文件大小是多少？", "What size is it?"))
+size_choices = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3, margin_start=6)
+size_section.add(size_choices)
+sidebar.add(size_section)
+size_filters = []
+for label, lower, upper in [
+    (tr("不限", "Don't remember"), None, None),
+    (tr("小（小于 100 KB）", "Small (less than 100 KB)"), 0, 100 * 1024 - 1),
+    (tr("中（100 KB 至 1 MB）", "Medium (100 KB to 1 MB)"), 100 * 1024, 1024 ** 2),
+    (tr("大（大于 1 MB）", "Large (more than 1 MB)"), 1024 ** 2 + 1, None),
+]:
+    group = size_filters[0][0] if size_filters else None
+    option = Gtk.RadioButton.new_with_label_from_widget(group, label)
+    size_choices.add(option)
+    size_filters.append((option, lower, upper))
 buttons = Gtk.ButtonBox()
 start = Gtk.Button.new_with_mnemonic(tr("搜索(_S)", "_Search"))
 stop = Gtk.Button.new_with_mnemonic(tr("停止(_T)", "S_top"))
@@ -135,6 +150,7 @@ def search(_widget):
     root = folder.get_filename()
     if not root:
         return
+    minimum, maximum = next((low, high) for option, low, high in size_filters if option.get_active())
     term = query.get_text().casefold()
     pattern = term if any(c in term for c in "*?[") else "*" + term + "*"
     cancel = threading.Event()
@@ -175,6 +191,10 @@ def search(_widget):
                         modified_text = time.strftime("%x %H:%M", time.localtime(modified))
                     except (OSError, OverflowError, ValueError):
                         pass
+                    if minimum is not None and size < minimum:
+                        continue
+                    if maximum is not None and size > maximum:
+                        continue
                     size_text = (f"{(size + 1023) // 1024:,} KB" if size >= 0 else "")
                     batch.append((name, directory, Gio.content_type_get_icon(content_type), size, size_text,
                                   modified, modified_text, type_description(content_type)))
