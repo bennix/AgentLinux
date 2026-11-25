@@ -143,7 +143,7 @@ def reload_hardware(_tabs, selected_page, _index):
                 continue
             identifier = kind + "/" + name
             hardware_info[identifier] = fields
-            hardware_devices.append(identifier, role + " · " + fields.get("Description", name))
+            hardware_devices.append(identifier, role + " · " + device_label(fields.get("Description", name)))
     if not hardware_devices.set_active_id(previous or ""):
         hardware_devices.set_active(0)
     show_hardware(hardware_devices)
