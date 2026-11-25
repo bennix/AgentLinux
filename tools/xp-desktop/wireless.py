@@ -424,10 +424,36 @@ class Wireless(Gtk.Application):
                     (dev, dev.connect("notify::active-access-point", update_access_point)),
                     (dev, dev.connect("notify::active-connection", update_access_point))]
         properties = Gtk.Button(label=tr("TCP/IPv4 属性", "TCP/IPv4 Properties"))
-        profile = connection.get_connection() if connection else None
-        ipv4 = profile.get_setting_ip4_config() if profile else None
-        properties.set_sensitive(bool(ipv4 and ipv4.get_method() in ("auto", "manual")))
-        properties.connect("clicked", lambda _: dns_properties(dialog, profile, tr))
+        state_label = Gtk.Label(selectable=True, xalign=0)
+
+        def current_profile():
+            if dev.get_state() == NM.DeviceState.ACTIVATED and dev.get_active_connection() == connection and connection:
+                profile = connection.get_connection()
+                ipv4 = profile.get_setting_ip4_config() if profile else None
+                if ipv4 and ipv4.get_method() in ("auto", "manual"):
+                    return profile
+            return None
+
+        def edit_profile(_button):
+            if profile := current_profile():
+                dns_properties(dialog, profile, tr)
+
+        def update_state(*_):
+            state = dev.get_state()
+            if state == NM.DeviceState.ACTIVATED:
+                text = tr("已连接", "Connected")
+            elif NM.DeviceState.PREPARE <= state <= NM.DeviceState.SECONDARIES:
+                text = tr("正在连接", "Connecting")
+            elif state == NM.DeviceState.DEACTIVATING:
+                text = tr("正在断开", "Disconnecting")
+            else:
+                text = tr("未连接", "Disconnected")
+            state_label.set_text(text)
+            properties.set_sensitive(current_profile() is not None)
+
+        properties.connect("clicked", edit_profile)
+        handlers.append((dev, dev.connect("notify::state", update_state)))
+        update_state()
         statistics = Path("/sys/class/net") / dev.get_iface() / "statistics"
         duration = Gtk.Label(selectable=True, xalign=0)
         sent = Gtk.Label(selectable=True, xalign=0)
@@ -437,7 +463,7 @@ class Wireless(Gtk.Application):
             (tr("接入点地址", "Access point address"), bssid),
             (tr("无线频率", "Radio frequency"), frequency),
             (tr("安全性", "Security"), security),
-            (tr("状态", "Status"), tr("已连接", "Connected")),
+            (tr("状态", "Status"), state_label),
             (tr("持续时间", "Duration"), duration),
             (tr("连接速度", "Link speed"), speed),
             (tr("信号强度", "Signal strength"), signal),
