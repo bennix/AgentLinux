@@ -40,6 +40,7 @@ while IFS='|' read -r key en zh icon; do
         keyboard|mouse) command="/usr/bin/python3 \"$assets/input-properties.py\" $key" ;;
         folder-options|language|settings) command="/usr/bin/python3 \"$assets/control-panel.py\" --$key" ;;
         admin) command="/usr/bin/python3 \"$assets/control-panel.py\" --admin-tools" ;;
+        about) command="/usr/bin/python3 \"$assets/system-properties.py\" --version" ;;
         devices) command="/usr/bin/python3 \"$assets/system-properties.py\" --devices" ;;
         system) command="/usr/bin/python3 \"$assets/system-properties.py\"" ;;
         programs) command="/usr/bin/python3 \"$assets/programs.py\"" ;;
@@ -72,6 +73,7 @@ settings|System Settings|系统设置|preferences-desktop
 mouse|Mouse|鼠标|input-mouse
 keyboard|Keyboard|键盘|input-keyboard
 admin|Administrative Tools|管理工具|preferences-system
+about|About AgentLinux|关于 AgentLinux|computer
 devices|Device Manager|设备管理器|computer
 system|System|系统|computer
 audio|Sounds and Audio Devices|声音和音频设备|audio-card
