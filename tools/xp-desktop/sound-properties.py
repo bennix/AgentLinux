@@ -15,6 +15,33 @@ def tr(zh, en):
     return zh if os.getenv("LANGUAGE", os.getenv("LANG", "")).startswith("zh") else en
 
 event_names = {
+    "alarm-clock-elapsed": ("闹钟到时", "Alarm elapsed"),
+    "audio-channel-front-center": ("前置中声道", "Front center channel"),
+    "audio-channel-front-left": ("前置左声道", "Front left channel"),
+    "audio-channel-front-right": ("前置右声道", "Front right channel"),
+    "audio-channel-mono": ("单声道", "Mono channel"),
+    "audio-channel-rear-center": ("后置中声道", "Rear center channel"),
+    "audio-channel-rear-left": ("后置左声道", "Rear left channel"),
+    "audio-channel-rear-right": ("后置右声道", "Rear right channel"),
+    "audio-channel-side-left": ("侧置左声道", "Side left channel"),
+    "audio-channel-side-right": ("侧置右声道", "Side right channel"),
+    "audio-test-signal": ("音频测试信号", "Audio test signal"),
+    "bell": ("响铃", "Bell"),
+    "camera-shutter": ("相机快门", "Camera shutter"),
+    "complete": ("操作完成", "Operation complete"),
+    "device-added": ("设备已连接", "Device connected"),
+    "device-removed": ("设备已断开", "Device disconnected"),
+    "message": ("收到消息", "Message received"),
+    "network-connectivity-established": ("网络已连接", "Network connected"),
+    "network-connectivity-lost": ("网络连接中断", "Network connection lost"),
+    "power-plug": ("已接通电源", "Power connected"),
+    "power-unplug": ("已拔下电源", "Power disconnected"),
+    "screen-capture": ("屏幕截图", "Screen capture"),
+    "service-login": ("登录服务", "Service logon"),
+    "service-logout": ("注销服务", "Service logoff"),
+    "suspend-error": ("挂起失败", "Suspend failed"),
+    "window-attention": ("窗口请求关注", "Window needs attention"),
+    "window-question": ("窗口询问", "Window question"),
     "audio-volume-change": ("调整音量", "Volume change"),
     "battery-caution": ("电池电量警告", "Battery warning"),
     "battery-low": ("电池电量低", "Low battery"),
@@ -226,9 +253,10 @@ def configure():
     sound_backends = [Gio.Settings.new(schema) for schema in ("org.gnome.desktop.sound", "org.ukui.sound")]
     scheme = Gtk.ComboBoxText()
     current = sound_backends[0].get_string("theme-name")
-    if current != "Windows XP Default":
+    if current not in ("Windows XP Default", "freedesktop"):
         scheme.append(current, current)
     scheme.append("Windows XP Default", tr("Windows XP 默认", "Windows XP Default"))
+    scheme.append("freedesktop", tr("桌面默认（freedesktop）", "Desktop Default (freedesktop)"))
     scheme.append("silent", tr("无声", "No sounds"))
     initial_scheme = current if sound_backends[0].get_boolean("event-sounds") else "silent"
     scheme.set_active_id(initial_scheme)
@@ -253,10 +281,6 @@ def configure():
         combo.connect("changed", update_apply)
     update_apply()
     event_rows = Gtk.ListStore(str, str)
-    for path in sorted(Path("/usr/share/sounds/Windows XP Default/stereo").glob("*")):
-        if path.is_file() and path.suffix.lower() in (".wav", ".oga", ".ogg"):
-            names = event_names.get(path.stem)
-            event_rows.append((str(path), tr(*names) if names else path.stem))
     events = Gtk.TreeView(model=event_rows, headers_visible=False)
     events.get_accessible().set_name(tr("程序事件", "Program events"))
     events.set_search_column(1)
@@ -268,8 +292,6 @@ def configure():
     column.add_attribute(caption, "text", 1)
     events.append_column(column)
     selection = events.get_selection()
-    if len(event_rows):
-        selection.select_path(0)
     event_scroll = Gtk.ScrolledWindow(shadow_type=Gtk.ShadowType.IN)
     event_scroll.set_min_content_height(100)
     event_scroll.add(events)
@@ -332,17 +354,28 @@ def configure():
     event_group.add(play)
     event_group.add(preview_error)
 
+    def load_events(theme):
+        event_rows.clear()
+        if theme in ("Windows XP Default", "freedesktop"):
+            for path in sorted((Path("/usr/share/sounds") / theme / "stereo").glob("*")):
+                if path.is_file() and path.suffix.lower() in (".wav", ".oga", ".ogg"):
+                    names = event_names.get(path.stem)
+                    event_rows.append((str(path), tr(*names) if names else path.stem))
+        if len(event_rows):
+            selection.select_path(0)
+        event_group.set_sensitive(bool(len(event_rows)))
+
     def scheme_changed(*_):
         stop_preview()
         if scheme.get_active_id() == "silent" and session_sound.is_writable("startup-music"):
             login.set_active(False)
         login.set_sensitive(scheme.get_active_id() != "silent" and session_sound.is_writable("startup-music"))
-        event_group.set_sensitive(scheme.get_active_id() == "Windows XP Default")
+        load_events(scheme.get_active_id())
         update_apply()
 
     scheme.connect("changed", scheme_changed)
     login.connect("toggled", update_apply)
-    event_group.set_sensitive(initial_scheme == "Windows XP Default")
+    load_events(initial_scheme)
     login.set_sensitive(session_sound.is_writable("startup-music") and initial_scheme != "silent")
     def sync_volume(channel, condition):
         nonlocal initial, muted
