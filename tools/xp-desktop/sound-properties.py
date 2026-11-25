@@ -429,12 +429,12 @@ def configure():
                 muted = mute.get_active()
             for item in selectors:
                 kind, combo, previous = item
-                selection = combo.get_active_id()
-                if selection and selection != previous:
-                    pactl("set-default-" + kind, selection)
-                    item[2] = selection
+                device_id = combo.get_active_id()
+                if device_id and device_id != previous:
+                    pactl("set-default-" + kind, device_id)
+                    item[2] = device_id
                     if kind == "sink":
-                        sink = selection
+                        sink = device_id
                         initial, muted = load_volume(sink)
             update_apply()
             if response == Gtk.ResponseType.OK:
