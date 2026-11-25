@@ -236,8 +236,9 @@ def search(_widget):
         start.set_sensitive(True)
         stop.set_sensitive(False)
         count = len(model)
+        english_count = "1 result" if count == 1 else f"{count} results"
         status.set_text((tr("已停止", "Stopped") if cancel.is_set() else tr("搜索完成", "Search complete"))
-                        + tr(f" · {count} 个结果", f" · {count} results"))
+                        + tr(f" · {count} 个结果", f" · {english_count}"))
         return False
 
     threading.Thread(target=scan, daemon=True).start()
