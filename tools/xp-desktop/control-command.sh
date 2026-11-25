@@ -10,6 +10,7 @@ case "$name" in
     taskmgr.exe) exec "$HOME/.local/share/agentlinux-xp/task-manager.sh" "$@" ;;
     cmd|cmd.exe) exec /usr/bin/x-terminal-emulator "$@" ;;
     calc|calc.exe) exec /usr/bin/mate-calc "$@" ;;
+    access.cpl,,[03]) exec "$HOME/.local/share/agentlinux-xp/accessibility.py" "${name##*,}" ;;
     access.cpl|accessibility) app=access ;;
     intl.cpl|international) exec "$HOME/.local/share/agentlinux-xp/control-panel.py" --language ;;
     appwiz.cpl) app=programs ;;

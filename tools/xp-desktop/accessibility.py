@@ -1,10 +1,13 @@
 #!/usr/bin/python3
 import subprocess
+import sys
 from pathlib import Path
 
 import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib
+
+from task_pane import cycle_property_pages
 
 def tr(zh, en):
     return zh if GLib.get_language_names()[0].startswith("zh") else en
@@ -20,6 +23,7 @@ for label, code in [(tr("确定", "OK"), Gtk.ResponseType.OK),
                     (tr("应用", "Apply"), Gtk.ResponseType.APPLY)]:
     dialog.add_button(label, code)
 tabs = Gtk.Notebook(border_width=8)
+dialog.connect("key-press-event", cycle_property_pages, tabs)
 dialog.get_content_area().add(tabs)
 options = {}
 for label, rows in [
@@ -52,6 +56,8 @@ for button in options.values():
     button.connect("toggled", update_pending)
 update_pending()
 dialog.show_all()
+if sys.argv[1:] == ["3"]:
+    tabs.set_current_page(1)
 while True:
     response = dialog.run()
     if response not in (Gtk.ResponseType.APPLY, Gtk.ResponseType.OK):
