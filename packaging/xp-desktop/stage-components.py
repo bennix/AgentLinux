@@ -54,7 +54,7 @@ for relative in ("accesskeys", "clock-entry.so", "start-actions.so", "task-manag
         parser.error(f"{source} must be an x86-64 Linux ELF file")
     files.append((source, user_assets / relative, 0o755))
 for name in (
-    "install-panel-entries.sh", "control-panel.py", "system-properties.py", "input-properties.py",
+    "install-panel-entries.sh", "help-center.py", "control-panel.py", "system-properties.py", "input-properties.py",
     "cursor-settings.py", "sound-properties.py", "date-properties.py", "power-properties.py",
     "programs.py", "fonts.py", "accessibility.py", "user-accounts.py", "network-places.py",
     "connections.py", "wireless.py", "search-files.py", "default-programs.py", "printers.py", "add-printer.py", "printer_test_page.py", "dns_properties.py",
