@@ -6,6 +6,7 @@ from pathlib import Path
 import gi
 gi.require_version("Gtk", "3.0")
 gi.require_version("GUdev", "1.0")
+gi.require_version("GdkPixbuf", "2.0")
 from gi.repository import GUdev, GdkPixbuf, Gio, GLib, GObject, Gtk, Pango
 
 from task_pane import cycle_property_pages
