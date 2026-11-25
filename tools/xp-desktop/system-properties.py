@@ -28,6 +28,9 @@ if sys.argv[1:] == ["--version"]:
     about.set_comments(platform.freedesktop_os_release()["PRETTY_NAME"] + "\nLinux " + platform.release())
     emblem = Path(__file__).with_name("college-emblem.png")
     about.set_logo(GdkPixbuf.Pixbuf.new_from_file_at_scale(str(emblem), 96, 96, True))
+    close = about.get_widget_for_response(Gtk.ResponseType.DELETE_EVENT)
+    if isinstance(close, Gtk.Button):
+        close.set_label(tr("关闭", "Close"))
     about.run()
     about.destroy()
     sys.exit(0)
