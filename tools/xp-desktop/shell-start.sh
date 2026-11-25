@@ -72,10 +72,12 @@ fi
         xprop -root _NET_CLIENT_LIST >/dev/null 2>&1 || exit 0
         sleep 0.25
     done
-    xdotool search --onlyvisible --name '^UKUI Panel$' windowunmap %@ || true
     xprop -spy -root _NET_CLIENT_LIST | while IFS= read -r event; do
         if taskbar_visible; then
             xdotool search --onlyvisible --name '^UKUI Panel$' windowunmap %@ || true
+            # Xfwm can frame Qt's selection owner during the UKUI handover.
+            # Unmapping it preserves the selection and its keyboard service.
+            xdotool search --onlyvisible --name '^Qt Selection Owner for kglobalaccel5$' windowunmap %@ || true
         fi
     done
 ) 9>&- &
