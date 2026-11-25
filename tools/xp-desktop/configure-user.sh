@@ -3,7 +3,8 @@ set -eu
 assets="$HOME/.local/share/agentlinux-xp"
 apps="$HOME/.local/share/applications"
 menu="$HOME/.config/wintc/start-menu"
-desktop="$(xdg-user-dir DESKTOP)"
+desktop=$(/usr/bin/python3 -c 'from gi.repository import GLib
+print(GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DESKTOP) or "")')
 mkdir -p "$apps" "$menu" "$desktop" "$HOME/.config/autostart"
 if [ -x "$assets/peony-qt-desktop" ] && [ -x /usr/local/libexec/agentlinux-xp-desktop ] &&
    [ -r /usr/share/applications/agentlinux-xp-desktop.desktop ]; then
@@ -152,16 +153,6 @@ install_desktop_shortcut() {
 }
 install_desktop_shortcut agentlinux-xp-wifi
 cp "$apps/agentlinux-xp-add-printer.desktop" "$menu/"
-cat > "$apps/explorer.desktop" <<ENTRY
-[Desktop Entry]
-Type=Application
-Name=Windows Explorer
-Name[zh_CN]=资源管理器
-Exec=$assets/explorer-launch.sh %F
-Icon=/usr/share/icons/luna/res/32x32/folder_search.png
-MimeType=inode/directory;
-Categories=System;FileManager;
-ENTRY
 # Peony uses the vendor metadata when the desktop filename matches a system entry.
 for folder in "$desktop" "${XDG_CONFIG_HOME:-$HOME/.config}/agentlinux-xp/hidden-shortcuts"; do
     for prefix in "" "."; do
@@ -180,11 +171,10 @@ for app in agentlinux-xp-control agentlinux-xp-places; do
 done
 ln -sfn "$apps/agentlinux-xp-admin.desktop" "$menu/agentlinux-xp-admin.desktop"
 mkdir -p "$menu/Accessories"
-sed '/^Name=Notepad$/a Name[zh_CN]=记事本' /usr/share/applications/notepad.desktop > "$apps/notepad.desktop"
-notepad=/usr/bin/wintc-notepad
-if [ -x "$assets/notepad" ]; then
-    notepad="$assets/notepad"
-    sed -i "s|^Exec=wintc-notepad |Exec=$notepad |" "$apps/notepad.desktop"
+notepad="$assets/notepad"
+if [ ! -x "$notepad" ]; then
+    notepad=/usr/bin/wintc-notepad
+    sed -i 's|^Exec=.*|Exec=/usr/bin/wintc-notepad %F|' "$apps/notepad.desktop"
 fi
 ln -sfn "$apps/notepad.desktop" "$menu/Accessories/notepad.desktop"
 ln -sfn "$apps/explorer.desktop" "$menu/Accessories/explorer.desktop"
