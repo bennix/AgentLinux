@@ -203,3 +203,8 @@ ENTRY
     fi
     touch "$settings/documents-shortcut-initialized"
 fi
+
+# Register the generated launchers with GIO and the XP recent-documents menu.
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database "$apps"
+fi
