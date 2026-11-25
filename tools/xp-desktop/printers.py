@@ -181,6 +181,7 @@ def open_queue(*_):
             server = cups.Connection()
             state = server.getPrinterAttributes(name, requested_attributes=["printer-state"]).get("printer-state")
             stopped = state == 5
+            queue.set_title(name + tr(" - 已暂停", " - Paused") if stopped else name)
             pause_printing.set_sensitive(state in (3, 4, 5))
             pause_printing.set_label(tr("恢复打印", "Resume Printing") if stopped else tr("暂停打印", "Pause Printing"))
             listing = server.getJobs(requested_attributes=attrs)
@@ -217,6 +218,7 @@ def open_queue(*_):
                         view.get_selection().select_iter(row)
             status.set_text(tr("队列中的文档数", "Documents in queue") + f" · {len(jobs)}")
         except (RuntimeError, cups.IPPError) as error:
+            queue.set_title(name)
             pause_printing.set_sensitive(False)
             jobs.clear()
             status.set_text(str(error))
