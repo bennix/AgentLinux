@@ -175,6 +175,9 @@ def read_sync_details(*_):
             names = [("Server", tr("服务器", "Server")), ("Stratum", tr("时钟层级", "Stratum")),
                      ("Offset", tr("时钟偏差", "Clock offset")), ("Delay", tr("网络延迟", "Network delay"))]
             lines = [f"{label}   {fields[key]}" for key, label in names if fields.get(key)]
+            interval = fields.get("Poll interval", "").partition(" (")[0]
+            if interval:
+                lines.append(tr("校时间隔", "Polling interval") + "   " + interval)
             sync_details.set_text("\n".join(lines) if process.get_successful() and lines else
                                   tr("暂无校时详情", "Synchronization details unavailable"))
         except GLib.Error as error:
@@ -189,7 +192,12 @@ def read_sync_details(*_):
         refresh_sync.set_sensitive(True)
 
 
-refresh_sync.connect("clicked", read_sync_details)
+def refresh_internet_time(*_):
+    refresh_status()
+    read_sync_details()
+
+
+refresh_sync.connect("clicked", refresh_internet_time)
 internet.connect("map", read_sync_details)
 zones = sorted(available_timezones())
 zone_picker = Gtk.ComboBoxText.new_with_entry()
