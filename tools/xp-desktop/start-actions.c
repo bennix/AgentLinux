@@ -22,6 +22,12 @@ gboolean wintc_launch_action(WinTCAction action, GError **error)
 {
     const char *script = NULL;
     switch (action) {
+    case WINTC_ACTION_MYDOCS: {
+        g_autofree char *launcher = g_build_filename(g_get_home_dir(), ".local", "share",
+                                                     "agentlinux-xp", "explorer-launch.sh", NULL);
+        char *argv[] = { launcher, "--my-documents", NULL };
+        return g_spawn_async(NULL, argv, NULL, G_SPAWN_DEFAULT, NULL, NULL, NULL, error);
+    }
     case WINTC_ACTION_SEARCH:    script = "search-files.py"; break;
     case WINTC_ACTION_CONNECTTO: script = "connections.py"; break;
     case WINTC_ACTION_MIMEMGMT: script = "default-programs.py"; break;
