@@ -83,7 +83,11 @@ for label, lower, upper in [
 advanced_section = Gtk.Expander(label=tr("更多高级选项", "More advanced options"))
 subfolders = Gtk.CheckButton(label=tr("搜索子文件夹", "Search subfolders"))
 subfolders.set_active(True)
-advanced_section.add(subfolders)
+advanced_choices = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
+advanced_section.add(advanced_choices)
+advanced_choices.add(subfolders)
+match_case = Gtk.CheckButton(label=tr("区分大小写", "Case sensitive"))
+advanced_choices.add(match_case)
 sidebar.add(advanced_section)
 buttons = Gtk.ButtonBox()
 start = Gtk.Button.new_with_mnemonic(tr("搜索(_S)", "_Search"))
@@ -171,7 +175,10 @@ def search(_widget):
     tomorrow = datetime.combine(today + timedelta(days=1), midnight).timestamp()
     minimum, maximum = next((low, high) for option, low, high in size_filters if option.get_active())
     recursive = subfolders.get_active()
-    term = query.get_text().casefold()
+    case_sensitive = match_case.get_active()
+    term = query.get_text()
+    if not case_sensitive:
+        term = term.casefold()
     pattern = term if any(c in term for c in "*?[") else "*" + term + "*"
     cancel = threading.Event()
     active = cancel
@@ -198,7 +205,7 @@ def search(_widget):
             for name in folders + files:
                 if cancel.is_set():
                     return
-                if fnmatch.fnmatchcase(name.casefold(), pattern):
+                if fnmatch.fnmatchcase(name if case_sensitive else name.casefold(), pattern):
                     content_type = "inode/directory" if name in folder_names else Gio.content_type_guess(name, None)[0]
                     size = -1
                     modified = float("-inf")
