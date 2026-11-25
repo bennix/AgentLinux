@@ -25,6 +25,13 @@ def choose(combo, content_type):
             combo.refresh()
 
 
+def open_choices(label, _group_cycling):
+    choice = label.get_mnemonic_widget()
+    choice.grab_focus()
+    choice.popup()
+    return True
+
+
 for row, (cn, en, mime) in enumerate([
     ("网页链接（HTTP_S）", "Web links (HTTP_S)", "x-scheme-handler/https"),
     ("网页链接（_HTTP）", "Web links (_HTTP)", "x-scheme-handler/http"),
@@ -39,6 +46,7 @@ for row, (cn, en, mime) in enumerate([
     choice.set_show_default_item(True)
     choice.set_show_dialog_item(True)
     caption.set_mnemonic_widget(choice)
+    caption.connect("mnemonic-activate", open_choices)
     choice.get_accessible().set_name(caption.get_text())
     choice.set_hexpand(True)
     grid.attach(choice, 1, row, 1, 1)
