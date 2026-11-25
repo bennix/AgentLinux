@@ -148,6 +148,23 @@ class PrinterWizard(newprinter.NewPrinterGUI):
     back_to_welcome = False
     returning = False
 
+    def on_entNPName_changed(self, widget):
+        super().on_entNPName_changed(widget)
+        if self.dialog_mode not in ("printer", "printer_with_uri"):
+            return
+        name = widget.get_text()
+        valid = newprinter.checkNPName(self.printers, name)
+        self.btnNPApply.set_sensitive(valid)
+        message = ""
+        if not name:
+            message = "请输入打印队列名称。" if zh else "Enter a print queue name."
+        elif not valid:
+            message = "此队列名称已被使用。" if zh else "This queue name is already in use."
+        position = Gtk.EntryIconPosition.SECONDARY
+        widget.set_icon_from_icon_name(position, "dialog-warning" if message else None)
+        widget.set_icon_tooltip_text(position, message or None)
+        widget.get_accessible().set_description(message)
+
     def on_btnNPApply_clicked(self, widget):
         # On Ubuntu local print administrators can authenticate to cupsd over
         # its Unix socket even in sessions without a graphical PolicyKit agent.
@@ -270,6 +287,8 @@ def advance(_button):
     if wizard.init("printer_with_uri" if uri else "printer", device_uri=uri, parent=window):
         wizard.btnNPBack.set_label("< 上一步(_B)" if zh else "< _Back")
         wizard.btnNPBack.set_use_underline(True)
+        wizard.btnNPApply.set_label("完成(_F)" if zh else "_Finish")
+        wizard.btnNPApply.set_use_underline(True)
         wizard.NewPrinterWindow.connect("key-press-event", wizard.device_key)
         wizard.NewPrinterWindow.set_title(title)
         wizard.NewPrinterWindow.set_icon_name("printer")
