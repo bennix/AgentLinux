@@ -3,14 +3,14 @@ import subprocess
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-labels = dict(line.split("|") for line in """%CTL_FILEMENU%|文件
+labels = dict(line.split("|") for line in """_File|文件(_F)
 %CTL_VIEWMENU%|查看
 %CTL_HELPMENU%|帮助
 Processes|进程
 Show processes from all users|显示所有用户的进程
 End Process|结束进程
-New Task (Run...)|新建任务（运行…）
-Exit Task Manager|退出任务管理器
+_New Task (Run...)|新建任务（运行…）(_N)
+E_xit Task Manager|退出任务管理器(_X)
 Options|选项
 Always On Top|置于顶层
 Minimize On Use|使用时最小化
@@ -36,9 +36,21 @@ for filename in ("taskmgr.ui", "page-processes.ui", "dlgkill.ui"):
     xml = subprocess.check_output(["gresource", "extract", "/usr/bin/taskmgr", "/uk/oddmatics/wintc/taskmgr/" + filename])
     root = ET.fromstring(xml)
     if filename == "taskmgr.ui":
+        mnemonics = {"%CTL_FILEMENU%": "_File", "New Task (Run...)": "_New Task (Run...)",
+                     "Exit Task Manager": "E_xit Task Manager"}
         for item in root.iter("object"):
-            if item.find("property[@name='label'][.='New Task (Run...)']") is not None:
+            label = item.find("property[@name='label']")
+            if label is None or label.text not in mnemonics:
+                continue
+            if label.text == "New Task (Run...)":
                 item.find("property[@name='action-name']").text = "win.new-task"
+            label.text = mnemonics[label.text]
+            underline = item.find("property[@name='use-underline']")
+            if underline is None:
+                underline = ET.Element("property", name="use-underline")
+                underline.tail = "\n            "
+                item.insert(list(item).index(label), underline)
+            underline.text = "True"
         english = directory.with_name("taskmgr-en")
         english.mkdir(exist_ok=True)
         ET.ElementTree(root).write(english / filename, encoding="UTF-8")
