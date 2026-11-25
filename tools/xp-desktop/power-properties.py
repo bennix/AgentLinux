@@ -57,19 +57,23 @@ tabs.append_page(meter_scroll, Gtk.Label(label=tr("电表", "Power Meter")))
 advanced = Gtk.Grid(column_spacing=12, row_spacing=12, border_width=14)
 tabs.append_page(advanced, Gtk.Label(label=tr("高级", "Advanced")))
 advanced.attach(Gtk.Label(label=tr("合上笔记本盖时", "When I close the lid"), xalign=0), 0, 0, 2, 1)
-lid_actions = {
+button_actions = {
     "blank": tr("关闭屏幕", "Turn off the screen"), "nothing": tr("不执行操作", "Do nothing"),
     "suspend": tr("待机", "Stand by"), "hibernate": tr("休眠", "Hibernate"),
     "shutdown": tr("关机", "Shut down"), "interactive": tr("询问操作", "Ask what to do"),
     "notify": tr("显示通知", "Show a notification"),
 }
-for row, (suffix, title) in enumerate([("ac", tr("使用交流电源", "Plugged in")),
-                                       ("battery", tr("使用电池", "Running on batteries"))], 1):
-    key = "button-lid-" + suffix
+for row, (key, title) in enumerate([
+    ("button-lid-ac", tr("使用交流电源", "Plugged in")),
+    ("button-lid-battery", tr("使用电池", "Running on batteries")),
+    ("button-power", tr("按下电源按钮时", "When I press the power button")),
+    ("button-suspend", tr("按下睡眠按钮时", "When I press the sleep button")),
+], 1):
     advanced.attach(Gtk.Label(label=title, xalign=0), 0, row, 1, 1)
     choices = Gtk.ComboBoxText()
+    choices.get_accessible().set_name(title)
     for value in settings.props.settings_schema.get_key(key).get_range().unpack()[1]:
-        choices.append(value, lid_actions.get(value, value))
+        choices.append(value, button_actions.get(value, value))
     choices.set_active_id(settings.get_string(key))
     settings.bind_writable(key, choices, "sensitive", False)
     choices.connect("changed", lambda widget, k=key: settings.set_string(k, widget.get_active_id()))
