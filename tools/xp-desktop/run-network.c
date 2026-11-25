@@ -19,6 +19,10 @@ gboolean wintc_launch_command(const gchar *command, GError **error)
         gchar *argv[] = {wizard, NULL};
         return g_spawn_async(NULL, argv, NULL, G_SPAWN_DEFAULT, NULL, NULL, NULL, error);
     }
+    if (!g_ascii_strcasecmp(address, "shell:Fonts")) {
+        gchar *argv[] = {"gtk-launch", "agentlinux-xp-fonts", NULL};
+        return g_spawn_async(NULL, argv, NULL, G_SPAWN_SEARCH_PATH, NULL, NULL, NULL, error);
+    }
     gboolean unc = g_str_has_prefix(address, "\\\\") || g_str_has_prefix(address, "//");
     if (!unc && g_ascii_strncasecmp(address, "smb://", 6)) {
         typedef gboolean (*LaunchCommand)(const gchar *, GError **);
