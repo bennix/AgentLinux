@@ -132,7 +132,7 @@ for package in ("gparted", "gparted-common", "libparted-fs-resize0t64",
     archive = args.debs.parent / "ubuntu-debs" / (package + ".deb")
     archives.append(archive)
 
-for package in ("wintc-taskband", "wintc-notepad", "wintc-taskmgr", "wintc-explorer", "wintc-shell-run", "wintc-cpl-desk",
+for package in ("wintc-taskband", "wintc-notepad", "wintc-taskmgr", "wintc-explorer", "wintc-shell-run", "wintc-cpl-desk", "wintc-cpl-appwiz", "libwintc-wizard97",
                 "wintc-sound-theme-xp", "wintc-cursor-theme-standard-with-shadow", "wintc-cursor-theme-standard-no-shadow",
                 "libwintc-exec", "libwintc-shelldpa", "libwintc-shellext", "libwintc-sndapi",
                 "libwintc-syscfg", "libwintc-registry", "libwintc-shell", "wintc-regsvc", "wintc-icon-theme-luna", "wintc-theme-luna-blue", "wintc-logonui",
