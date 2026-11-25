@@ -267,7 +267,7 @@ categories = [
     ("性能和维护", "Performance and Maintenance", ["System", "Power Options", "Administrative Tools", "Task Manager", "System Settings"], "settings"),
 ]
 by_name = {entry[1]: entry for entry in entries}
-preference = config / "control-panel-view"
+preference = Path(GLib.get_user_config_dir()) / "agentlinux-xp/control-panel-view"
 classic = preference.exists() and preference.read_text().strip() == "classic"
 
 
@@ -391,7 +391,7 @@ def show(category=None):
 def change_view(_button):
     global classic
     classic = not classic
-    config.mkdir(parents=True, exist_ok=True)
+    preference.parent.mkdir(parents=True, exist_ok=True)
     write_setting(preference, lambda f: f.write("classic" if classic else "category"))
     show()
 
