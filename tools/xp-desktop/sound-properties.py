@@ -252,16 +252,31 @@ def configure():
     for _, combo, _previous in selectors:
         combo.connect("changed", update_apply)
     update_apply()
-    events = Gtk.ComboBoxText()
+    event_rows = Gtk.ListStore(str, str)
     for path in sorted(Path("/usr/share/sounds/Windows XP Default/stereo").glob("*")):
         if path.is_file() and path.suffix.lower() in (".wav", ".oga", ".ogg"):
             names = event_names.get(path.stem)
-            events.append(str(path), tr(*names) if names else path.stem)
-    events.set_active(0)
+            event_rows.append((str(path), tr(*names) if names else path.stem))
+    events = Gtk.TreeView(model=event_rows, headers_visible=False)
+    events.get_accessible().set_name(tr("程序事件", "Program events"))
+    events.set_search_column(1)
+    column = Gtk.TreeViewColumn()
+    icon = Gtk.CellRendererPixbuf(icon_name="audio-x-generic")
+    column.pack_start(icon, False)
+    caption = Gtk.CellRendererText()
+    column.pack_start(caption, True)
+    column.add_attribute(caption, "text", 1)
+    events.append_column(column)
+    selection = events.get_selection()
+    if len(event_rows):
+        selection.select_path(0)
+    event_scroll = Gtk.ScrolledWindow(shadow_type=Gtk.ShadowType.IN)
+    event_scroll.set_min_content_height(100)
+    event_scroll.add(events)
     event_group = group(sound, tr("程序事件声音", "Program event sounds"))
-    event_group.add(events)
+    event_group.add(event_scroll)
     play = Gtk.Button(label=tr("试听", "Preview"))
-    play.set_sensitive(bool(events.get_active_id()))
+    play.set_sensitive(selection.count_selected_rows() > 0)
     preview_process = None
 
     def stop_preview(*_):
@@ -286,7 +301,10 @@ def configure():
             stop_preview()
             return
         try:
-            preview_process = Gio.Subprocess.new(["paplay", events.get_active_id()], Gio.SubprocessFlags.NONE)
+            model, item = selection.get_selected()
+            if item is None:
+                return
+            preview_process = Gio.Subprocess.new(["paplay", model[item][0]], Gio.SubprocessFlags.NONE)
         except GLib.Error as error:
             play.set_tooltip_text(error.message)
             return
@@ -294,7 +312,12 @@ def configure():
         preview_process.wait_async(None, preview_finished)
 
     play.connect("clicked", toggle_preview)
-    events.connect("changed", stop_preview)
+    def event_selected(*_):
+        stop_preview()
+        play.set_sensitive(selection.count_selected_rows() > 0)
+
+    selection.connect("changed", event_selected)
+    events.connect("row-activated", lambda *_: play.clicked())
     event_group.add(play)
 
     def scheme_changed(*_):
