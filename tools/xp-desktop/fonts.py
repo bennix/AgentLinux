@@ -63,7 +63,17 @@ def show_sample(*_):
     header.set_markup(f"<big><b>{family}</b></big>  {style_name}")
     sheet.attach(header, 0, 0, 2, 1)
     sheet.attach(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL), 0, 1, 2, 1)
-    for row, size in enumerate((10, 12, 16, 24, 32), start=2):
+    characters = Gtk.Label(
+        label="abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ\n0123456789.:,;!?",
+        xalign=0, selectable=True,
+    )
+    alphabet_font = font.copy()
+    alphabet_font.set_size(14 * Pango.SCALE)
+    alphabet_attrs = Pango.AttrList()
+    alphabet_attrs.insert(Pango.attr_font_desc_new(alphabet_font))
+    characters.set_attributes(alphabet_attrs)
+    sheet.attach(characters, 0, 2, 2, 1)
+    for row, size in enumerate((10, 12, 16, 18, 24, 32, 36, 48, 60, 72), start=3):
         sheet.attach(Gtk.Label(label=f"{size} pt", xalign=1), 0, row, 1, 1)
         sample = Gtk.Label(label=chooser.get_preview_text(), xalign=0, selectable=True)
         sample.set_line_wrap(True)
