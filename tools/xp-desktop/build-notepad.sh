@@ -24,6 +24,12 @@ s = s[:start] + '''    gboolean chinese = g_str_has_prefix(g_get_language_names(
     g_clear_object(&file);
 
 ''' + s[end:]
+# Register only successful opens and saves with the GTK recent-documents menu.
+import re
+s, count = re.subn(r"(?m)^( +)wnd->file_uri = g_strdup\(uri\);$",
+                   r"\g<0>\n\1gtk_recent_manager_add_item(gtk_recent_manager_get_default(), wnd->file_uri);", s)
+if count != 2:
+    raise RuntimeError("Unexpected Notepad open/save implementation")
 p.write_text(s)
 app = Path("application.c")
 source = app.read_text().replace("        first_run = FALSE;", """
