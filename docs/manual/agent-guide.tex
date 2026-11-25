@@ -72,4 +72,25 @@ agentlinux-components --launch app/agentlinux-xp-add-printer.desktop
 \par\textbf{手机没有收到文件。} 检查 Host 是否在线、配对账号和会话是否正确、文件是否位于已授权工作区，以及附件大小是否符合工作台提示。
 \par\textbf{多步任务中途停下。} 先询问已完成的动作和文件路径，再只提交剩余步骤。重复创建或发送文件前先核对已有结果。
 \vfill\href{https://bennix.github.io/AgentLinux/}{AgentLinux 产品页与版本下载}\hfill\href{https://github.com/bennix/AgentLinux}{项目仓库}
+
+\newpage
+\chaptertitle{用 Agent 操作 XP 资源管理器}
+本页适用于已更新资源管理器的笔记本及候选镜像（SHA-256 前八位为 \texttt{643cae82}）。公开版 v2026.11.25.4 尚未包含本页所用的文件项接口。
+\section*{准备一个练习目录}
+在本机终端运行以下命令，再按 Win+R，输入下面第二行的命令打开资源管理器。示例中的目录名可自行替换。
+\begin{verbatim}
+mkdir -p "/tmp/AgentLinux Demo/Reports"
+explorer.exe "/tmp/AgentLinux Demo"
+\end{verbatim}
+\section*{先选择，再确认，再打开}
+\sample{在资源管理器的 AgentLinux Demo 窗口中找到 Reports 文件夹，选中它，读取选中状态，然后打开它。告诉我打开后的窗口标题。}
+支持 AT-SPI 的桌面工具可以按以下顺序执行。若用 Python 编写 Agent，可通过系统 Python 的 \texttt{gi.repository.Atspi} 调用这些接口。
+\begin{enumerate}
+\item 从桌面辅助功能树找到应用 \texttt{explorer}，再找到标题为 \texttt{AgentLinux Demo} 的窗口。在该窗口内查找角色为 \texttt{LIST\_ITEM}、名称恰好为 \texttt{Reports} 的节点。
+\item 在文件项上枚举动作名称，调用 \texttt{select}。读取状态集合中的 \texttt{SELECTED} 后，确认选中的是刚才的文件夹。
+\item 调用同一文件项的 \texttt{open} 动作。重新读取窗口标题，应显示 \texttt{Reports}。也可读取地址栏，核对末尾的目录名。
+\end{enumerate}
+\section*{目录内容发生变化时}
+用户删除文件或切换目录后，原来的文件项可能返回 \texttt{DEFUNCT}，可用动作数变为零。此时重新读取当前目录，按名称匹配目标，再核对选中状态。中英文界面使用相同的动作名称。
+
 \end{document}
