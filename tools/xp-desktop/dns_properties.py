@@ -72,6 +72,12 @@ def dns_properties(parent, profile, tr, device):
         if device.get_active_connection() != active:
             dialog.destroy()
 
+    def invalid(entry):
+        label = entry.get_accessible().get_name()
+        note.set_text(tr("请检查以下字段：", "Check this field: ") + label)
+        entry.grab_focus()
+        entry.select_region(0, -1)
+
     handler = device.connect("notify::active-connection", connection_changed)
     dialog.show_all()
     try:
@@ -82,13 +88,16 @@ def dns_properties(parent, profile, tr, device):
             if simple and (ip_auto.get_active() != dhcp or (ip_manual.get_active() and ip != ip_values)):
                 if ip_manual.get_active():
                     try:
+                        field = ip_entries[0]
                         address = IPv4Address(ip[0])
+                        field = ip_entries[1]
                         network = IPv4Network("0.0.0.0/" + ip[1])
                         if str(network.netmask) != ip[1]:
                             raise ValueError
+                        field = ip_entries[2]
                         gateway = str(IPv4Address(ip[2])) if ip[2] else ""
                     except ValueError:
-                        note.set_text(tr("请检查 IP 地址、子网掩码和网关。", "Check the IP address, subnet mask and gateway."))
+                        invalid(field)
                         continue
                     changes.extend(["ipv4.method", "manual", "ipv4.addresses", f"{address}/{network.prefixlen}",
                                     "ipv4.gateway", gateway])
@@ -97,11 +106,13 @@ def dns_properties(parent, profile, tr, device):
             dns_changed = auto.get_active() != automatic or values != (servers + ["", ""])[:2]
             if dns_changed and manual.get_active():
                 try:
+                    field = entries[0]
                     selected = [str(IPv4Address(values[0]))]
                     if values[1]:
+                        field = entries[1]
                         selected.append(str(IPv4Address(values[1])))
                 except ValueError:
-                    note.set_text(tr("请输入有效的 IPv4 DNS 地址。", "Enter a valid IPv4 DNS address."))
+                    invalid(field)
                     continue
                 selected.extend(servers[2:])
             else:
