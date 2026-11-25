@@ -7,7 +7,7 @@ from pathlib import Path
 
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gio, GLib, GObject, Gtk
+from gi.repository import Gio, GLib, GObject, Gtk, Pango
 
 def tr(zh, en):
     return zh if os.getenv("LANGUAGE", os.getenv("LANG", "")).startswith("zh") else en
@@ -79,6 +79,13 @@ def page(title):
     tabs.append_page(scroll, Gtk.Label(label=title))
     return box
 
+def device_selector():
+    combo = Gtk.ComboBoxText()
+    renderer = combo.get_cells()[0]
+    renderer.set_property("ellipsize", Pango.EllipsizeMode.END)
+    renderer.set_property("max-width-chars", 30)
+    return combo
+
 def group(box, title):
     frame = Gtk.Frame(label=title)
     content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, border_width=10)
@@ -92,7 +99,7 @@ audio = page(tr("音频", "Audio"))
 
 voice = page(tr("语音", "Voice"))
 hardware = page(tr("硬件", "Hardware"))
-hardware_devices = Gtk.ComboBoxText()
+hardware_devices = device_selector()
 hardware.pack_start(hardware_devices, False, False, 0)
 hardware_grid = Gtk.Grid(column_spacing=12, row_spacing=8)
 hardware.pack_start(hardware_grid, False, False, 0)
@@ -189,7 +196,7 @@ def configure():
         master.set_sensitive(False)
     selectors = []
     for kind, names, title in [("sink", outputs, tr("声音播放", "Sound playback")), ("source", sources, tr("录音", "Sound recording"))]:
-        combo = Gtk.ComboBoxText()
+        combo = device_selector()
         default = pactl("get-default-" + kind) if names else None
         for identifier, description in names.items():
             if identifier == default or not identifier.endswith(".monitor"):
@@ -200,7 +207,7 @@ def configure():
         combo.get_accessible().set_name(title)
         group(audio, title).add(combo)
         voice_title = tr("语音播放", "Voice playback") if kind == "sink" else tr("语音录制", "Voice recording")
-        voice_combo = Gtk.ComboBoxText()
+        voice_combo = device_selector()
         voice_combo.set_model(combo.get_model())
         voice_combo.get_accessible().set_name(voice_title)
         voice_combo.set_sensitive(combo.get_sensitive())
