@@ -1,0 +1,23 @@
+#!/usr/bin/python3
+import os
+import socket
+import sys
+import time
+from pathlib import Path
+
+if len(sys.argv) != 3 or sys.argv[2] not in ("up", "down"):
+    sys.exit(0)
+try:
+    index = socket.if_nametoindex(sys.argv[1])
+except OSError:
+    sys.exit(0)
+directory = Path("/run/agentlinux-connection-time")
+directory.mkdir(mode=0o755, exist_ok=True)
+record = directory / str(index)
+if sys.argv[2] == "down":
+    record.unlink(missing_ok=True)
+elif uuid := os.environ.get("CONNECTION_UUID"):
+    pending = record.with_suffix(".new")
+    pending.write_text(f"{uuid} {int(time.clock_gettime(time.CLOCK_BOOTTIME))}\n")
+    pending.chmod(0o644)
+    pending.replace(record)

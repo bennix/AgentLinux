@@ -15,6 +15,7 @@ assets = Path(__file__).resolve().parents[2] / "tools/xp-desktop"
 user_assets = Path("etc/skel/.local/share/agentlinux-xp")
 installer_assets = Path("usr/share/desktop-provision")
 files = [
+    (Path(__file__).with_name("85-agentlinux-connection-time"), Path("etc/NetworkManager/dispatcher.d/85-agentlinux-connection-time"), 0o755),
     (Path(__file__).with_name("41agentlinux-xp-background"), Path("etc/X11/Xsession.d/41agentlinux-xp-background"), 0o644),
     (assets.parents[1] / "packaging/myime/settings.py", Path("usr/bin/myime-settings"), 0o755),
     (Path(__file__).with_name("mimeapps.list"), Path("etc/skel/.config/mimeapps.list"), 0o644),
