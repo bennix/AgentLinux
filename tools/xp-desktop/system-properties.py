@@ -144,12 +144,6 @@ def show_devices(_button):
     fit_window(viewer, 690, 380)
     viewer.add_button(tr("关闭", "Close"), Gtk.ResponseType.CLOSE)
     area = viewer.get_content_area()
-    try:
-        inventory = subprocess.run(["lspci", "-D", "-vmmk"], capture_output=True, text=True,
-                                   check=True, timeout=4, env={**os.environ, "LC_ALL": "C"}).stdout
-    except (OSError, subprocess.SubprocessError) as error:
-        line(area, tr("无法读取 PCI 设备", "Could not read PCI devices") + " · " + str(error))
-        inventory = ""
     model = Gtk.TreeStore(str, str, str)
     machine = model.append(None, [platform.node(), "", ""])
     categories = {
@@ -160,16 +154,42 @@ def show_devices(_button):
         "0c03": tr("通用串行总线控制器", "Universal Serial Bus controllers"),
     }
     groups = {}
-    for record in inventory.strip().split("\n\n"):
-        fields = dict(line.split(":\t", 1) for line in record.splitlines() if ":\t" in line)
-        if "Slot" in fields:
-            slot = fields["Slot"]
-            code = read(f"/sys/bus/pci/devices/{slot}/class").removeprefix("0x")
-            category = categories.get(code[:4]) or categories.get(code[:2], tr("系统设备", "System devices"))
-            if category not in groups:
-                groups[category] = model.append(machine, [category, "", ""])
-            model.append(groups[category], [fields.get("Device", slot), slot,
-                          fields.get("Driver", tr("未绑定", "Unbound"))])
+    pci_rows = {}
+    pci_error = Gtk.Label(xalign=0, wrap=True, no_show_all=True)
+    area.pack_start(pci_error, False, False, 0)
+
+    def refresh_pci():
+        try:
+            inventory = subprocess.run(["lspci", "-D", "-vmmk"], capture_output=True, text=True,
+                                       check=True, timeout=4, env={**os.environ, "LC_ALL": "C"}).stdout
+        except (OSError, subprocess.SubprocessError) as error:
+            pci_error.set_text(tr("无法读取 PCI 设备", "Could not read PCI devices") + " · " + str(error))
+            pci_error.show()
+            return
+        pci_error.hide()
+        present = set()
+        for record in inventory.strip().split("\n\n"):
+            fields = dict(line.split(":\t", 1) for line in record.splitlines() if ":\t" in line)
+            if "Slot" in fields:
+                slot = fields["Slot"]
+                code = read(f"/sys/bus/pci/devices/{slot}/class").removeprefix("0x")
+                category = categories.get(code[:4]) or categories.get(code[:2], tr("系统设备", "System devices"))
+                if category not in groups:
+                    groups[category] = model.append(machine, [category, "", ""])
+                present.add(slot)
+                values = [fields.get("Device", slot), slot, fields.get("Driver", tr("未绑定", "Unbound"))]
+                if slot in pci_rows:
+                    model.set(pci_rows[slot], [0, 1, 2], values)
+                else:
+                    pci_rows[slot] = model.append(groups[category], values)
+        for slot in pci_rows.keys() - present:
+            row = pci_rows.pop(slot)
+            parent = model.iter_parent(row)
+            model.remove(row)
+            if not model.iter_has_child(parent):
+                model.remove(groups.pop(model.get_value(parent, 0)))
+
+    refresh_pci()
     usb = Path("/sys/bus/usb/devices")
     usb_rows = {}
     category = tr("USB 设备", "USB devices")
@@ -384,6 +404,12 @@ def show_devices(_button):
 
     def device_key(tree, event):
         modifiers = event.state & Gtk.accelerator_get_default_mod_mask()
+        if not modifiers and event.keyval == Gdk.KEY_F5:
+            refresh_pci()
+            refresh_usb()
+            if monitor is not None:
+                refresh_inputs(monitor)
+            return True
         if modifiers != Gdk.ModifierType.MOD1_MASK or event.keyval not in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
             return False
         path, column = tree.get_cursor()
