@@ -10,6 +10,8 @@ gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
 from gi.repository import Gdk, Gio, GLib, Gtk
 
+from task_pane import cycle_property_pages
+
 home = Path.home()
 config = home / ".config/agentlinux-xp"
 chinese = GLib.get_language_names()[0].startswith("zh")
@@ -33,6 +35,7 @@ def folder_options(_button):
     dialog.add_button(tr("取消", "Cancel"), Gtk.ResponseType.CANCEL)
     apply = dialog.add_button(tr("应用", "Apply"), Gtk.ResponseType.APPLY)
     notebook = Gtk.Notebook(border_width=8)
+    dialog.connect("key-press-event", cycle_property_pages, notebook)
     click_file = Path(GLib.get_user_config_dir()) / "agentlinux-xp/explorer-single-click"
     click_available = Path(__file__).with_name("explorer-lib").joinpath("libwintc-comctl.so.1").is_file()
     if click_available:
@@ -41,11 +44,19 @@ def folder_options(_button):
         click_scope = tr("新打开的 XP 资源管理器窗口", "New XP Explorer windows")
         if Path(__file__).with_name("peony-qt-desktop").is_file():
             click_scope = tr("桌面图标及新打开的 XP 资源管理器窗口", "Desktop icons and new XP Explorer windows")
-        general.add(Gtk.Label(label=click_scope, xalign=0, wrap=True))
+        frame = Gtk.Frame(label=tr("打开项目的方式", "Click items as follows"))
+        choices = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, border_width=8)
+        general.add(frame)
+        frame.add(choices)
+        choices.set_tooltip_text(click_scope)
         single = Gtk.RadioButton.new_with_label_from_widget(None, tr("单击打开项目", "Single-click to open an item"))
         double = Gtk.RadioButton.new_with_label_from_widget(single, tr("双击打开项目", "Double-click to open an item"))
-        general.add(single)
-        general.add(double)
+        choices.add(single)
+        choices.add(double)
+        reset_click = Gtk.Button(label=tr("还原默认值", "Restore Defaults"))
+        reset_click.set_halign(Gtk.Align.END)
+        reset_click.connect("clicked", lambda _button: double.set_active(True))
+        general.pack_end(reset_click, False, False, 0)
         (single if click_file.exists() else double).set_active(True)
     panel = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, border_width=12)
     notebook.append_page(panel, Gtk.Label(label=tr("查看", "View")))
