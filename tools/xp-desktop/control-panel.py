@@ -62,8 +62,17 @@ def folder_options(_button):
     notebook.append_page(panel, Gtk.Label(label=tr("查看", "View")))
     dialog.get_content_area().add(notebook)
     panel.add(Gtk.Label(label=tr("高级设置", "Advanced settings"), xalign=0))
+    hidden_group = Gtk.Frame(label=tr("隐藏文件和文件夹", "Hidden files and folders"))
+    hidden_choices = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, border_width=6)
+    hidden_group.add(hidden_choices)
+    hide = Gtk.RadioButton.new_with_label_from_widget(None, tr("不显示隐藏文件和文件夹", "Do not show hidden files and folders"))
+    show_hidden = Gtk.RadioButton.new_with_label_from_widget(hide, tr("显示隐藏文件和文件夹", "Show hidden files and folders"))
+    hidden_choices.add(hide)
+    hidden_choices.add(show_hidden)
+    panel.add(hidden_group)
+    settings.bind("show-hidden-file", show_hidden, "active", Gio.SettingsBindFlags.DEFAULT)
+    settings.bind_writable("show-hidden-file", hidden_group, "sensitive", False)
     options = [
-        ("show-hidden-file", tr("显示隐藏文件和文件夹", "Show hidden files and folders"), False),
         ("show-file-extension", tr("隐藏文件扩展名", "Hide file extensions"), True),
         ("do-not-thumbnail", tr("显示缩略图", "Show thumbnails"), True),
         ("show-trash-dialog", tr("移入回收站前显示确认对话框", "Ask before moving items to the Recycle Bin"), False),
@@ -77,6 +86,8 @@ def folder_options(_button):
         settings.bind(key, check, "active", flags)
         panel.add(check)
     def restore_defaults(_button):
+        if settings.is_writable("show-hidden-file"):
+            settings.reset("show-hidden-file")
         for key, _, _ in options:
             if settings.is_writable(key):
                 settings.reset(key)
