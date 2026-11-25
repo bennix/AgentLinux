@@ -37,6 +37,7 @@ case "$name" in
     fsmgmt.msc) app=shares ;;
     devmgmt.msc) exec "$HOME/.local/share/agentlinux-xp/system-properties.py" --devices ;;
     sysdm.cpl,,1) exec "$HOME/.local/share/agentlinux-xp/system-properties.py" --computer-name ;;
+    sysdm.cpl,,3) exec "$HOME/.local/share/agentlinux-xp/system-properties.py" --advanced ;;
     sysdm.cpl,,2) exec "$HOME/.local/share/agentlinux-xp/system-properties.py" --hardware ;;
     sysdm.cpl|sysdm.cpl,,0|system) app=system ;;
     mmsys.cpl) app=audio ;;

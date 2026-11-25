@@ -442,11 +442,30 @@ hardware.pack_start(devices, False, False, 0)
 action(hardware, tr("附加驱动程序", "Additional Drivers"), "software-properties-drivers.desktop")
 action(hardware, tr("磁盘管理", "Disk Management"), "org.gnome.DiskUtility.desktop")
 action(hardware, tr("任务管理器", "Task Manager"), "agentlinux-xp-taskmgr.desktop")
+advanced = page("高级", "Advanced")
+for heading, description, caption, entry in [
+    (tr("性能", "Performance"), tr("查看处理器、内存和交换空间的使用情况。", "View processor, memory and swap usage."),
+     tr("系统监视器", "System Monitor"), "mate-system-monitor.desktop"),
+    (tr("用户配置文件", "User Profiles"), tr("管理此计算机上的用户账户。", "Manage user accounts on this computer."),
+     tr("用户账户", "User Accounts"), "agentlinux-xp-userinfo.desktop"),
+    (tr("启动", "Startup"), tr("选择登录后自动启动的程序。", "Choose which applications start at sign-in."),
+     tr("启动程序", "Startup Applications"), "gnome-session-properties.desktop"),
+]:
+    frame = Gtk.Frame(label=heading)
+    row = Gtk.Box(spacing=10, border_width=8)
+    description_label = Gtk.Label(label=description, xalign=0)
+    description_label.set_line_wrap(True)
+    row.pack_start(description_label, True, True, 0)
+    action(row, caption, entry)
+    frame.add(row)
+    advanced.pack_start(frame, False, False, 0)
+
 if sys.argv[1:] == ["--devices"]:
     show_devices(None)
 else:
     dialog.show_all()
-    if sys.argv[1:] in (["--computer-name"], ["--hardware"]):
-        tabs.set_current_page(tabs.page_num(computer if sys.argv[1] == "--computer-name" else hardware))
+    pages = {"--computer-name": computer, "--hardware": hardware, "--advanced": advanced}
+    if len(sys.argv) == 2 and sys.argv[1] in pages:
+        tabs.set_current_page(tabs.page_num(pages[sys.argv[1]]))
     dialog.run()
 dialog.destroy()
