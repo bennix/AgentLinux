@@ -184,6 +184,17 @@ def open_queue(*_):
             pause_printing.set_sensitive(state in (3, 4, 5))
             pause_printing.set_label(tr("恢复打印", "Resume Printing") if stopped else tr("暂停打印", "Pause Printing"))
             listing = server.getJobs(requested_attributes=attrs)
+            # CUPS can omit private titles from the all-users listing even for
+            # the caller's own jobs. Request only the missing owner metadata.
+            if any("job-name" not in job or "job-originating-user-name" not in job
+                   for job in listing.values()):
+                try:
+                    owned = server.getJobs(my_jobs=True, requested_attributes=[
+                        "job-id", "job-name", "job-originating-user-name"])
+                except (RuntimeError, cups.IPPError):
+                    owned = {}
+                for job_id in listing.keys() & owned.keys():
+                    listing[job_id].update(owned[job_id])
             updated = []
             for job_id, job in sorted(listing.items()):
                 destination = unquote(urlsplit(job.get("job-printer-uri", "")).path.split("/")[-1])
