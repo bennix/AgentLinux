@@ -106,7 +106,7 @@ for resource in ("defaults/pref/agentlinux-system-language.js",
     relative = browser / resource
     files.append((assets.parents[1] / "overlay" / relative, relative, 0o644))
 
-for name in ("accessible.py", "backend.py", "desktop.py"):
+for name in ("accessible.py", "backend.py", "components.py", "desktop.py"):
     relative = Path("usr/local/lib/zenmux") / name
     files.append((assets.parents[1] / "overlay" / relative, relative, 0o755 if name == "desktop.py" else 0o644))
 

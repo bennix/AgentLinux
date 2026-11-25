@@ -1,6 +1,7 @@
 """Discover desktop entries and inspect supported system components as the current user."""
 import shutil
 import subprocess
+from pathlib import Path
 
 from gi.repository import Gio, GLib
 
@@ -22,12 +23,37 @@ def entries():
     return {app.get_id(): app for app in Gio.AppInfo.get_all() if app.get_id() and app.should_show()}
 
 
+def power_readings():
+    batteries = []
+    supplies = []
+    for path in sorted(Path("/sys/class/power_supply").glob("*/uevent")):
+        try:
+            properties = dict(line.split("=", 1) for line in path.read_text().splitlines() if "=" in line)
+        except OSError:
+            continue
+        if properties.get("POWER_SUPPLY_SCOPE") == "Device":
+            continue
+        kind = properties.get("POWER_SUPPLY_TYPE", "")
+        if kind == "Battery" and properties.get("POWER_SUPPLY_PRESENT") != "0":
+            capacity = properties.get("POWER_SUPPLY_CAPACITY", "")
+            batteries.append({"name": path.parent.name, "state": properties.get("POWER_SUPPLY_STATUS"),
+                              "percent": int(capacity) if capacity.isdecimal() else None})
+        elif kind in ("Mains", "Wireless") or kind.startswith("USB"):
+            online = properties.get("POWER_SUPPLY_ONLINE")
+            if online in ("0", "1"):
+                supplies.append(online == "1")
+    return {"external_power_online": any(supplies) if supplies else None, "batteries": batteries}
+
+
 def describe(component):
     if component.startswith("system/") and component[7:] in PROBES:
         key = component[7:]
         result = subprocess.run(PROBES[key], text=True, capture_output=True, timeout=8)
-        return {"component": component, "ok": result.returncode == 0, "status": result.stdout.strip(),
+        info = {"component": component, "ok": result.returncode == 0, "status": result.stdout.strip(),
                 "error": result.stderr.strip() if result.returncode else ""}
+        if key == "power":
+            info.update(power_readings())
+        return info
     app = entries().get(component.removeprefix("app/")) if component.startswith("app/") else None
     if not app:
         raise ValueError("Unknown component")
