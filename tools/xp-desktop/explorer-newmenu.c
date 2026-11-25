@@ -82,27 +82,27 @@ const gchar *wintc_ishext_view_get_display_name(WinTCIShextView *view)
     typedef const gchar *(*DisplayName)(WinTCIShextView *);
     DisplayName original = (DisplayName)dlsym(RTLD_NEXT, "wintc_ishext_view_get_display_name");
     const gchar *name = original ? original(view) : NULL;
-    if (!chinese_ui()) return name;
-    if (!g_strcmp0(G_OBJECT_TYPE_NAME(view), "WinTCShViewDesktop")) return "桌面";
+    const gboolean chinese = chinese_ui();
+    if (!g_strcmp0(G_OBJECT_TYPE_NAME(view), "WinTCShViewDesktop")) return chinese ? "桌面" : name;
     WinTCShextPathInfo path = {0};
     wintc_ishext_view_get_path(view, &path);
     if (path.base_path) {
         if (!g_ascii_strcasecmp(path.base_path, "::{170f6110-d099-4fca-9307-fc1dc43eb71b}"))
-            name = "我的电脑";
+            name = chinese ? "我的电脑" : name;
         else if (!g_ascii_strcasecmp(path.base_path, "::{38f0b859-bfe8-49fe-88db-024d9c450147}"))
-            name = "控制面板";
+            name = chinese ? "控制面板" : name;
         else if (!g_strcmp0(path.base_path, "file:///") || !g_strcmp0(path.base_path, "/"))
-            name = "本地磁盘 (/)";
+            name = chinese ? "本地磁盘 (/)" : name;
         else if (g_str_has_prefix(path.base_path, "file://")) {
-            static const struct { GUserDirectory directory; const gchar *label; } places[] = {
-                {G_USER_DIRECTORY_DESKTOP, "桌面"}, {G_USER_DIRECTORY_DOCUMENTS, "我的文档"}, {G_USER_DIRECTORY_PUBLIC_SHARE, "共享文档"},
-                {G_USER_DIRECTORY_PICTURES, "图片收藏"}, {G_USER_DIRECTORY_MUSIC, "我的音乐"},
+            static const struct { GUserDirectory directory; const gchar *zh; const gchar *en; } places[] = {
+                {G_USER_DIRECTORY_DESKTOP, "桌面", "Desktop"}, {G_USER_DIRECTORY_DOCUMENTS, "我的文档", "My Documents"}, {G_USER_DIRECTORY_PUBLIC_SHARE, "共享文档", "Shared Documents"},
+                {G_USER_DIRECTORY_PICTURES, "图片收藏", "My Pictures"}, {G_USER_DIRECTORY_MUSIC, "我的音乐", "My Music"},
             };
             g_autofree gchar *local = g_filename_from_uri(path.base_path, NULL, NULL);
             for (guint i = 0; local && i < G_N_ELEMENTS(places); i++) {
                 const gchar *dir = g_get_user_special_dir(places[i].directory);
                 if (!g_strcmp0(local, dir) && g_strcmp0(dir, g_get_home_dir())) {
-                    name = places[i].label;
+                    name = chinese ? places[i].zh : places[i].en;
                     break;
                 }
             }
