@@ -148,7 +148,10 @@ static gboolean tray_event(GtkWidget *widget, GdkEvent *event, gpointer data)
         GDesktopAppInfo *app = g_desktop_app_info_new(entries[i]);
         if (!app)
             continue;
-        GtkWidget *item = gtk_menu_item_new_with_label(g_app_info_get_display_name(G_APP_INFO(app)));
+        const gchar *label = g_app_info_get_display_name(G_APP_INFO(app));
+        if (chinese_menu && g_str_equal(entries[i], "nm-connection-editor.desktop"))
+            label = "高级网络配置";
+        GtkWidget *item = gtk_menu_item_new_with_label(label);
         g_signal_connect(item, "activate", G_CALLBACK(menu_launch), (gpointer)entries[i]);
         gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
         g_object_unref(app);
