@@ -6,7 +6,7 @@ import subprocess
 import gi
 gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
-from gi.repository import Gdk, Gio, GLib, GObject, Gtk
+from gi.repository import Gdk, Gio, GLib, GObject, Gtk, Pango
 from task_pane import fit_window, add_task_pane, task_button
 
 
@@ -55,6 +55,37 @@ def choose_package(_):
     chosen = chooser.get_file() if chooser.run() == Gtk.ResponseType.OK else None
     chooser.destroy()
     if chosen:
+        try:
+            info = subprocess.run(
+                ["dpkg-deb", "--show", "--showformat=" + r"${Package}\n${Version}\n${Architecture}", chosen.get_path()],
+                capture_output=True, text=True, errors="replace", check=True, timeout=5,
+            ).stdout.splitlines()
+        except (OSError, subprocess.SubprocessError):
+            detail.set_text(tr("无法读取 Debian 安装包信息。", "Could not read the Debian package information."))
+            return
+        preview = Gtk.Dialog(title=tr("安装包属性", "Package Properties"), transient_for=window, modal=True)
+        preview.add_button(tr("取消", "Cancel"), Gtk.ResponseType.CANCEL)
+        preview.add_button(tr("打开安装器", "Open installer"), Gtk.ResponseType.OK)
+        preview.set_default_response(Gtk.ResponseType.CANCEL)
+        grid = Gtk.Grid(border_width=12, row_spacing=6, column_spacing=12)
+        fit_window(preview, 420, 220)
+        scroll = Gtk.ScrolledWindow()
+        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll.add(grid)
+        preview.get_content_area().pack_start(scroll, True, True, 0)
+        labels = [tr("软件包", "Package"), tr("版本", "Version"), tr("架构", "Architecture")]
+        for row, (label, value) in enumerate(zip(labels, info)):
+            grid.attach(Gtk.Label(label=label, xalign=0), 0, row, 1, 1)
+            field = Gtk.Label(label=value, xalign=0, selectable=True, wrap=True)
+            field.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
+            field.set_max_width_chars(36)
+            field.set_hexpand(True)
+            grid.attach(field, 1, row, 1, 1)
+        preview.show_all()
+        proceed = preview.run() == Gtk.ResponseType.OK
+        preview.destroy()
+        if not proceed:
+            return
         try:
             installer.launch([chosen], None)
         except GLib.Error as exc:
@@ -151,6 +182,8 @@ def reload_apps(*_):
 filtered = rows.filter_new()
 search_package = None
 archive_job = None
+requested_result = None
+last_query = None
 
 
 def matches_program(model, item, _data):
@@ -176,15 +209,19 @@ def use_package_name(job, original):
             pass
         filtered.refilter()
         selected(table.get_selection())
+        select_requested_result()
     return False
 
 
-def update_search(_entry):
-    global search_package, archive_job
+def update_search(_entry, *, refresh=False):
+    global search_package, archive_job, last_query
+    original = search.get_text().strip()
+    if not refresh and original == last_query:
+        return
+    last_query = original
     if archive_job:
         archive_job.cancel()
         archive_job = None
-    original = search.get_text().strip()
     search_package = None
     if original.lower().endswith(".deb"):
         path = Path(original)
@@ -207,6 +244,8 @@ icon = Gtk.CellRendererPixbuf()
 column.pack_start(icon, False)
 column.add_attribute(icon, "gicon", 3)
 caption = Gtk.CellRendererText()
+caption.set_property("ellipsize", Pango.EllipsizeMode.END)
+column.set_expand(True)
 column.pack_start(caption, True)
 column.add_attribute(caption, "text", 0)
 table.append_column(column)
@@ -261,6 +300,7 @@ def load_sizes(job):
             terms.append(package.casefold())
         rows.set(item, 2, "\n".join(terms), 4, size, 5, size_label(size))
     selected(table.get_selection())
+    select_requested_result()
     return False
 
 
@@ -279,13 +319,37 @@ def selected(selection):
     info = packages.get(filename)
     if info:
         package, version, size = info
-        detail.set_text("\n".join((tr("软件包", "Package") + " · " + package,
+        detail.set_text("\n".join((name, tr("软件包", "Package") + " · " + package,
                                    tr("已安装版本", "Installed version") + " · " + version,
                                    tr("软件包大小", "Package size") + " · " + size_label(size))))
     else:
         detail.set_text(name)
 
 
+def select_requested_result():
+    global requested_result
+    if requested_result is None or archive_job is not None:
+        return
+    if requested_result != search.get_text() or window.get_focus() != search:
+        requested_result = None
+        return
+    first = filtered.get_iter_first()
+    if first is None and pending is not None:
+        return
+    requested_result = None
+    if first is not None:
+        table.set_cursor(filtered.get_path(first))
+        table.grab_focus()
+
+
+def focus_first_result(entry):
+    global requested_result
+    update_search(entry, refresh=True)
+    requested_result = entry.get_text()
+    select_requested_result()
+
+
+search.connect("activate", focus_first_result)
 table.get_selection().connect("changed", selected)
 refresh = task_button(tr("刷新列表", "Refresh list"))
 refresh.connect("clicked", reload_apps)
