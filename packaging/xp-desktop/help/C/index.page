@@ -18,6 +18,14 @@
     <title>Keyboard and mouse</title>
     <p>Open Control Panel in Classic View and choose Keyboard or Mouse. Use the test area before applying your settings.</p>
   </section>
+  <section id="programs">
+    <title>Programs and packages</title>
+    <p>Open Add or Remove Programs in Control Panel. Press Ctrl+F, type a program name, and press Enter to select the first match. To install a local .deb, choose Install from file, select the package, then check its name, version and architecture. Choose Open installer to continue.</p>
+  </section>
+  <section id="fonts">
+    <title>Fonts and input methods</title>
+    <p>Open Fonts in Control Panel. Press Alt+I to preview the font used for input method candidates, then Alt+P to open its sample sheet. Choose Print to print the sheet.</p>
+  </section>
   <section id="more">
     <title>More help</title>
     <p>

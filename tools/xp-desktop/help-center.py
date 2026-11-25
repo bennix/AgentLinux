@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 from pathlib import Path
 import subprocess
+from task_pane import fit_window
 from xml.etree import ElementTree
 
 import gi
@@ -21,7 +22,7 @@ def activate(app):
     doc = ElementTree.parse(page).getroot()
     title = doc.findtext("{*}title")
     window = Gtk.ApplicationWindow(application=app, title=title)
-    window.set_default_size(700, 440)
+    fit_window(window, 700, 440)
     window.set_icon_name("help-browser")
     box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
     window.add(box)
@@ -42,7 +43,10 @@ def activate(app):
     body.set_line_wrap(True)
     body.set_selectable(True)
     content.pack_start(heading, False, False, 0)
-    content.pack_start(body, False, False, 0)
+    reading = Gtk.ScrolledWindow()
+    reading.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+    reading.add(body)
+    content.pack_start(reading, True, True, 0)
     more = doc.find("{*}section[@id='more']/{*}p/{*}link")
     link = Gtk.Button(label=more.text)
     link.connect("clicked", lambda *_: subprocess.Popen(["/usr/bin/yelp", "help-list:"]))
@@ -61,6 +65,7 @@ def activate(app):
             if widget.get_active():
                 heading.set_text(topic)
                 body.set_text(text)
+                reading.get_vadjustment().set_value(0)
 
         button.connect("toggled", select)
         if group is None:

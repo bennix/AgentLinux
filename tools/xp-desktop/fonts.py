@@ -152,7 +152,7 @@ def show_sample(*_):
 chooser.connect("font-activated", show_sample)
 actions = Gtk.Box(spacing=8)
 box.pack_end(actions, False, False, 0)
-candidate = Gtk.Button(label="预览输入法候选字体（默认宋体）" if chinese else "Preview input method font (Song style by default)")
+candidate = Gtk.Button.new_with_mnemonic("预览输入法候选字体（默认宋体）(_I)" if chinese else "Preview _input method font (Song style by default)")
 candidate.connect("clicked", preview_candidates)
 actions.pack_start(candidate, False, False, 0)
 preview = Gtk.Button.new_with_mnemonic("字体样张(_P)…" if chinese else "Font sam_ple…")

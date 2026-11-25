@@ -18,6 +18,14 @@
     <title>键盘和鼠标</title>
     <p>在控制面板的经典视图中打开“键盘”或“鼠标”。应用设置前，可先在测试区试用。</p>
   </section>
+  <section id="programs">
+    <title>程序和安装包</title>
+    <p>在控制面板打开“添加或删除程序”。按 Ctrl+F 输入程序名，再按回车选中第一个匹配项。安装本地 .deb 时，选择“从文件安装”，选中安装包，核对包名、版本和架构，然后点击“打开安装器”。</p>
+  </section>
+  <section id="fonts">
+    <title>字体和输入法</title>
+    <p>在控制面板打开“字体”。按 Alt+I 预览输入法候选字体，再按 Alt+P 打开字体样张。点击“打印”可打印样张。</p>
+  </section>
   <section id="more">
     <title>更多帮助</title>
     <p>
