@@ -8,7 +8,18 @@ import sys
 
 from gi.repository import Gio, GLib
 
-panels = sorted(Path("/sys/class/drm").glob("*-eDP-*/intel_backlight"))
+def internal_backlights(drm, backlights):
+    devices = {device.resolve() for device in backlights.glob("*")}
+    panels = set()
+    for connector_type in ("eDP", "LVDS", "DSI"):
+        for connector in drm.glob(f"card*-{connector_type}-*"):
+            for entry in (*connector.glob("*"), *connector.glob("backlight/*")):
+                if entry.resolve() in devices and (entry / "brightness").is_file():
+                    panels.add(entry.resolve())
+    return sorted(panels)
+
+
+panels = internal_backlights(Path("/sys/class/drm"), Path("/sys/class/backlight"))
 if not panels or not os.environ.get("XDG_SESSION_ID"):
     sys.exit(0)
 panel = panels[0]
