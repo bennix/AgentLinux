@@ -36,6 +36,8 @@ dialog = Gtk.Dialog(title=tr("系统属性", "System Properties"))
 dialog.set_icon_name("computer")
 dialog.set_default_size(475, 320)
 dialog.add_button(tr("确定", "OK"), Gtk.ResponseType.OK)
+dialog.add_button(tr("取消", "Cancel"), Gtk.ResponseType.CANCEL)
+dialog.set_default_response(Gtk.ResponseType.OK)
 tabs = Gtk.Notebook(border_width=8)
 dialog.get_content_area().pack_start(tabs, True, True, 0)
 
