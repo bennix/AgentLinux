@@ -306,6 +306,17 @@ def open_queue(*_):
         change_job(tree, "cancel")
         return True
 
+    view_item = Gtk.MenuItem.new_with_mnemonic(tr("查看(_V)", "_View"))
+    view_menu = Gtk.Menu()
+    view_item.set_submenu(view_menu)
+    bar.append(view_item)
+    refresh_jobs = Gtk.MenuItem.new_with_mnemonic(tr("刷新(_R)", "_Refresh"))
+    refresh_jobs.connect("activate", lambda _: reload_jobs())
+    view_menu.append(refresh_jobs)
+    accelerators = Gtk.AccelGroup()
+    queue.add_accel_group(accelerators)
+    refresh_jobs.add_accelerator("activate", accelerators, Gdk.KEY_F5, 0, Gtk.AccelFlags.VISIBLE)
+
     view.connect("key-press-event", job_key)
     view.connect("button-press-event", job_menu)
     view.connect("popup-menu", job_menu)
