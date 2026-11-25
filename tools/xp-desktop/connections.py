@@ -4,7 +4,7 @@ from pathlib import Path
 from network_details import address_fields
 from dns_properties import dns_properties
 
-from task_pane import fit_window, add_task_pane, task_button
+from task_pane import cycle_property_pages, fit_window, add_task_pane, task_button
 
 import gi
 gi.require_version("NM", "1.0")
@@ -61,6 +61,7 @@ def show_properties(parent, device):
     dialog = Gtk.Dialog(title=tr("连接属性", "Connection Properties"), transient_for=parent, modal=True)
     dialog.add_button(tr("关闭", "Close"), Gtk.ResponseType.CLOSE)
     pages = Gtk.Notebook(border_width=8)
+    dialog.connect("key-press-event", cycle_property_pages, pages)
     dialog.get_content_area().add(pages)
     general = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, border_width=12)
     pages.append_page(general, Gtk.Label(label=tr("常规", "General")))
@@ -114,6 +115,7 @@ def show_status(*_):
     dialog.get_action_area().reorder_child(edit, 0)
     edit.connect("clicked", lambda _: show_properties(dialog, device) if device in client.get_devices() else None)
     notebook = Gtk.Notebook(border_width=6)
+    dialog.connect("key-press-event", cycle_property_pages, notebook)
     dialog.set_default_size(460, 340)
     dialog.get_content_area().pack_start(notebook, True, True, 0)
     pages = []
