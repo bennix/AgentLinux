@@ -80,6 +80,11 @@ for label, lower, upper in [
     option = Gtk.RadioButton.new_with_label_from_widget(group, label)
     size_choices.add(option)
     size_filters.append((option, lower, upper))
+advanced_section = Gtk.Expander(label=tr("更多高级选项", "More advanced options"))
+subfolders = Gtk.CheckButton(label=tr("搜索子文件夹", "Search subfolders"))
+subfolders.set_active(True)
+advanced_section.add(subfolders)
+sidebar.add(advanced_section)
 buttons = Gtk.ButtonBox()
 start = Gtk.Button.new_with_mnemonic(tr("搜索(_S)", "_Search"))
 stop = Gtk.Button.new_with_mnemonic(tr("停止(_T)", "S_top"))
@@ -165,6 +170,7 @@ def search(_widget):
     first_day = datetime.combine(today - timedelta(days=days - 1), midnight).timestamp() if days else None
     tomorrow = datetime.combine(today + timedelta(days=1), midnight).timestamp()
     minimum, maximum = next((low, high) for option, low, high in size_filters if option.get_active())
+    recursive = subfolders.get_active()
     term = query.get_text().casefold()
     pattern = term if any(c in term for c in "*?[") else "*" + term + "*"
     cancel = threading.Event()
@@ -217,6 +223,8 @@ def search(_widget):
                     if len(batch) == 100:
                         send(batch)
                         batch = []
+            if not recursive:
+                break
         if batch:
             send(batch)
         send(None)
