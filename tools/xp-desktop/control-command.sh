@@ -23,6 +23,7 @@ case "$name" in
     appwiz.cpl,,3) exec "$HOME/.local/share/agentlinux-xp/default-programs.py" ;;
     appwiz.cpl) app=programs ;;
     panel) app=control ;;
+    settings) app=settings ;;
     winver) exec "$HOME/.local/share/agentlinux-xp/system-properties.py" --version ;;
     timedate.cpl,,[0-2]) exec "$HOME/.local/share/agentlinux-xp/date-properties.py" "${name##*,}" ;;
     timedate.cpl|date/time) app=datetime ;;
