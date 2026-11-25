@@ -150,16 +150,22 @@ class PrinterWizard(newprinter.NewPrinterGUI):
 
     def on_entNPName_changed(self, widget):
         super().on_entNPName_changed(widget)
+        self.update_queue_name(widget)
+
+    def update_queue_name(self, widget):
         if self.dialog_mode not in ("printer", "printer_with_uri"):
             return
         name = widget.get_text()
-        valid = newprinter.checkNPName(self.printers, name)
-        self.btnNPApply.set_sensitive(valid)
         message = ""
         if not name:
             message = "请输入打印队列名称。" if zh else "Enter a print queue name."
-        elif not valid:
+        elif len(name.encode("utf-8")) > 127:
+            message = "队列名称最多可用 127 个 UTF-8 字节。" if zh else "Use at most 127 UTF-8 bytes for the queue name."
+        elif any(ord(c) <= 32 or ord(c) == 127 or c in "/#" for c in name):
+            message = "名称不能包含控制字符、空格、/ 或 #。" if zh else "Names cannot contain control characters, spaces, / or #."
+        elif not newprinter.checkNPName(self.printers, name):
             message = "此队列名称已被使用。" if zh else "This queue name is already in use."
+        self.btnNPApply.set_sensitive(not message)
         position = Gtk.EntryIconPosition.SECONDARY
         widget.set_icon_from_icon_name(position, "dialog-warning" if message else None)
         widget.set_icon_tooltip_text(position, message or None)
@@ -184,6 +190,8 @@ class PrinterWizard(newprinter.NewPrinterGUI):
 
     def setNPButtons(self):
         super().setNPButtons()
+        if self.ntbkNewPrinter.get_current_page() == self.PAGE_DESCRIBE_PRINTER:
+            self.update_queue_name(self.entNPName)
         # CUPS hides Back on its first page, which follows our welcome page.
         self.back_to_welcome = not self.btnNPBack.get_visible()
         self.btnNPBack.show()
