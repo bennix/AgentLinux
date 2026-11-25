@@ -5,6 +5,7 @@ import os
 import re
 import threading
 import time
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from queue import Empty, Full, Queue
 
@@ -56,6 +57,14 @@ folder.set_current_folder(str(Path.home()))
 folder.set_filename(str(Path.home()))
 folder_label.set_mnemonic_widget(folder)
 sidebar.add(folder)
+date_section = Gtk.Expander(label=tr("什么时候修改的？", "When was it modified?"))
+date_choices = Gtk.ComboBoxText()
+for label in [tr("不限", "Any time"), tr("最近 7 天", "Last 7 days"),
+              tr("最近 30 天", "Last 30 days"), tr("最近 365 天", "Last 365 days")]:
+    date_choices.append_text(label)
+date_choices.set_active(0)
+date_section.add(date_choices)
+sidebar.add(date_section)
 size_section = Gtk.Expander(label=tr("文件大小是多少？", "What size is it?"))
 size_choices = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3, margin_start=6)
 size_section.add(size_choices)
@@ -150,6 +159,11 @@ def search(_widget):
     root = folder.get_filename()
     if not root:
         return
+    days = (0, 7, 30, 365)[date_choices.get_active()]
+    today = date.today()
+    midnight = datetime.min.time()
+    first_day = datetime.combine(today - timedelta(days=days - 1), midnight).timestamp() if days else None
+    tomorrow = datetime.combine(today + timedelta(days=1), midnight).timestamp()
     minimum, maximum = next((low, high) for option, low, high in size_filters if option.get_active())
     term = query.get_text().casefold()
     pattern = term if any(c in term for c in "*?[") else "*" + term + "*"
@@ -191,6 +205,8 @@ def search(_widget):
                         modified_text = time.strftime("%x %H:%M", time.localtime(modified))
                     except (OSError, OverflowError, ValueError):
                         pass
+                    if first_day is not None and not first_day <= modified < tomorrow:
+                        continue
                     if minimum is not None and size < minimum:
                         continue
                     if maximum is not None and size > maximum:
