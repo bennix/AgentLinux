@@ -247,8 +247,13 @@ class Window(Gtk.Window):
                 fn = call["function"]
                 args = json.loads(fn["arguments"])
                 labels = {tool["function"]["name"]: tool["function"]["description"] for tool in backend.TOOLS}
+                title = labels[fn["name"]]
+                if fn["name"] == "explorer_item_action":
+                    prompts = {"select": tr("Select this item in Explorer?"),
+                               "open": tr("Open this item in Explorer?")}
+                    title = prompts[args["action"]] + "\n" + args["label"]
                 dialog = Gtk.MessageDialog(transient_for=self, modal=True, buttons=Gtk.ButtonsType.OK_CANCEL,
-                                           text=labels[fn["name"]])
+                                           text=title)
                 dialog.format_secondary_text(json.dumps(args, ensure_ascii=False) + "\n" + tr("The result will be sent to your selected AI provider."))
                 ok = dialog.run() == Gtk.ResponseType.OK
                 dialog.destroy()

@@ -95,7 +95,11 @@ for name in ("logo.png", "mini-logo.png", "userpic.png"):
 for resource in (*greeter.glob("*/*.ui"), *greeter.glob("*/*.css")):
     files.append((resource, resource_dir / resource.relative_to(greeter), 0o644))
 
-for name in ("accessible.py", "backend.py"):
+catalog = args.overlay / "usr/share/locale/zh_CN/LC_MESSAGES/agentlinux.mo"
+catalog.parent.mkdir(parents=True, exist_ok=True)
+subprocess.run(["msgfmt", "-o", catalog, assets.parents[1] / "packaging/i18n/zh_CN.po"], check=True)
+
+for name in ("accessible.py", "backend.py", "desktop.py"):
     relative = Path("usr/local/lib/zenmux") / name
     files.append((assets.parents[1] / "overlay" / relative, relative, 0o644))
 

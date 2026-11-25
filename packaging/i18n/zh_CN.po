@@ -549,3 +549,12 @@ msgstr "查看系统状态或已安装应用的启动方式"
 
 msgid "Create a LibreOffice document, spreadsheet (cell A1), or presentation with the supplied text"
 msgstr "用提供的文字创建 LibreOffice 文档、电子表格（写入 A1）或演示文稿"
+
+msgid "Select or open a listed Explorer item. List controls again to verify selection."
+msgstr "选择或打开资源管理器里的项目。再次读取控件列表可核对选中状态。"
+
+msgid "Select this item in Explorer?"
+msgstr "在资源管理器中选中此项？"
+
+msgid "Open this item in Explorer?"
+msgstr "在资源管理器中打开此项？"
