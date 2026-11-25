@@ -305,6 +305,7 @@ def show_devices(_button):
         properties.add_button(tr("关闭", "Close"), Gtk.ResponseType.CLOSE)
         grid = Gtk.Grid(row_spacing=8, column_spacing=12, border_width=12)
         pages = Gtk.Notebook()
+        properties.connect("key-press-event", cycle_property_pages, pages)
         properties.get_content_area().add(pages)
         pages.append_page(grid, Gtk.Label(label=tr("常规", "General")))
         fields = [(tr("设备", "Device"), name), (tr("总线", "Bus"), bus.upper()),
