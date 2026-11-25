@@ -187,6 +187,16 @@ else:
         slider.add_mark(slider.get_adjustment().get_lower(), Gtk.PositionType.BOTTOM, low)
         slider.add_mark(slider.get_adjustment().get_upper(), Gtk.PositionType.BOTTOM, high)
         repeat.bind_property("active", slider, "sensitive", GObject.BindingFlags.SYNC_CREATE)
+    def describe_repeat(slider):
+        units = (tr("重复延迟：{} 毫秒", "Repeat delay: {} ms") if slider == delay else
+                 tr("重复速度：每秒 {} 次", "Repeat rate: {} repeats per second"))
+        description = units.format(round(slider.get_value()))
+        slider.set_tooltip_text(description)
+        slider.get_accessible().set_description(description)
+
+    for slider in (delay, rate):
+        slider.connect("value-changed", describe_repeat)
+        describe_repeat(slider)
     test = Gtk.Entry(placeholder_text=tr("在此测试键盘重复速度", "Click here and hold down a key to test repeat rate"))
     characters.pack_start(test, False, False, 0)
     cursor = keyboard_group("光标闪烁频率", "Cursor blink rate")
