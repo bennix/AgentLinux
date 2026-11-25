@@ -8,6 +8,7 @@ import sys
 import threading
 from urllib.parse import urlsplit
 from network_details import smb_uri
+from printer_test_page import submit_test_page
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -203,6 +204,12 @@ def printer_added(_wizard, name):
     summary = Gtk.Label(xalign=0, wrap=True)
     summary.set_text(("已添加打印队列：%s" if zh else "Added print queue: %s") % name)
     body.pack_start(summary, False, False, 0)
+    test_page = Gtk.Button.new_with_mnemonic("打印测试页(_T)" if zh else "Print _test page")
+    test_page.set_halign(Gtk.Align.START)
+    feedback = Gtk.Label(xalign=0, wrap=True, selectable=True)
+    test_page.connect("clicked", lambda _: feedback.set_text(submit_test_page(name)))
+    body.pack_start(test_page, False, False, 0)
+    body.pack_start(feedback, False, False, 0)
     back.destroy()
     forward.destroy()
     cancel.destroy()

@@ -53,7 +53,7 @@ for name in (
     "install-panel-entries.sh", "control-panel.py", "system-properties.py", "input-properties.py",
     "cursor-settings.py", "sound-properties.py", "date-properties.py", "power-properties.py",
     "programs.py", "fonts.py", "accessibility.py", "user-accounts.py", "network-places.py",
-    "connections.py", "wireless.py", "search-files.py", "default-programs.py", "printers.py", "add-printer.py", "dns_properties.py",
+    "connections.py", "wireless.py", "search-files.py", "default-programs.py", "printers.py", "add-printer.py", "printer_test_page.py", "dns_properties.py",
     "login-start.sh", "shell-start.sh", "session-env.sh", "taskbar.sh", "task-manager.sh", "display-mode.py",
     "session-dialog.py", "menu-open.sh", "explorer-launch.sh", "run-dialog.sh", "control-command.sh",
     "network_details.py", "task_pane.py", "cursor_preview.py",

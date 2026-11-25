@@ -9,6 +9,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
 from gi.repository import Gdk, Gio, GLib, GObject, Gtk, Pango
+from printer_test_page import submit_test_page
 from task_pane import add_task_pane, task_button
 
 
@@ -325,13 +326,6 @@ queue_button = task_button(tr("查看正在打印的文档", "See what's printin
 queue_button.set_sensitive(False)
 queue_button.connect("clicked", open_queue)
 tasks.pack_start(queue_button, False, False, 0)
-def submit_test_page(name):
-    try:
-        job = cups.Connection().printFile(name, "/usr/share/cups/data/default-testpage.pdf",
-                                          tr("测试页", "Test page"), {})
-        return tr("已提交测试页", "Test page submitted") + f" · {name} #{job}"
-    except (RuntimeError, OSError) as exc:
-        return tr("测试页提交失败", "Could not submit test page") + " · " + str(exc)
 
 
 def print_test_page(_button):
