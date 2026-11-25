@@ -45,7 +45,7 @@ def show_sample(*_):
     if font is None:
         return
     dialog = Gtk.Dialog(title=font.get_family(), transient_for=window, modal=True)
-    dialog.add_button("关闭(_C)" if chinese else "_Close", Gtk.ResponseType.CLOSE)
+    close_button = dialog.add_button("关闭(_C)" if chinese else "_Close", Gtk.ResponseType.CLOSE)
     dialog.set_default_response(Gtk.ResponseType.CLOSE)
     dialog.set_default_size(560, 320)
     scroll = Gtk.ScrolledWindow()
@@ -89,6 +89,7 @@ def show_sample(*_):
     dialog.set_destroy_with_parent(True)
     dialog.connect("response", lambda widget, _response: widget.destroy())
     dialog.connect("destroy", lambda widget: Gtk.StyleContext.remove_provider_for_screen(widget.get_screen(), style))
+    close_button.grab_focus()
     dialog.show_all()
 
 
