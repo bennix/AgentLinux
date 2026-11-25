@@ -46,6 +46,13 @@ def address_fields(dev, tr):
             except (OSError, ValueError, OverflowError):
                 pass
             else:
+                try:
+                    seconds = int(dhcp.get_one_option("dhcp_lease_time") or 0)
+                    if 0 < seconds < 0xffffffff:
+                        start = datetime.fromtimestamp(int(expiry) - seconds).astimezone()
+                        fields.append((tr("租约获得时间", "Lease obtained"), start.strftime("%Y-%m-%d %H:%M:%S %Z")))
+                except (OSError, ValueError, OverflowError):
+                    pass
                 fields.append((tr("租约到期时间", "Lease expires"), end.strftime("%Y-%m-%d %H:%M:%S %Z")))
     return fields
 
