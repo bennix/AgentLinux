@@ -43,7 +43,7 @@ for slide in sorted(slides.glob("*/*.html")):
     files.append((slide, installer_assets / "slides" / slide.relative_to(slides), 0o644))
 for relative in ("accesskeys", "clock-entry.so", "start-actions.so", "task-manager-run.so", "taskmgr-localized", "notepad", "new-task", "mount-compat.so", "run-shortcut",
                  "explorer-toolbar.so", "explorer-newmenu.so", "run-network.so", "display-language.so",
-                 "peony-qt-desktop", "explorer-lib/libwintc-comctl.so.1"):
+                 "peony-qt-desktop", "explorer-lib/libwintc-comctl.so.1", "explorer-lib/libwintc-shell.so.1"):
     source = args.components / relative
     with source.open("rb") as binary:
         header = binary.read(20)

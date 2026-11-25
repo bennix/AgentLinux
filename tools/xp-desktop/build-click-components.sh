@@ -22,6 +22,22 @@ cp -R "$wintc/shared/comctl" "$work/comctl"
         $(pkg-config --cflags --libs gtk+-3.0 wintc-comgtk wintc-shcommon wintc-shlang) \
         -lm -o "$work/libwintc-comctl.so.1"
 )
+mkdir -p "$work/shared"
+cp -R "$wintc/shared/shell" "$work/shared/"
+(
+    cd "$work"
+    patch --batch --forward -p1 < "$assets/explorer-volume.patch"
+    cd shared/shell
+    (cd src/res && glib-compile-resources --generate-source --target=../resources.c resources.xml)
+    # Ubuntu 24.04 uses the original names for these GLib mount functions.
+    cc -O2 -Werror=implicit-function-declaration -fPIC -shared -Wl,-soname,libwintc-shell.so.1 \
+        -Dg_unix_mount_entry_at=g_unix_mount_at -Dg_unix_mount_entry_free=g_unix_mount_free \
+        -Dg_unix_mount_entry_get_device_path=g_unix_mount_get_device_path \
+        -Dg_unix_mount_entry_get_fs_type=g_unix_mount_get_fs_type src/*.c \
+        $(pkg-config --cflags --libs gtk+-3.0 gio-unix-2.0 wintc-comctl wintc-comgtk wintc-exec \
+            wintc-shcommon wintc-shellext wintc-shlang wintc-winbrand libxml-2.0) \
+        -o "$work/libwintc-shell.so.1"
+)
 cp -R "$peony" "$work/peony"
 (
     cd "$work/peony"
@@ -43,12 +59,12 @@ install -m755 "$work/start-actions.so" "$dest/start-actions.so"
 cc -Wall -Werror -shared -fPIC "$assets/task-manager-run.c" \
     $(pkg-config --cflags --libs gio-unix-2.0 gtk+-3.0) -o "$work/task-manager-run.so"
 mkdir -p "$dest/explorer-lib"
-for file in "$work/task-manager-run.so" "$work/accesskeys" "$work/libwintc-comctl.so.1" "$work/peony/libpeony-qt/libpeony.so.3.2.2" "$work/peony/peony-qt-desktop/peony-qt-desktop"; do
+for file in "$work/task-manager-run.so" "$work/accesskeys" "$work/libwintc-comctl.so.1" "$work/libwintc-shell.so.1" "$work/peony/libpeony-qt/libpeony.so.3.2.2" "$work/peony/peony-qt-desktop/peony-qt-desktop"; do
     case "$file" in
         */task-manager-run.so) output="$dest/task-manager-run.so" ;;
         */accesskeys) output="$dest/accesskeys" ;;
         */libpeony.so.3.2.2) output="$dest/libpeony.so.3.2.2" ;;
-        *.so.1) output="$dest/explorer-lib/libwintc-comctl.so.1" ;;
+        *.so.1) output="$dest/explorer-lib/${file##*/}" ;;
         *) output="$dest/peony-qt-desktop" ;;
     esac
     stage=$(mktemp "$output.XXXXXX")
