@@ -162,9 +162,23 @@ if device == "mouse":
     scale(wheel, "wheel-speed", "滚动速度", "Scrolling speed", 1, 10)
 else:
     speed = tab("速度", "Speed")
-    repeat = toggle(speed, "repeat", "按住键时重复输入", "Repeat characters when a key is held down")
-    delay = scale(speed, "delay", "重复延迟", "Repeat delay", 150, 1000)
-    rate = scale(speed, "rate", "重复速度", "Repeat rate", 10, 250)
+    scroll_settings = Gtk.ScrolledWindow()
+    scroll_settings.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+    speed.pack_start(scroll_settings, True, True, 0)
+    groups = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+    scroll_settings.add(groups)
+
+    def keyboard_group(zh, en):
+        frame = Gtk.Frame(label=tr(zh, en))
+        controls = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4, border_width=6)
+        frame.add(controls)
+        groups.pack_start(frame, False, False, 0)
+        return controls
+
+    characters = keyboard_group("字符重复", "Character repeat")
+    repeat = toggle(characters, "repeat", "按住键时重复输入", "Repeat characters when a key is held down")
+    delay = scale(characters, "delay", "重复延迟", "Repeat delay", 150, 1000)
+    rate = scale(characters, "rate", "重复速度", "Repeat rate", 10, 250)
     delay.set_inverted(True)
     for slider, low, high in ((delay, tr("短", "Short"), tr("长", "Long")),
                               (rate, tr("慢", "Slow"), tr("快", "Fast"))):
@@ -174,8 +188,9 @@ else:
         slider.add_mark(slider.get_adjustment().get_upper(), Gtk.PositionType.BOTTOM, high)
         repeat.bind_property("active", slider, "sensitive", GObject.BindingFlags.SYNC_CREATE)
     test = Gtk.Entry(placeholder_text=tr("在此测试键盘重复速度", "Click here and hold down a key to test repeat rate"))
-    speed.pack_start(test, False, False, 0)
-    cursor = tab("光标", "Cursor")
+    characters.pack_start(test, False, False, 0)
+    cursor = keyboard_group("光标闪烁频率", "Cursor blink rate")
+    dialog.set_default_size(425, 440)
     style = Gio.Settings.new("org.ukui.style")
     style.delay()
     backends.append(style)
