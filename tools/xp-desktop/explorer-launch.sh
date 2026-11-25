@@ -16,4 +16,11 @@ fi
 if [ -f "$assets/explorer-lib/libwintc-comctl.so.1" ]; then
     export LD_LIBRARY_PATH="$assets/explorer-lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 fi
+if [ "$#" = 1 ] && [ "$1" = --my-documents ]; then
+    documents=$(/usr/bin/python3 -c 'from gi.repository import GLib
+import os
+print(GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DOCUMENTS) or os.path.expanduser("~/Documents"))') || exit 1
+    mkdir -p "$documents" || exit 1
+    set -- "$documents"
+fi
 exec /usr/bin/explorer "$@"

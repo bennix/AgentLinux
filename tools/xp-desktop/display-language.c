@@ -412,6 +412,7 @@ static GSettings *page_settings(GtkWidget *window, const char *schema)
 }
 
 static const struct { const char *id, *en, *zh; } desktop_items[] = {
+    {"agentlinux-xp-documents", "My Documents", "我的文档"},
     {"agentlinux-xp-explorer", "Windows Explorer", "资源管理器"},
     {"agentlinux-xp-control", "Control Panel", "控制面板"},
     {"agentlinux-xp-places", "My Network Places", "网上邻居"},

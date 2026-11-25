@@ -182,3 +182,24 @@ if [ -n "$desktop" ] && [ "$desktop" != "$HOME" ] && [ ! -e "$settings/desktop-s
     done
     touch "$settings/desktop-shortcuts-initialized"
 fi
+
+# Add My Documents once for existing desktops as well as fresh accounts.
+if [ -n "$desktop" ] && [ "$desktop" != "$HOME" ] && [ ! -e "$settings/documents-shortcut-initialized" ]; then
+    mkdir -p "$desktop" "$settings"
+    name=agentlinux-xp-documents.desktop
+    if [ ! -e "$desktop/$name" ] && [ ! -L "$desktop/$name" ] &&
+       [ ! -e "$desktop/.$name" ] && [ ! -e "$settings/hidden-shortcuts/$name" ]; then
+        cat > "$apps/$name" <<ENTRY
+[Desktop Entry]
+Type=Application
+Name=My Documents
+Name[zh_CN]=我的文档
+Exec="$assets/explorer-launch.sh" --my-documents
+Icon=/usr/share/icons/luna/res/48x48/folder_documents.png
+Categories=System;FileManager;
+ENTRY
+        install -m 755 "$apps/$name" "$desktop/$name"
+        gio set "$desktop/$name" metadata::trusted true 2>/dev/null || true
+    fi
+    touch "$settings/documents-shortcut-initialized"
+fi
