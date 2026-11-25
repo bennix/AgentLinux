@@ -1,5 +1,9 @@
 # AgentLinux
 
+在开始菜单中选择“帮助和支持”，或按 **Win + F1**，可打开新版中英文离线帮助中心。Agent 也可通过 `agentlinux-components app/agentlinux-xp-help.desktop --launch` 打开帮助。选择左侧主题即可查看文件、网络、打印机和键鼠操作说明。字体样张支持分页打印，也可按 Win + R 输入 `shell:Fonts` 打开字体文件夹。控制面板会记住上次的视图，添加打印机时会检查队列名称。
+
+Open **Help and Support** from Start or press **Win + F1** for offline help in English or Chinese. Agents can open the same window with `agentlinux-components app/agentlinux-xp-help.desktop --launch`. Select a topic on the left for instructions on files, networking, printers, or input devices. Font samples now support multipage printing. To open Fonts, press Win + R and enter `shell:Fonts`. Control Panel remembers the selected view, and the Add Printer wizard validates queue names.
+
 XP 资源管理器支持移除无父驱动器的卷，中文右键菜单支持“新建 → 文件夹”。字体样张从顶部打开，“运行”支持 control appwiz.cpl,,3，中文桌面的网络断开通知使用系统翻译。
 
 XP Explorer handles removal of volumes without a parent drive. Its Chinese context menu includes New Folder. Font previews open at the top, Run recognizes control appwiz.cpl,,3, and network disconnection notifications follow the Chinese desktop locale.
@@ -20,18 +24,18 @@ System Properties adds an Advanced tab. Keyboard shortcuts cycle between propert
 
 从桌面双击“我的文档”即可打开个人文档目录。用记事本保存文本后，可在“开始”菜单的最近文档中重新打开。
 
-XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。v2026.11.26.1 已在 BIOS 和 UEFI 虚拟机中从只读虚拟 USB 启动至中文桌面。
+XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。v2026.11.26.2 已在 BIOS 和 UEFI 虚拟机中从只读虚拟 USB 启动至中文桌面。
 
 快捷方式向导支持含空格的路径和同名文件。右键点击已连接的 Wi-Fi 可查看连接状态和 TCP/IPv4 属性。
 
 The shortcut wizard handles paths with spaces and existing filenames. Right-click a connected Wi-Fi network to view its status and TCP/IPv4 properties.
 
-**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.26.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.26.1/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
+**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.26.2/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.26.2/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
 
-ISO SHA-256 (v2026.11.26.1)
+ISO SHA-256 (v2026.11.26.2)
 
-`51f461bab3341b4ab658d36fafb041962640edc99c2577e18ddc823aa65b2429`
+`c1423a0aec80e00c98fef28b1207b657dafe64a10f737d8b202dce562c01e3c1`
 
 | 启动方式 / Boot mode | 用户名 / Username | 密码 / Password |
 | --- | --- | --- |
@@ -39,7 +43,7 @@ ISO SHA-256 (v2026.11.26.1)
 | 预装 SanDisk U 盘 / Preinstalled SanDisk USB | `agent` | `agentfudan` |
 | 自行安装到硬盘 / Installation on your own disk | 安装时创建 / Set during installation | 安装时设置 / Set during installation |
 
-[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.26.1)
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.26.2)
 
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可双击桌面的“安装到硬盘”启动安装器。
 
@@ -90,7 +94,7 @@ unsquashfs -ll xp-standard.squashfs
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.26.1)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.26.2)
 
 运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。需要至少 8 GB 可用空间。Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
