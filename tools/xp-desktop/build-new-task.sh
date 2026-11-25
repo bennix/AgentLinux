@@ -20,7 +20,7 @@ for name, old, new in (
         raise ValueError(f"Unexpected WinTC source in {name}")
     path.write_text(source.replace(old, new))
 PY
-echo '#define PKG_NAME "wintc-run"' > meta.h
+echo '#define PKG_NAME "wintc-shell-run"' > meta.h
 cc -o new-task ./*.c $(pkg-config --cflags --libs gtk+-3.0 wintc-comctl wintc-comgtk wintc-exec wintc-shlang)
 stage=$(mktemp "$dest/new-task.XXXXXX")
 trap 'rm -f "$stage"; rm -rf "$work"' EXIT
