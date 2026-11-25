@@ -165,7 +165,8 @@ Categories=System;FileManager;
 ENTRY
 
 # Seed the XP desktop once, after XDG has selected its localized directory.
-desktop=$(xdg-user-dir DESKTOP)
+desktop=$(/usr/bin/python3 -c 'from gi.repository import GLib
+print(GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_DESKTOP) or "")')
 settings="${XDG_CONFIG_HOME:-$HOME/.config}/agentlinux-xp"
 if [ -n "$desktop" ] && [ "$desktop" != "$HOME" ] && [ ! -e "$settings/desktop-shortcuts-initialized" ]; then
     mkdir -p "$desktop" "$settings"
