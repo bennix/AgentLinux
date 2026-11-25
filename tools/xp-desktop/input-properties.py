@@ -206,6 +206,8 @@ else:
         slider.connect("value-changed", describe_repeat)
         describe_repeat(slider)
     test = Gtk.Entry(placeholder_text=tr("在此测试键盘重复速度", "Click here and hold down a key to test repeat rate"))
+    test.get_accessible().set_name(tr("按键重复测试", "Key repeat test"))
+    test.get_accessible().set_description(test.get_placeholder_text())
     characters.pack_start(test, False, False, 0)
     cursor = keyboard_group("光标闪烁频率", "Cursor blink rate")
     dialog.set_default_size(425, 440)
@@ -217,6 +219,8 @@ else:
                    "Blink period (ms, faster to the right)", 100, 2500, style)
     period.set_inverted(True)
     preview = Gtk.Entry(placeholder_text=tr("点击此处预览光标", "Click here to preview the cursor"))
+    preview.get_accessible().set_name(tr("光标预览", "Cursor preview"))
+    preview.get_accessible().set_description(preview.get_placeholder_text())
     cursor.pack_start(preview, False, False, 0)
 
     def preview_cursor(*_):
