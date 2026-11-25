@@ -97,12 +97,19 @@ if device == "mouse":
     last_click = None
     folder_open = False
 
+    def update_test_folder():
+        folder_icon.set_from_icon_name("folder-open" if folder_open else "folder", Gtk.IconSize.LARGE_TOOLBAR)
+        state = tr("文件夹已打开", "Folder open") if folder_open else tr("文件夹已关闭", "Folder closed")
+        test_folder.get_accessible().set_description(state)
+
+    update_test_folder()
+
     def test_double_click(_button):
         global last_click, folder_open
         now = GLib.get_monotonic_time()
         if last_click is not None and now - last_click <= settings.get_int("double-click") * 1000:
             folder_open = not folder_open
-            folder_icon.set_from_icon_name("folder-open" if folder_open else "folder", Gtk.IconSize.LARGE_TOOLBAR)
+            update_test_folder()
             last_click = None
         else:
             last_click = now
