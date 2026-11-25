@@ -8,7 +8,7 @@ import cairo
 
 from network_details import address_fields
 from dns_properties import dns_properties
-from task_pane import add_task_pane, task_button
+from task_pane import add_task_pane, cycle_property_pages, task_button
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -200,6 +200,7 @@ class Wireless(Gtk.Application):
             self.list.append_column(col)
         self.list.set_has_tooltip(True)
         self.list.connect("query-tooltip", self.network_tooltip)
+        self.list.connect("key-press-event", self.network_key_press)
         self.list.connect("row-activated", self.activate_network)
         self.preferred_network = None
         self.list.get_selection().connect("changed", self.selection_changed)
@@ -310,6 +311,13 @@ class Wireless(Gtk.Application):
         self.update_button()
         return True
 
+    def network_key_press(self, _view, event):
+        modifiers = event.state & Gtk.accelerator_get_default_mod_mask()
+        if modifiers == Gdk.ModifierType.MOD1_MASK and event.keyval in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
+            self.edit_selected_ip()
+            return True
+        return False
+
     def activate_network(self, view, path, _column):
         view.get_selection().select_path(path)
         ap, dev = self.selected()
@@ -349,6 +357,7 @@ class Wireless(Gtk.Application):
                             transient_for=self.window, modal=True)
         dialog.add_button(tr("关闭", "Close"), Gtk.ResponseType.CLOSE)
         tabs = Gtk.Notebook(border_width=8)
+        dialog.connect("key-press-event", cycle_property_pages, tabs)
         dialog.set_default_size(460, 340)
         dialog.get_content_area().pack_start(tabs, True, True, 0)
 
