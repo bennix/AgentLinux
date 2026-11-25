@@ -207,7 +207,6 @@ else:
         describe_repeat(slider)
     test = Gtk.Entry(placeholder_text=tr("在此测试键盘重复速度", "Click here and hold down a key to test repeat rate"))
     test.get_accessible().set_name(tr("按键重复测试", "Key repeat test"))
-    test.get_accessible().set_description(test.get_placeholder_text())
     characters.pack_start(test, False, False, 0)
     cursor = keyboard_group("光标闪烁频率", "Cursor blink rate")
     dialog.set_default_size(425, 440)
@@ -301,6 +300,7 @@ def sync_pending(*_):
     if device == "keyboard":
         test.set_placeholder_text(tr("点击“应用”后可试打新设置", "Click Apply to test the new settings") if settings.get_has_unapplied()
                                   else tr("在此按住一个键测试重复速度", "Hold down a key here to test the repeat rate"))
+        test.get_accessible().set_description(test.get_placeholder_text())
 
 
 for backend in backends:
