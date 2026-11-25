@@ -39,7 +39,9 @@ class Window(Gtk.Window):
         self.chatbox, self.settings = column(), column()
         settings_scroll = Gtk.ScrolledWindow()
         settings_scroll.add(self.settings)
-        for page, name in [(self.chatbox, tr('Assistant')), (settings_scroll, tr('Settings'))]:
+        settings_page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        settings_page.pack_start(settings_scroll, True, True, 0)
+        for page, name in [(self.chatbox, tr('Assistant')), (settings_page, tr('Settings'))]:
             self.book.append_page(page, Gtk.Label(label=name))
         self.log = Gtk.TextView(editable=False, cursor_visible=False, wrap_mode=Gtk.WrapMode.WORD_CHAR)
         scroll = Gtk.ScrolledWindow()
@@ -85,7 +87,11 @@ class Window(Gtk.Window):
         self.settings.add(button(tr('Benchmark and select a node'), self.measure))
         self.draft = {k: self.cfg.get(k) for k in ("source", "data", "names")}
         self.populate(self.cfg.get("names", []), self.cfg.get("node"))
-        self.settings.add(button(tr('Save settings'), self.store))
+        footer = Gtk.ButtonBox(orientation=Gtk.Orientation.HORIZONTAL)
+        footer.set_layout(Gtk.ButtonBoxStyle.END)
+        footer.set_border_width(6)
+        footer.add(button(tr('Save settings'), self.store))
+        settings_page.pack_end(footer, False, False, 0)
         self.status = Gtk.Label(xalign=0, wrap=True)
         self.settings.add(self.status)
         self.settings.add(Gtk.LinkButton.new_with_label("https://cs.fudan.edu.cn/", tr('Publisher: Fudan University School of Computer Science and Artificial Intelligence')))
