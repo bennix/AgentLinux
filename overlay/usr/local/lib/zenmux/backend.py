@@ -182,6 +182,9 @@ TOOLS = [{"type": "function", "function": {
         ("list_controls", tr('List visible controls and slider values in a selected window'), {"window_id": {"type": "string"}}),
         ("activate_control", tr('Activate a named control in a selected window'),
          {key: {"type": "string"} for key in ("window_id", "path", "role", "label")}),
+        ("explorer_item_action", tr("Select or open a listed Explorer item. List controls again to verify selection."),
+         {**{key: {"type": "string"} for key in ("window_id", "path", "role", "label")},
+          "action": {"type": "string", "enum": ["select", "open"]}}),
         ("set_slider_value", tr('Set a named slider in a selected window'),
          {**{key: {"type": "string"} for key in ("window_id", "path", "role", "label")}, "value": {"type": "number"}}),
         ("open_home", tr('Open the home directory in the file manager'), {}),
@@ -260,7 +263,7 @@ def action(name, args):
             app = apps[args["desktop_id"]]
             app.launch([], None)
             return app.get_display_name()
-    if name in ("list_windows", "focus_window", "list_controls", "activate_control", "set_slider_value"):
+    if name in ("list_windows", "focus_window", "list_controls", "activate_control", "set_slider_value", "explorer_item_action"):
         import re
         listing = subprocess.check_output(["xprop", "-root", "_NET_CLIENT_LIST_STACKING"], text=True, timeout=3)
         ids = re.findall(r"0x[0-9a-fA-F]+", listing)
@@ -274,9 +277,13 @@ def action(name, args):
                 if title.returncode == 0:
                     windows[wid] = title.stdout.strip()[:250]
             return json.dumps(windows, ensure_ascii=False)
-        if name in ("list_controls", "activate_control", "set_slider_value") and args.get("window_id") in ids:
+        if name in ("list_controls", "activate_control", "set_slider_value", "explorer_item_action") and args.get("window_id") in ids:
             keys = {"window_id"} if name == "list_controls" else {"window_id", "path", "role", "label"}
             expected = keys | {"value"} if name == "set_slider_value" else keys
+            if name == "explorer_item_action":
+                expected = keys | {"action"}
+                if args.get("action") not in ("select", "open"):
+                    raise ValueError(tr('Unsupported action'))
             if name == "set_slider_value" and type(args.get("value")) not in (int, float):
                 raise ValueError(tr('Unsupported action'))
             if set(args) == expected and all(isinstance(args[k], str) for k in keys):

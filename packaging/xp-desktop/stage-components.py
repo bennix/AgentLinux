@@ -95,6 +95,10 @@ for name in ("logo.png", "mini-logo.png", "userpic.png"):
 for resource in (*greeter.glob("*/*.ui"), *greeter.glob("*/*.css")):
     files.append((resource, resource_dir / resource.relative_to(greeter), 0o644))
 
+for name in ("accessible.py", "backend.py"):
+    relative = Path("usr/local/lib/zenmux") / name
+    files.append((assets.parents[1] / "overlay" / relative, relative, 0o644))
+
 for directory in ("taskbar-zh", "explorer-zh", "taskmgr-zh", "taskmgr-en"):
     for resource in Path(__file__).with_name(directory).glob("*.ui"):
         files.append((resource, user_assets / directory / resource.name, 0o644))

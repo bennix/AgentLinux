@@ -41,6 +41,13 @@ def controls(window):
         obj, path = queue.popleft()
         visited += 1
         states = obj.get_state_set()
+        if (obj.get_role() == Atspi.Role.LIST_ITEM and states.contains(Atspi.StateType.SELECTABLE)
+                and not states.contains(Atspi.StateType.DEFUNCT) and "Action" in obj.get_interfaces()):
+            actions = [obj.get_action_name(i) for i in range(obj.get_n_actions())]
+            label = obj.get_name()
+            if label and actions == ["select", "open"]:
+                yield obj, {"path": path, "role": obj.get_role_name(), "label": label,
+                            "actions": actions, "selected": states.contains(Atspi.StateType.SELECTED)}
         if obj.get_role() in ROLES and states.contains(Atspi.StateType.SHOWING) and states.contains(Atspi.StateType.ENABLED):
             label = obj.get_name()
             if label and obj.get_role() == Atspi.Role.SLIDER and "Value" in obj.get_interfaces():
@@ -63,6 +70,15 @@ def main():
         return
     for obj, info in items:
         if all(info[k] == args[k] for k in ("path", "role", "label")):
+            if "actions" in info:
+                if operation != "explorer_item_action" or args["action"] not in info["actions"]:
+                    break
+                if obj.do_action(info["actions"].index(args["action"])):
+                    print(json.dumps({"requested": args["action"], "label": info["label"]}, ensure_ascii=False))
+                    return
+                break
+            if operation == "explorer_item_action":
+                break
             if operation == "set_slider_value":
                 if "value" not in info or not info["minimum"] <= args["value"] <= info["maximum"]:
                     break
