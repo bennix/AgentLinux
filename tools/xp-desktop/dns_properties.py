@@ -31,13 +31,19 @@ def dns_properties(parent, profile, tr, device):
     ip_values = [first.get_address() if first else "",
                  str(IPv4Network((0, first.get_prefix())).netmask) if first else "",
                  ipv4.get_gateway() or ""]
+    def address_entry(label, value, row):
+        entry = Gtk.Entry(text=value)
+        caption = Gtk.Label(label=label, xalign=0, use_underline=True)
+        caption.set_mnemonic_widget(entry)
+        entry.get_accessible().set_name(caption.get_text())
+        grid.attach(caption, 0, row, 1, 1)
+        grid.attach(entry, 1, row, 1, 1)
+        return entry
+
     ip_entries = []
-    for row, label in enumerate((tr("IP 地址", "IP address"), tr("子网掩码", "Subnet mask"),
-                                 tr("默认网关", "Default gateway"))):
-        entry = Gtk.Entry(text=ip_values[row])
-        grid.attach(Gtk.Label(label=label, xalign=0), 0, row + 3, 1, 1)
-        grid.attach(entry, 1, row + 3, 1, 1)
-        ip_entries.append(entry)
+    for row, label in enumerate((tr("IP 地址(_I)", "_IP address"), tr("子网掩码(_M)", "Subnet _mask"),
+                                 tr("默认网关(_G)", "Default _gateway"))):
+        ip_entries.append(address_entry(label, ip_values[row], row + 3))
     ip_manual.set_active(not dhcp)
     for radio in (ip_auto, ip_manual):
         radio.set_sensitive(simple)
@@ -51,11 +57,9 @@ def dns_properties(parent, profile, tr, device):
     grid.attach(auto, 0, 6, 2, 1)
     grid.attach(manual, 0, 7, 2, 1)
     entries = []
-    for i, label in enumerate((tr("首选 DNS 服务器", "Preferred DNS server"), tr("备用 DNS 服务器", "Alternate DNS server"))):
-        entry = Gtk.Entry(text=servers[i] if i < len(servers) else "")
-        grid.attach(Gtk.Label(label=label, xalign=0), 0, i + 8, 1, 1)
-        grid.attach(entry, 1, i + 8, 1, 1)
-        entries.append(entry)
+    for i, label in enumerate((tr("首选 DNS 服务器(_P)", "_Preferred DNS server"),
+                               tr("备用 DNS 服务器(_A)", "_Alternate DNS server"))):
+        entries.append(address_entry(label, servers[i] if i < len(servers) else "", i + 8))
     note = Gtk.Label(label=tr("更改将在下次连接时生效。", "Changes take effect on the next connection."), xalign=0, wrap=True)
     grid.attach(note, 0, 10, 2, 1)
     def sensitivity(*_):
