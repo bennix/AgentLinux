@@ -25,3 +25,30 @@ msgstr "所有文件"
 
 msgid "The operation could not be completed."
 msgstr "无法完成操作。"
+
+msgid "OK"
+msgstr "确定"
+
+msgid "Cancel"
+msgstr "取消"
+
+msgid "Yes"
+msgstr "是"
+
+msgid "No"
+msgstr "否"
+
+msgid "Abort"
+msgstr "中止"
+
+msgid "Retry"
+msgstr "重试"
+
+msgid "Ignore"
+msgstr "忽略"
+
+msgid "Try Again"
+msgstr "再试一次"
+
+msgid "Continue"
+msgstr "继续"

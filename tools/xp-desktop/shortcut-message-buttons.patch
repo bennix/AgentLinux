@@ -1,0 +1,11 @@
+--- a/src/msgbox.c
++++ b/src/msgbox.c
+@@ -237,7 +237,7 @@
+     };
+ 
+     GtkWidget* button =
+-        gtk_button_new_with_label(s_button_labels[response]);
++        gtk_button_new_with_label(g_dgettext("wintc-cpl-appwiz", s_button_labels[response]));
+ 
+     g_signal_connect(
+         button,
