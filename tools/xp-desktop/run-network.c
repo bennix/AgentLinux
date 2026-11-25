@@ -11,6 +11,14 @@ gboolean wintc_launch_command(const gchar *command, GError **error)
         address[length - 1] = '\0';
         address++;
     }
+    if (g_regex_match_simple(
+            "^(?:rundll32(?:\\.exe)?[ \\t]+printui\\.dll,PrintUIEntry|printui(?:\\.exe)?)[ \\t]+/il$",
+            address, G_REGEX_CASELESS, 0)) {
+        g_autofree gchar *wizard = g_build_filename(g_get_home_dir(), ".local", "share",
+                                                    "agentlinux-xp", "add-printer.py", NULL);
+        gchar *argv[] = {wizard, NULL};
+        return g_spawn_async(NULL, argv, NULL, G_SPAWN_DEFAULT, NULL, NULL, NULL, error);
+    }
     gboolean unc = g_str_has_prefix(address, "\\\\") || g_str_has_prefix(address, "//");
     if (!unc && g_ascii_strncasecmp(address, "smb://", 6)) {
         typedef gboolean (*LaunchCommand)(const gchar *, GError **);
