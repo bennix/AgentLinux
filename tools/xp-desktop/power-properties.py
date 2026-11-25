@@ -50,7 +50,10 @@ for col, (suffix, source_title) in enumerate([("ac", tr("使用交流电源", "P
         combo.connect("changed", lambda w, k=name: settings.set_int(k, int(w.get_active_id())))
         grid.attach(combo, col, row, 1, 1)
 meter = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, border_width=16)
-tabs.append_page(meter, Gtk.Label(label=tr("电表", "Power Meter")))
+meter_scroll = Gtk.ScrolledWindow()
+meter_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+meter_scroll.add(meter)
+tabs.append_page(meter_scroll, Gtk.Label(label=tr("电表", "Power Meter")))
 advanced = Gtk.Grid(column_spacing=12, row_spacing=12, border_width=14)
 tabs.append_page(advanced, Gtk.Label(label=tr("高级", "Advanced")))
 advanced.attach(Gtk.Label(label=tr("合上笔记本盖时", "When I close the lid"), xalign=0), 0, 0, 2, 1)
@@ -185,7 +188,7 @@ apply_button = window.get_widget_for_response(Gtk.ResponseType.APPLY)
 settings.bind_property("has-unapplied", apply_button, "sensitive", GObject.BindingFlags.SYNC_CREATE)
 window.show_all()
 if sys.argv[1:] == ["--meter"]:
-    tabs.set_current_page(tabs.page_num(meter))
+    tabs.set_current_page(tabs.page_num(meter_scroll))
 elif len(sys.argv) == 2 and sys.argv[1] in ("0", "1", "2"):
     tabs.set_current_page(int(sys.argv[1]))
 while True:
