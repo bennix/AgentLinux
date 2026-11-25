@@ -23,7 +23,7 @@ Name=Help and Support Center
 Name[zh_CN]=帮助和支持中心
 Exec=/usr/bin/python3 "$assets/help-center.py"
 Icon=help-browser
-NoDisplay=true
+Categories=Utility;Documentation;
 ENTRY
 cat > "$apps/agentlinux-xp-control.desktop" <<ENTRY
 [Desktop Entry]
