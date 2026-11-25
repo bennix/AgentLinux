@@ -1,5 +1,9 @@
 # AgentLinux
 
+XP 资源管理器支持移除无父驱动器的卷，中文右键菜单支持“新建 → 文件夹”。字体样张从顶部打开，“运行”支持 control appwiz.cpl,,3，中文桌面的网络断开通知使用系统翻译。
+
+XP Explorer handles removal of volumes without a parent drive. Its Chinese context menu includes New Folder. Font previews open at the top, Run recognizes control appwiz.cpl,,3, and network disconnection notifications follow the Chinese desktop locale.
+
 XP 控制面板现在支持用快捷键选择 HTTP、HTTPS、邮件、文本和 PDF 的默认应用。字体样张支持 Alt+P、字符预览和十档字号。此版也修正了关于窗口的关闭按钮翻译，并清理了任务栏中多余的 Qt 辅助窗口。
 
 The XP Control Panel now supports keyboard selection of default apps for HTTP, HTTPS, email, text and PDF. Alt+P opens the font sample with character rows and ten point sizes. This release also localizes the About dialog’s Close button and hides a stray Qt helper window from the taskbar.
@@ -16,14 +20,14 @@ System Properties adds an Advanced tab. Keyboard shortcuts cycle between propert
 
 从桌面双击“我的文档”即可打开个人文档目录。用记事本保存文本后，可在“开始”菜单的最近文档中重新打开。
 
-XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。v2026.11.25.11 已在 BIOS 和 UEFI 虚拟机中从只读虚拟 USB 启动至中文桌面。
+XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。v2026.11.25.12 已在 BIOS 和 UEFI 虚拟机中从只读虚拟 USB 启动至中文桌面。
 
-**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.25.11/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.25.11/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
+**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.25.12/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.25.12/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
 
-ISO SHA-256 (v2026.11.25.11)
+ISO SHA-256 (v2026.11.25.12)
 
-`cfee90214798dc2d9958d427363eaaa96565fcb478513f2b81316ae1c6128d72`
+`fdbb75c9909350f779e54caa142da135e2524fad19112221e566f13c0de774aa`
 
 | 启动方式 / Boot mode | 用户名 / Username | 密码 / Password |
 | --- | --- | --- |
@@ -31,7 +35,7 @@ ISO SHA-256 (v2026.11.25.11)
 | 预装 SanDisk U 盘 / Preinstalled SanDisk USB | `agent` | `agentfudan` |
 | 自行安装到硬盘 / Installation on your own disk | 安装时创建 / Set during installation | 安装时设置 / Set during installation |
 
-[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.25.11)
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.25.12)
 
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可双击桌面的“安装到硬盘”启动安装器。
 
@@ -82,7 +86,7 @@ unsquashfs -ll xp-standard.squashfs
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.25.11)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.25.12)
 
 运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。需要至少 8 GB 可用空间。Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
