@@ -40,7 +40,7 @@ for category in ("ADDRESS", "COLLATE", "CTYPE", "IDENTIFICATION", "MEASUREMENT",
     files.append((args.components / relative, Path("usr/lib/locale") / relative, 0o644))
 for slide in sorted(slides.glob("*/*.html")):
     files.append((slide, installer_assets / "slides" / slide.relative_to(slides), 0o644))
-for relative in ("accesskeys", "clock-entry.so", "start-actions.so", "task-manager-run.so", "taskmgr-localized", "notepad", "mount-compat.so", "run-shortcut",
+for relative in ("accesskeys", "clock-entry.so", "start-actions.so", "task-manager-run.so", "taskmgr-localized", "notepad", "new-task", "mount-compat.so", "run-shortcut",
                  "explorer-toolbar.so", "explorer-newmenu.so", "run-network.so", "display-language.so",
                  "peony-qt-desktop", "explorer-lib/libwintc-comctl.so.1"):
     source = args.components / relative

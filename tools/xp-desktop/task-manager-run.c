@@ -8,7 +8,10 @@ static void launch_run(GSimpleAction *action, GVariant *parameter, gpointer data
     (void)data;
     GDesktopAppInfo *app = g_desktop_app_info_new("agentlinux-xp-run.desktop");
     if (app) {
-        g_app_info_launch(G_APP_INFO(app), NULL, NULL, NULL);
+        GAppLaunchContext *context = g_app_launch_context_new();
+        g_app_launch_context_setenv(context, "AGENTLINUX_NEW_TASK", "1");
+        g_app_info_launch(G_APP_INFO(app), NULL, context, NULL);
+        g_object_unref(context);
         g_object_unref(app);
     }
 }
