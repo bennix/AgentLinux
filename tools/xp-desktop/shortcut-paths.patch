@@ -1,0 +1,30 @@
+--- a/lnkwiz.c
++++ b/lnkwiz.c
+@@ -457,6 +457,18 @@
+         )
+         {
+             is_url = FALSE;
++            // Exec uses Desktop Entry quoting and doubles literal percent signs.
++            GString* command = g_string_new("\"");
++            for (const gchar* c = target; *c; ++c)
++            {
++                if (*c == '"' || *c == '\\' || *c == '$' || *c == '`')
++                    g_string_append_c(command, '\\');
++                if (*c == '%')
++                    g_string_append_c(command, '%');
++                g_string_append_c(command, *c);
++            }
++            g_string_append_c(command, '"');
++            true_target = g_string_free(command, FALSE);
+ 
+             // Okay it's an executable -- if there's a corresponding desktop
+             // entry then we should copy over some of its information
+@@ -489,7 +501,7 @@
+         else
+         {
+             true_target =
+-                g_strdup_printf("file://%s", target);
++                g_filename_to_uri(target, NULL, NULL);
+         }
+     }
+ 
