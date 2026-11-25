@@ -205,6 +205,32 @@ def launch_path(target):
         dialog.destroy()
 
 
+def show_properties(target):
+    try:
+        bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
+        bus.call_sync("org.freedesktop.FileManager1", "/org/freedesktop/FileManager1",
+                      "org.freedesktop.FileManager1", "ShowItemProperties",
+                      GLib.Variant("(ass)", ([target.as_uri()], "")), None,
+                      Gio.DBusCallFlags.NONE, 5000, None)
+    except GLib.Error as exc:
+        dialog = Gtk.MessageDialog(transient_for=window, modal=True, message_type=Gtk.MessageType.ERROR,
+                                   buttons=Gtk.ButtonsType.CLOSE, text=exc.message)
+        dialog.run()
+        dialog.destroy()
+
+
+def result_key(tree, event):
+    modifiers = event.state & Gtk.accelerator_get_default_mod_mask()
+    if modifiers != Gdk.ModifierType.MOD1_MASK or event.keyval not in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
+        return False
+    selected_model, row = tree.get_selection().get_selected()
+    if row is None:
+        return False
+    name, directory, *_ = selected_model[row]
+    show_properties(Path(directory, name))
+    return True
+
+
 def result_menu(event=None):
     selected_model, row = results.get_selection().get_selected()
     if row is None:
@@ -217,6 +243,10 @@ def result_menu(event=None):
         item = Gtk.MenuItem(label=label)
         item.connect("activate", lambda _, path=target: launch_path(path))
         menu.append(item)
+    menu.append(Gtk.SeparatorMenuItem())
+    properties = Gtk.MenuItem(label=tr("属性", "Properties"))
+    properties.connect("activate", lambda _: show_properties(Path(directory, name)))
+    menu.append(properties)
     menu.connect("selection-done", lambda widget: widget.destroy())
     menu.show_all()
     if event is not None:
@@ -242,6 +272,7 @@ def result_click(tree, event):
 
 
 results.connect("button-press-event", result_click)
+results.connect("key-press-event", result_key)
 results.connect("popup-menu", lambda _: result_menu())
 start.connect("clicked", search)
 query.connect("activate", search)
