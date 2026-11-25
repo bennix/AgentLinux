@@ -402,13 +402,27 @@ def show_devices(_button):
         properties.run()
         properties.destroy()
 
+    def scan_devices(_item):
+        refresh_pci()
+        refresh_usb()
+        if monitor is not None:
+            refresh_inputs(monitor)
+        view.grab_focus()
+
+    menu_bar = Gtk.MenuBar()
+    actions = Gtk.MenuItem.new_with_mnemonic(tr("操作(_A)", "_Action"))
+    action_menu = Gtk.Menu()
+    scan = Gtk.MenuItem.new_with_mnemonic(tr("扫描检测硬件改动(_S)", "_Scan for hardware changes"))
+    scan.connect("activate", scan_devices)
+    action_menu.append(scan)
+    actions.set_submenu(action_menu)
+    menu_bar.append(actions)
+    area.pack_start(menu_bar, False, False, 0)
+
     def device_key(tree, event):
         modifiers = event.state & Gtk.accelerator_get_default_mod_mask()
         if not modifiers and event.keyval == Gdk.KEY_F5:
-            refresh_pci()
-            refresh_usb()
-            if monitor is not None:
-                refresh_inputs(monitor)
+            scan_devices(None)
             return True
         if modifiers != Gdk.ModifierType.MOD1_MASK or event.keyval not in (Gdk.KEY_Return, Gdk.KEY_KP_Enter):
             return False
