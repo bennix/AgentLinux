@@ -437,14 +437,24 @@ window.connect("key-press-event", navigation_key)
 back.connect("clicked", lambda _: show())
 switch.connect("clicked", change_view)
 window.connect("destroy", Gtk.main_quit)
-if sys.argv[1:] == ["--admin-tools"]:
+if sys.argv[1:] in (["--admin-tools"], ["--settings"]):
     classic = True
-    entries = [
-        ("设备管理器", "Device Manager", "computer", "agentlinux-xp-devices.desktop"),
-        ("磁盘管理", "Disk Management", "drive-harddisk", "org.gnome.DiskUtility.desktop"),
-        by_name["Shared Folders"],
-    ]
-    window.set_title(tr("管理工具", "Administrative Tools"))
+    if sys.argv[1:] == ["--settings"]:
+        entries = [by_name[name] for name in (
+            "Display Properties", "Sounds and Audio Devices", "Network Connections",
+            "Input Method", "User Accounts", "Date and Time", "Power Options",
+            "Printers and Faxes", "System",
+        )]
+        entries.append(("其他系统设置", "Additional System Settings", "preferences-system",
+                        "ukui-control-center.desktop"))
+        window.set_title(tr("系统设置", "System Settings"))
+    else:
+        entries = [
+            ("设备管理器", "Device Manager", "computer", "agentlinux-xp-devices.desktop"),
+            ("磁盘管理", "Disk Management", "drive-harddisk", "org.gnome.DiskUtility.desktop"),
+            by_name["Shared Folders"],
+        ]
+        window.set_title(tr("管理工具", "Administrative Tools"))
     window.show_all()
     show()
     nav.hide()

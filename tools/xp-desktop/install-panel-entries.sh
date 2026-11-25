@@ -37,9 +37,8 @@ ENTRY
 while IFS='|' read -r key en zh icon; do
     case "$key" in
         display) command="\"$HOME/.local/bin/desk.cpl\"" ;;
-        settings) command="/usr/bin/ukui-control-center" ;;
         keyboard|mouse) command="/usr/bin/python3 \"$assets/input-properties.py\" $key" ;;
-        folder-options|language) command="/usr/bin/python3 \"$assets/control-panel.py\" --$key" ;;
+        folder-options|language|settings) command="/usr/bin/python3 \"$assets/control-panel.py\" --$key" ;;
         admin) command="/usr/bin/python3 \"$assets/control-panel.py\" --admin-tools" ;;
         devices) command="/usr/bin/python3 \"$assets/system-properties.py\" --devices" ;;
         system) command="/usr/bin/python3 \"$assets/system-properties.py\"" ;;
