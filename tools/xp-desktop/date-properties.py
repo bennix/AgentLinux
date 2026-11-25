@@ -3,6 +3,7 @@ import locale
 import math
 import os
 import subprocess
+import sys
 from datetime import datetime
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError, available_timezones
 
@@ -13,6 +14,8 @@ locale.setlocale(locale.LC_TIME, os.environ["LC_TIME"])
 import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gio, GLib, GObject, Gtk
+
+from task_pane import cycle_property_pages
 
 def tr(zh, en):
     return zh if os.getenv("LANGUAGE", os.getenv("LANG", "")).startswith("zh") else en
@@ -63,6 +66,7 @@ window = Gtk.Dialog(title=tr("日期和时间 属性", "Date and Time Properties
 window.set_icon_name("appointment-new")
 window.add_button(tr("关闭", "Close"), Gtk.ResponseType.CLOSE)
 tabs = Gtk.Notebook(border_width=8)
+window.connect("key-press-event", cycle_property_pages, tabs)
 window.get_content_area().pack_start(tabs, True, True, 0)
 def page(label):
     box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, border_width=12)
@@ -312,6 +316,8 @@ refresh_status()
 tick()
 timer = GLib.timeout_add_seconds(1, tick)
 window.show_all()
+if len(sys.argv) == 2 and sys.argv[1] in ("0", "1", "2"):
+    tabs.set_current_page(int(sys.argv[1]))
 window.run()
 GLib.source_remove(timer)
 window.destroy()

@@ -15,6 +15,7 @@ case "$name" in
     appwiz.cpl) app=programs ;;
     panel) app=control ;;
     winver) exec "$HOME/.local/share/agentlinux-xp/system-properties.py" --version ;;
+    timedate.cpl,,[0-2]) exec "$HOME/.local/share/agentlinux-xp/date-properties.py" "${name##*,}" ;;
     timedate.cpl|date/time) app=datetime ;;
     nusrmgr.cpl|userpasswords) app=userinfo ;;
     folders) exec "$HOME/.local/share/agentlinux-xp/control-panel.py" --folder-options ;;
