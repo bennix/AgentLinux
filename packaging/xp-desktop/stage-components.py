@@ -114,6 +114,12 @@ for directory in ("taskbar-zh", "explorer-zh", "taskmgr-zh", "taskmgr-en"):
     for resource in Path(__file__).with_name(directory).glob("*.ui"):
         files.append((resource, user_assets / directory / resource.name, 0o644))
 
+network_zh = Path(__file__).with_name("network-zh")
+files.extend([
+    (network_zh / "nm-applet.mo", Path("usr/share/locale-langpack/zh_CN/LC_MESSAGES/nm-applet.mo"), 0o644),
+    (network_zh / "copyright", Path("usr/share/doc/agentlinux-network-zh/copyright"), 0o644),
+])
+
 boot_theme = Path("usr/share/plymouth/themes/agentlinux-xp")
 for resource in Path(__file__).with_name("boot").joinpath("theme").iterdir():
     files.append((resource, boot_theme / resource.name, 0o644))
