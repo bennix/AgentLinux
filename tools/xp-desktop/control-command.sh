@@ -3,6 +3,13 @@ set -eu
 name=${0##*/}
 if [ "$name" = control ] || [ "$name" = control.exe ]; then
     name=$(printf '%s' "${1:-panel}" | LC_ALL=C tr '[:upper:]' '[:lower:]')
+    case "$name:${2:-}" in
+        *.cpl,*:*|*.cpl:,*)
+            # Control Panel accepts whitespace around each comma in an applet selector.
+            name=$(printf '%s' "$*" | LC_ALL=C tr '[:upper:]' '[:lower:]' |
+                sed 's/[[:blank:]]*,[[:blank:]]*/,/g')
+            ;;
+    esac
 fi
 case "$name" in
     explorer.exe) exec "$HOME/.local/share/agentlinux-xp/explorer-launch.sh" "$@" ;;
