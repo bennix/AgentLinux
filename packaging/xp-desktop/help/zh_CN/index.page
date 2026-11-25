@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="index" xml:lang="zh-CN">
+  <title>帮助和支持中心</title>
+  <p>在任意应用中按 Windows 徽标键 + F1，可打开此帮助中心。</p>
+  <section id="desktop">
+    <title>桌面和文件</title>
+    <p>从开始菜单打开“我的文档”。要查找其他位置的文件，请选择“开始 → 搜索”。</p>
+  </section>
+  <section id="network">
+    <title>网络连接</title>
+    <p>选择“开始 → 连接到”，选中无线网络，打开“属性”查看网络地址。</p>
+  </section>
+  <section id="printers">
+    <title>打印机与打印</title>
+    <p>从开始菜单打开“打印机和传真”，选择“添加打印机”。安装后可在打印机属性中打印测试页。</p>
+  </section>
+  <section id="input">
+    <title>键盘和鼠标</title>
+    <p>在控制面板的经典视图中打开“键盘”或“鼠标”。应用设置前，可先在测试区试用。</p>
+  </section>
+  <section id="more">
+    <title>更多帮助</title>
+    <p>
+      <link href="help-list:">浏览所有已安装的帮助</link>
+    </p>
+  </section>
+</page>

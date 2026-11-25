@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<page xmlns="http://projectmallard.org/1.0/" type="topic" id="index" xml:lang="en">
+  <title>Help and Support Center</title>
+  <p>Press Windows key + F1 to open this help center from any application.</p>
+  <section id="desktop">
+    <title>Desktop and files</title>
+    <p>Open My Documents from Start. To find a file elsewhere, choose Start → Search.</p>
+  </section>
+  <section id="network">
+    <title>Network connections</title>
+    <p>Choose Start → Connect To. Select the wireless network and open Properties to inspect its addresses.</p>
+  </section>
+  <section id="printers">
+    <title>Printers and printing</title>
+    <p>Open Printers and Faxes from Start, then choose Add a printer. After setup, open the printer properties to print a test page.</p>
+  </section>
+  <section id="input">
+    <title>Keyboard and mouse</title>
+    <p>Open Control Panel in Classic View and choose Keyboard or Mouse. Use the test area before applying your settings.</p>
+  </section>
+  <section id="more">
+    <title>More help</title>
+    <p>
+      <link href="help-list:">Browse all installed help</link>
+    </p>
+  </section>
+</page>

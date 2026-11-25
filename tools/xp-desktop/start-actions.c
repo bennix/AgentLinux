@@ -43,7 +43,7 @@ gboolean wintc_launch_action(WinTCAction action, GError **error)
     case WINTC_ACTION_CONNECTTO: script = "connections.py"; break;
     case WINTC_ACTION_MIMEMGMT: script = "default-programs.py"; break;
     case WINTC_ACTION_HELP: {
-        char *argv[] = { "/usr/bin/yelp", "help-list:", NULL };
+        char *argv[] = { "/usr/bin/yelp", "help:agentlinux-xp", NULL };
         return g_spawn_async(NULL, argv, NULL, G_SPAWN_DEFAULT, NULL, NULL, NULL, error);
     }
     default: break;

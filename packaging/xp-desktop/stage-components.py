@@ -39,6 +39,9 @@ for category in ("ADDRESS", "COLLATE", "CTYPE", "IDENTIFICATION", "MEASUREMENT",
                  "TELEPHONE", "TIME"):
     relative = Path("en_US.utf8") / ("LC_" + category)
     files.append((args.components / relative, Path("usr/lib/locale") / relative, 0o644))
+for lang in ("C", "zh_CN"):
+    files.append((Path(__file__).with_name("help") / lang / "index.page",
+                  Path("usr/share/help") / lang / "agentlinux-xp/index.page", 0o644))
 for slide in sorted(slides.glob("*/*.html")):
     files.append((slide, installer_assets / "slides" / slide.relative_to(slides), 0o644))
 for relative in ("accesskeys", "clock-entry.so", "start-actions.so", "task-manager-run.so", "taskmgr-localized", "notepad", "new-task", "mount-compat.so", "run-shortcut",

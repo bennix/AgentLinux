@@ -80,6 +80,7 @@ int main(void)
         {XK_e, super, "agentlinux-xp-computer", 0},
         {XK_d, super, NULL, 0},
         {XK_f, super, "agentlinux-xp-search", 0},
+        {XK_F1, super, NULL, 0},
         {XK_Pause, super, "agentlinux-xp-system", 0},
     };
     XSetErrorHandler(grab_error);
@@ -113,7 +114,9 @@ int main(void)
             }
             if (fork() == 0) {
                 close(ConnectionNumber(display));
-                if (shortcuts[i].entry)
+                if (shortcuts[i].symbol == XK_F1)
+                    execl("/usr/bin/yelp", "yelp", "help:agentlinux-xp", (char *)NULL);
+                else if (shortcuts[i].entry)
                     execl("/usr/bin/gtk-launch", "gtk-launch", shortcuts[i].entry, (char *)NULL);
                 else
                     execl("/usr/bin/wintc-taskband", "wintc-taskband", "--start", (char *)NULL);
