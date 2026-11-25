@@ -36,7 +36,10 @@ Categories=Settings;
 ENTRY
 while IFS='|' read -r key en zh icon; do
     case "$key" in
+        display) command="\"$HOME/.local/bin/desk.cpl\"" ;;
+        settings) command="/usr/bin/ukui-control-center" ;;
         keyboard|mouse) command="/usr/bin/python3 \"$assets/input-properties.py\" $key" ;;
+        folder-options|language) command="/usr/bin/python3 \"$assets/control-panel.py\" --$key" ;;
         admin) command="/usr/bin/python3 \"$assets/control-panel.py\" --admin-tools" ;;
         devices) command="/usr/bin/python3 \"$assets/system-properties.py\" --devices" ;;
         system) command="/usr/bin/python3 \"$assets/system-properties.py\"" ;;
@@ -63,6 +66,10 @@ Icon=$icon
 Categories=Settings;
 ENTRY
 done <<'ITEMS'
+folder-options|Folder Options|文件夹选项|folder
+language|Display Language|界面语言|preferences-desktop-locale
+display|Display Properties|显示属性|preferences-desktop-display
+settings|System Settings|系统设置|preferences-desktop
 mouse|Mouse|鼠标|input-mouse
 keyboard|Keyboard|键盘|input-keyboard
 admin|Administrative Tools|管理工具|preferences-system
