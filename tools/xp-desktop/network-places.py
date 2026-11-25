@@ -350,8 +350,8 @@ def set_share_password(button):
     box.set_spacing(6)
     box.add(Gtk.Label(label=tr("网络共享账号", "Network sharing account") + " · " + account, xalign=0))
     entries = []
-    for caption in (tr("新的共享密码", "New sharing password"), tr("确认共享密码", "Confirm sharing password")):
-        label = Gtk.Label(label=caption, xalign=0)
+    for caption in (tr("新的共享密码(_N)", "_New sharing password"), tr("确认共享密码(_C)", "_Confirm sharing password")):
+        label = Gtk.Label(label=caption, use_underline=True, xalign=0)
         entry = Gtk.Entry(visibility=False, activates_default=True)
         entry.set_input_purpose(Gtk.InputPurpose.PASSWORD)
         label.set_mnemonic_widget(entry)
@@ -359,11 +359,19 @@ def set_share_password(button):
         box.add(entry)
         entries.append(entry)
     first, confirm = entries
+    feedback = Gtk.Label(xalign=0, wrap=True)
+    box.add(feedback)
 
     def validate(*_):
         password = first.get_text()
-        save.set_sensitive(bool(password) and password == confirm.get_text()
-                           and not any(char in password for char in "\r\n"))
+        repeated = confirm.get_text()
+        message = ""
+        if any(char in password or char in repeated for char in "\r\n"):
+            message = tr("密码中不能包含换行符。", "Remove line breaks from the password.")
+        elif repeated and password != repeated:
+            message = tr("两次输入的密码不一致。", "The passwords do not match.")
+        feedback.set_text(message)
+        save.set_sensitive(bool(password) and password == repeated and not message)
 
     for entry in entries:
         entry.connect("changed", validate)
@@ -523,8 +531,15 @@ def browse_share(target, parent=None):
 def connect(_):
     try:
         target = share_uri(address.get_text())
+    except ValueError as exc:
+        status.set_text(str(exc))
+        address.grab_focus()
+        address.select_region(0, -1)
+        return
+    status.set_text("")
+    try:
         browse_share(target, window)
-    except (OSError, ValueError) as exc:
+    except OSError as exc:
         status.set_text(str(exc))
 
 
@@ -692,7 +707,7 @@ if __name__ == "__main__":
     def show_computers(entries, error):
         global discovering
         discovering = False
-        if error:
+        if entries is None:
             discovery_status.set_text(error)
             return False
         model, selected = computers.get_selection().get_selected()
@@ -709,9 +724,9 @@ if __name__ == "__main__":
                 discovered.append((name, uri))
         if selected_uri and selected_uri not in incoming:
             computers.get_selection().unselect_all()
-        discovery_status.set_text("" if entries else tr(
+        discovery_status.set_text(error or ("" if entries else tr(
             "尚未发现 SMB 计算机。也可以在地址栏输入共享路径。",
-            "No SMB computers found. You can enter a share path in the address bar."))
+            "No SMB computers found. You can enter a share path in the address bar.")))
         return False
 
     def discover_computers(_, *, background=False):
@@ -734,13 +749,23 @@ if __name__ == "__main__":
                         for info in files:
                             uri = info.get_attribute_string("standard::target-uri")
                             if uri and uri.lower().startswith("smb://"):
-                                entries.setdefault(uri, info.get_display_name())
+                                key = place_key_for_uri(uri)
+                                if len(key) > 2 and key[2]:
+                                    entries.setdefault(key, (info.get_display_name(), uri))
                     finally:
                         files.close(None)
                 except GLib.Error as exc:
                     errors.append(exc.message)
-            result = [(name, uri) for uri, name in entries.items()]
-            GLib.idle_add(show_computers, result, errors[0] if len(errors) == 2 else None)
+            result = list(entries.values())
+            message = None
+            if errors:
+                message = tr("部分发现服务不可用。可在地址栏输入共享路径。",
+                             "Some discovery services are unavailable. Enter a share path in the address bar.")
+                if len(errors) == 2:
+                    result = None
+                    message = tr("无法刷新网络计算机。可在地址栏输入共享路径。",
+                                 "Could not refresh network computers. Enter a share path in the address bar.")
+            GLib.idle_add(show_computers, result, message)
 
         threading.Thread(target=enumerate_network, daemon=True).start()
 

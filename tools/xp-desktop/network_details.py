@@ -122,7 +122,10 @@ def smb_uri(text, tr):
     if target.startswith(("\\\\", "//")):
         host, separator, path = target[2:].replace("\\", "/").partition("/")
         if host.startswith("[") and host.endswith("]"):
-            host = f"[{ipaddress.IPv6Address(host[1:-1])}]"
+            try:
+                host = f"[{ipaddress.IPv6Address(host[1:-1])}]"
+            except ValueError:
+                raise ValueError(tr("共享路径中的 IPv6 地址无效。", "Invalid IPv6 address in the share path.")) from None
         elif not re.fullmatch(r"[\w.-]+", host) or host in (".", ".."):
             raise ValueError(tr("共享路径中的计算机名无效。", "Invalid computer name in the share path."))
         target = "smb://" + host + separator + quote(path, safe="/")
@@ -130,7 +133,10 @@ def smb_uri(text, tr):
         host, separator, path = target.replace("\\", "/").partition("/")
         if re.fullmatch(r"[\w.-]+", host) and host not in (".", ".."):
             target = "smb://" + host + separator + quote(path, safe="/")
-    parsed = urlsplit(target)
+    try:
+        parsed = urlsplit(target)
+    except ValueError:
+        raise ValueError(tr("共享地址中的计算机名无效。", "Invalid computer name in the share address.")) from None
     literal_suffix = ".ipv6-literal.net"
     if re.fullmatch(r"[0-9a-f-]+\.ipv6-literal\.net", parsed.netloc, re.I):
         literal = parsed.netloc[:-len(literal_suffix)].replace("-", ":")

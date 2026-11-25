@@ -1,6 +1,8 @@
 from ipaddress import IPv4Address, IPv4Network
 import subprocess
 
+from task_pane import fit_window
+
 import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import GObject, Gtk
@@ -15,10 +17,17 @@ def dns_properties(parent, profile, tr, device):
     automatic = not ipv4.get_ignore_auto_dns() and not servers
     dialog = Gtk.Dialog(title=tr("Internet 协议 (TCP/IPv4) 属性", "Internet Protocol (TCP/IPv4) Properties"), transient_for=parent, modal=True)
     dialog.set_destroy_with_parent(True)
-    dialog.add_button(tr("取消", "Cancel"), Gtk.ResponseType.CANCEL)
     dialog.add_button(tr("确定", "OK"), Gtk.ResponseType.OK)
+    dialog.add_button(tr("取消", "Cancel"), Gtk.ResponseType.CANCEL)
+    fit_window(dialog, 450, 460)
+    tabs = Gtk.Notebook()
+    tabs.set_border_width(6)
+    dialog.get_content_area().pack_start(tabs, True, True, 0)
+    scroll = Gtk.ScrolledWindow()
+    scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+    tabs.append_page(scroll, Gtk.Label(label=tr("常规", "General")))
     grid = Gtk.Grid(border_width=14, column_spacing=12, row_spacing=8)
-    dialog.get_content_area().add(grid)
+    scroll.add(grid)
     grid.attach(Gtk.Label(label=profile.get_id(), xalign=0), 0, 0, 2, 1)
     count = ipv4.get_num_addresses()
     first = ipv4.get_address(0) if count else None

@@ -300,6 +300,20 @@ def advance(_button):
         wizard.NewPrinterWindow.connect("key-press-event", wizard.device_key)
         wizard.NewPrinterWindow.set_title(title)
         wizard.NewPrinterWindow.set_icon_name("printer")
+        display = window.get_display()
+        monitor = display.get_monitor_at_window(window.get_window())
+        area = monitor.get_workarea()
+        if wizard.NewPrinterWindow.get_preferred_height()[0] + 40 > area.height:
+            pages = wizard.ntbkNewPrinter
+            container = pages.get_parent()
+            container.remove(pages)
+            scroll = Gtk.ScrolledWindow()
+            scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+            scroll.add(pages)
+            container.pack_start(scroll, True, True, 0)
+            container.reorder_child(scroll, 0)
+            scroll.show()
+            wizard.NewPrinterWindow.resize(min(640, area.width - 16), area.height - 48)
         wizard.NewPrinterWindow.present()
         window.hide()
 

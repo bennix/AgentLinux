@@ -33,7 +33,8 @@ def folder_options(_button):
     dialog = Gtk.Dialog(title=tr("文件夹选项", "Folder Options"), transient_for=window, modal=True)
     dialog.add_button(tr("确定", "OK"), Gtk.ResponseType.OK)
     dialog.add_button(tr("取消", "Cancel"), Gtk.ResponseType.CANCEL)
-    apply = dialog.add_button(tr("应用", "Apply"), Gtk.ResponseType.APPLY)
+    apply = dialog.add_button(tr("应用(_A)", "_Apply"), Gtk.ResponseType.APPLY)
+    apply.set_use_underline(True)
     notebook = Gtk.Notebook(border_width=8)
     dialog.connect("key-press-event", cycle_property_pages, notebook)
     click_file = Path(GLib.get_user_config_dir()) / "agentlinux-xp/explorer-single-click"
@@ -65,8 +66,8 @@ def folder_options(_button):
     hidden_group = Gtk.Frame(label=tr("隐藏文件和文件夹", "Hidden files and folders"))
     hidden_choices = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, border_width=6)
     hidden_group.add(hidden_choices)
-    hide = Gtk.RadioButton.new_with_label_from_widget(None, tr("不显示隐藏文件和文件夹", "Do not show hidden files and folders"))
-    show_hidden = Gtk.RadioButton.new_with_label_from_widget(hide, tr("显示隐藏文件和文件夹", "Show hidden files and folders"))
+    hide = Gtk.RadioButton.new_with_mnemonic_from_widget(None, tr("不显示隐藏文件和文件夹(_D)", "_Do not show hidden files and folders"))
+    show_hidden = Gtk.RadioButton.new_with_mnemonic_from_widget(hide, tr("显示隐藏文件和文件夹(_S)", "_Show hidden files and folders"))
     hidden_choices.add(hide)
     hidden_choices.add(show_hidden)
     panel.add(hidden_group)
@@ -131,7 +132,8 @@ def folder_options(_button):
 
 
 def language(_button):
-    dialog = Gtk.Dialog(title="界面语言 / Display Language", transient_for=window, modal=True)
+    dialog = Gtk.Dialog(title=tr("界面语言 / Display Language", "Display Language / 界面语言"),
+                        transient_for=window, modal=True)
     dialog.add_button(tr("取消", "Cancel"), Gtk.ResponseType.CANCEL)
     dialog.add_button(tr("确定(_O)", "_OK"), Gtk.ResponseType.OK)
     dialog.set_default_response(Gtk.ResponseType.OK)
@@ -156,8 +158,10 @@ def language(_button):
     box.add(choice)
     hint = Gtk.Label(xalign=0, wrap=True)
     def update_hint(*_):
-        hint.set_text(("下次登录后，桌面将使用所选语言。\nYour desktop will use this language the next time you sign in.")
-                      if choice.get_active_id() != current else "")
+        zh_hint = "下次登录后，桌面将使用所选语言。"
+        en_hint = "Your desktop will use this language the next time you sign in."
+        message = tr(zh_hint + "\n" + en_hint, en_hint + "\n" + zh_hint)
+        hint.set_text(message if choice.get_active_id() != current else "")
     choice.connect("changed", update_hint)
     update_hint()
     box.add(hint)
