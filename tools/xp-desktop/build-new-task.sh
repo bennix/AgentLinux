@@ -1,7 +1,9 @@
 #!/bin/sh
 set -eu
 src=${1:?supply WinTC shell/run/src}
-assets="$HOME/.local/share/agentlinux-xp"
+dest=${2:-"$HOME/.local/share/agentlinux-xp"}
+mkdir -p "$dest"
+dest=$(cd "$dest" && pwd)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 cp "$src"/*.c "$src"/*.h "$work/"
@@ -20,5 +22,7 @@ for name, old, new in (
 PY
 echo '#define PKG_NAME "wintc-run"' > meta.h
 cc -o new-task ./*.c $(pkg-config --cflags --libs gtk+-3.0 wintc-comctl wintc-comgtk wintc-exec wintc-shlang)
-install -m 755 new-task "$assets/new-task.new"
-mv "$assets/new-task.new" "$assets/new-task"
+stage=$(mktemp "$dest/new-task.XXXXXX")
+trap 'rm -f "$stage"; rm -rf "$work"' EXIT
+install -m 755 new-task "$stage"
+mv "$stage" "$dest/new-task"

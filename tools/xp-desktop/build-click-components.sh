@@ -39,9 +39,13 @@ cp -R "$peony" "$work/peony"
 cc -Wall -Werror "$assets/accesskeys.c" -lX11 -o "$work/accesskeys"
 cc -Wall -Werror -shared -fPIC "$assets/start-actions.c" $(pkg-config --cflags --libs gtk+-3.0) -ldl -o "$work/start-actions.so"
 install -m755 "$work/start-actions.so" "$dest/start-actions.so"
+"$assets/build-new-task.sh" "$wintc/shell/run/src" "$dest"
+cc -Wall -Werror -shared -fPIC "$assets/task-manager-run.c" \
+    $(pkg-config --cflags --libs gio-unix-2.0 gtk+-3.0) -o "$work/task-manager-run.so"
 mkdir -p "$dest/explorer-lib"
-for file in "$work/accesskeys" "$work/libwintc-comctl.so.1" "$work/peony/libpeony-qt/libpeony.so.3.2.2" "$work/peony/peony-qt-desktop/peony-qt-desktop"; do
+for file in "$work/task-manager-run.so" "$work/accesskeys" "$work/libwintc-comctl.so.1" "$work/peony/libpeony-qt/libpeony.so.3.2.2" "$work/peony/peony-qt-desktop/peony-qt-desktop"; do
     case "$file" in
+        */task-manager-run.so) output="$dest/task-manager-run.so" ;;
         */accesskeys) output="$dest/accesskeys" ;;
         */libpeony.so.3.2.2) output="$dest/libpeony.so.3.2.2" ;;
         *.so.1) output="$dest/explorer-lib/libwintc-comctl.so.1" ;;
