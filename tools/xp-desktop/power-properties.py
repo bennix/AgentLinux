@@ -6,6 +6,8 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gio, GLib, GObject, Gtk
 
+from task_pane import cycle_property_pages
+
 def tr(zh, en):
     return zh if os.getenv("LANGUAGE", os.getenv("LANG", "")).startswith("zh") else en
 
@@ -17,6 +19,7 @@ window.set_icon_name("battery")
 for label, response in [(tr("确定", "OK"), Gtk.ResponseType.OK), (tr("取消", "Cancel"), Gtk.ResponseType.CANCEL), (tr("应用", "Apply"), Gtk.ResponseType.APPLY)]:
     window.add_button(label, response)
 tabs = Gtk.Notebook(border_width=8)
+window.connect("key-press-event", cycle_property_pages, tabs)
 window.get_content_area().pack_start(tabs, True, True, 0)
 grid = Gtk.Grid(column_spacing=12, row_spacing=14, border_width=12)
 tabs.append_page(grid, Gtk.Label(label=tr("电源使用方案", "Power Schemes")))
@@ -164,7 +167,10 @@ timer = GLib.timeout_add_seconds(15, refresh)
 apply_button = window.get_widget_for_response(Gtk.ResponseType.APPLY)
 settings.bind_property("has-unapplied", apply_button, "sensitive", GObject.BindingFlags.SYNC_CREATE)
 window.show_all()
-tabs.set_current_page(tabs.page_num(meter) if sys.argv[1:] == ["--meter"] else 0)
+if sys.argv[1:] == ["--meter"]:
+    tabs.set_current_page(tabs.page_num(meter))
+elif len(sys.argv) == 2 and sys.argv[1] in ("0", "1", "2"):
+    tabs.set_current_page(int(sys.argv[1]))
 while True:
     response = window.run()
     if response in (Gtk.ResponseType.OK, Gtk.ResponseType.APPLY):

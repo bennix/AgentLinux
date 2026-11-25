@@ -44,6 +44,7 @@ case "$name" in
     mmsys.cpl) app=audio ;;
     mmsys.cpl,,[0-4])
         exec "$HOME/.local/share/agentlinux-xp/sound-properties.py" "${name##*,}" ;;
+    powercfg.cpl,,[0-2]) exec "$HOME/.local/share/agentlinux-xp/power-properties.py" "${name##*,}" ;;
     powercfg.cpl) app=power ;;
     main.cpl,,[0-3]|main.cpl,@0,[0-3])
         exec "$HOME/.local/share/agentlinux-xp/input-properties.py" mouse "${name##*,}" ;;
