@@ -146,6 +146,12 @@ class PrinterWizard(newprinter.NewPrinterGUI):
     back_to_welcome = False
     returning = False
 
+    def device_key(self, _window, event):
+        if event.keyval == Gdk.KEY_Escape and not (event.state & Gtk.accelerator_get_default_mod_mask()):
+            self.on_NPCancel(self.NewPrinterWindow)
+            return True
+        return False
+
     def setNPButtons(self):
         super().setNPButtons()
         # CUPS hides Back on its first page, which follows our welcome page.
@@ -245,6 +251,7 @@ def advance(_button):
     if wizard.init("printer_with_uri" if uri else "printer", device_uri=uri, parent=window):
         wizard.btnNPBack.set_label("< 上一步(_B)" if zh else "< _Back")
         wizard.btnNPBack.set_use_underline(True)
+        wizard.NewPrinterWindow.connect("key-press-event", wizard.device_key)
         wizard.NewPrinterWindow.set_title(title)
         wizard.NewPrinterWindow.set_icon_name("printer")
         wizard.NewPrinterWindow.present()
