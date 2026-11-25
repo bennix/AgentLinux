@@ -474,6 +474,7 @@ def printer_properties(name, parent, feedback_label):
             for key, entry in edits.items():
                 attrs[key] = entry.get_text()
             update_save()
+            refresh(background=True)
             feedback.set_text(tr("打印机信息已保存。", "Printer information saved."))
         except OSError as exc:
             feedback.set_text(str(exc))
