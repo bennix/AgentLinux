@@ -189,6 +189,14 @@ window.set_default_size(min(800, workarea.width - 24), min(500, workarea.height 
 provider = Gtk.CssProvider()
 provider.load_from_data(b"""
 #xp-control { background-color: #f2f5fc; }
+#xp-control.classic-view { background-color: white; }
+#xp-control.classic-view #xp-icon {
+    background: transparent; border-color: transparent; box-shadow: none;
+}
+#xp-control.classic-view #xp-icon:focus label {
+    color: white; background-color: #316ac5;
+    outline: 1px dotted #182b4a; outline-offset: 0;
+}
 #xp-nav { background-image: linear-gradient(to bottom, #7698e7, #647ed4); }
 #xp-task-title { background-color: #e5ecfb; color: #174481; font-weight: bold; padding: 7px; }
 #xp-nav button { color: #183e82; }
@@ -259,6 +267,7 @@ def tile(label, icon, resource=None):
     button = Gtk.Button()
     button.get_accessible().set_name(label)
     caption = Gtk.Label(label=label, xalign=0)
+    caption.set_halign(Gtk.Align.START)
     caption.set_line_wrap(True)
     caption.set_max_width_chars(16 if classic else 22)
     button.set_relief(Gtk.ReliefStyle.NONE)
@@ -288,6 +297,11 @@ forward_category = None
 
 def show(category=None):
     global current_category, forward_category
+    style = window.get_style_context()
+    if classic:
+        style.add_class("classic-view")
+    else:
+        style.remove_class("classic-view")
     previous = current_category
     forward_category = previous if category is None and not classic else None
     current_category = category
@@ -317,6 +331,7 @@ def show(category=None):
             items = [by_name[name] for name in category[2]]
         for zh, en, icon, desktop in items:
             button = tile(tr(zh, en), icon)
+            button.set_name("xp-icon")
             if desktop:
                 try:
                     app = Gio.DesktopAppInfo.new(desktop)
