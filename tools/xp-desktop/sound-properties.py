@@ -2,6 +2,7 @@
 import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 import gi
@@ -313,6 +314,11 @@ def configure():
         watch = GLib.io_add_watch(channel, GLib.PRIORITY_DEFAULT, GLib.IO_IN | GLib.IO_HUP | GLib.IO_ERR, sync_volume)
     try:
         dialog.show_all()
+        # XP numbers Hardware after its Voice tab.
+        pages = {"0": volume, "1": sound, "2": audio, "4": hardware}
+        if len(sys.argv) == 2 and sys.argv[1] in pages:
+            page_widget = pages[sys.argv[1]].get_ancestor(Gtk.ScrolledWindow)
+            tabs.set_current_page(tabs.page_num(page_widget))
         while True:
             response = dialog.run()
             if response not in (Gtk.ResponseType.APPLY, Gtk.ResponseType.OK):
