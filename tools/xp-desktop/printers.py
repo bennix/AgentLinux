@@ -34,7 +34,7 @@ content.pack_start(layout, True, True, 0)
 tasks = add_task_pane(layout, tr("打印机任务", "Printer Tasks"))
 right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 layout.pack_start(right, True, True, 0)
-rows = Gtk.ListStore(str, str, str, str)
+rows = Gtk.ListStore(str, str, str, str, str, str)
 table = Gtk.TreeView(model=rows)
 name_column = Gtk.TreeViewColumn(tr("名称", "Name"))
 icon = Gtk.CellRendererPixbuf()
@@ -47,6 +47,13 @@ name_column.add_attribute(caption, "text", 2)
 table.append_column(name_column)
 table.append_column(Gtk.TreeViewColumn(tr("状态", "Status"), Gtk.CellRendererText(), text=1))
 table.append_column(Gtk.TreeViewColumn(tr("文档数", "Documents"), Gtk.CellRendererText(), text=3))
+for index, title in ((4, tr("位置", "Location")), (5, tr("备注", "Comment"))):
+    renderer = Gtk.CellRendererText(ellipsize=Pango.EllipsizeMode.END)
+    column = Gtk.TreeViewColumn(title, renderer, text=index)
+    column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+    column.set_fixed_width(110)
+    column.set_resizable(True)
+    table.append_column(column)
 scroll = Gtk.ScrolledWindow(shadow_type=Gtk.ShadowType.IN)
 scroll.add(table)
 right.pack_start(scroll, True, True, 0)
@@ -91,7 +98,8 @@ def refresh(*_, select_name=None, background=False):
             except RuntimeError:
                 pass
         updated.append([name, printer_status(attrs),
-                        caption, str(count) if count is not None else "—"])
+                        caption, str(count) if count is not None else "—",
+                        attrs.get("printer-location") or "", attrs.get("printer-info") or ""])
     if updated != [list(row) for row in rows]:
         rows.clear()
         for values in updated:
