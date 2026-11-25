@@ -384,8 +384,12 @@ def show(category=None):
         focus.grab_focus()
     else:
         adjustment.set_value(0)
-        if category and grid.get_children():
-            grid.get_children()[0].get_child().grab_focus()
+        if classic or category:
+            for row in grid.get_children():
+                button = row.get_child()
+                if button.get_sensitive():
+                    button.grab_focus()
+                    break
 
 
 def change_view(_button):
