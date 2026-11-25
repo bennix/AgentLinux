@@ -890,6 +890,22 @@ static void select_display_page(GSimpleAction *action, GVariant *value, GtkNoteb
     }
 }
 
+static gboolean cycle_display_page(GtkWidget *window, GdkEventKey *event, GtkNotebook *book)
+{
+    GdkModifierType modifiers = event->state & gtk_accelerator_get_default_mod_mask();
+    if ((modifiers != GDK_CONTROL_MASK && modifiers != (GDK_CONTROL_MASK | GDK_SHIFT_MASK)) ||
+        (event->keyval != GDK_KEY_Tab && event->keyval != GDK_KEY_ISO_Left_Tab))
+        return FALSE;
+
+    int count = gtk_notebook_get_n_pages(book);
+    if (!count)
+        return FALSE;
+    int step = (modifiers & GDK_SHIFT_MASK) ? -1 : 1;
+    int page = gtk_notebook_get_current_page(book);
+    gtk_notebook_set_current_page(book, (page + count + step) % count);
+    return TRUE;
+}
+
 static gboolean on_map(GSignalInvocationHint *hint, guint count, const GValue *values, gpointer data)
 {
     GtkWidget *widget = g_value_get_object(values);
@@ -898,6 +914,7 @@ static gboolean on_map(GSignalInvocationHint *hint, guint count, const GValue *v
         const char *id = gtk_buildable_get_name(GTK_BUILDABLE(widget));
         if (GTK_IS_NOTEBOOK(widget) && g_strcmp0(id, "main-notebook") == 0) {
             GtkApplication *app = gtk_window_get_application(GTK_WINDOW(window));
+            g_signal_connect_object(window, "key-press-event", G_CALLBACK(cycle_display_page), widget, 0);
             g_autoptr(GSimpleAction) select = g_simple_action_new("select-page", G_VARIANT_TYPE_INT32);
             g_signal_connect_object(select, "activate", G_CALLBACK(select_display_page), widget, 0);
             g_action_map_add_action(G_ACTION_MAP(app), G_ACTION(select));
