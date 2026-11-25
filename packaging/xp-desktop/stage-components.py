@@ -132,7 +132,7 @@ for package in ("gparted", "gparted-common", "libparted-fs-resize0t64",
     archive = args.debs.parent / "ubuntu-debs" / (package + ".deb")
     archives.append(archive)
 
-for package in ("wintc-taskband", "wintc-notepad", "wintc-taskmgr", "wintc-explorer", "wintc-shell-run", "wintc-cpl-desk", "wintc-cpl-appwiz", "libwintc-wizard97",
+for package in ("wintc-taskband", "wintc-notepad", "wintc-taskmgr", "wintc-explorer", "wintc-shell-run", "wintc-cpl-desk", "libwintc-wizard97",
                 "wintc-sound-theme-xp", "wintc-cursor-theme-standard-with-shadow", "wintc-cursor-theme-standard-no-shadow",
                 "libwintc-exec", "libwintc-shelldpa", "libwintc-shellext", "libwintc-sndapi",
                 "libwintc-syscfg", "libwintc-registry", "libwintc-shell", "wintc-regsvc", "wintc-icon-theme-luna", "wintc-theme-luna-blue", "wintc-logonui",
@@ -140,6 +140,7 @@ for package in ("wintc-taskband", "wintc-notepad", "wintc-taskmgr", "wintc-explo
                 "libwintc-shcommon", "libwintc-winbrand"):
     archives.append(args.debs / (package + ".deb"))
 
+archives.append(args.components / "wintc-cpl-appwiz.deb")
 archives.append(args.components / "ukui-media_3.1.1.2-1+agentlinux1_amd64.deb")
 
 for archive in archives:

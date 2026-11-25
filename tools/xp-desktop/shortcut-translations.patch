@@ -1,0 +1,63 @@
+--- a/lnkwiz.c
++++ b/lnkwiz.c
+@@ -6,11 +6,12 @@
+ #include <wintc/wizard97.h>
+ 
+ #include "lnkwiz.h"
++#include <glib/gi18n.h>
+ 
+ #define K_INI_GROUP_DESKTOP_ENTRY "Desktop Entry"
+ 
+-#define K_TITLE_CREATE_SHORTCUT "Create Shortcut"
+-#define K_TITLE_SELECT_TITLE    "Select a Title for the Program"
++#define K_TITLE_CREATE_SHORTCUT _("Create Shortcut")
++#define K_TITLE_SELECT_TITLE    _("Select a Title for the Program")
+ 
+ //
+ // PRIVATE ENUMS
+@@ -715,7 +716,7 @@
+             if (!g_file_test(target, G_FILE_TEST_EXISTS))
+             {
+                 gchar* msg =
+-                    g_strdup_printf("The file %s cannot be found.", target);
++                    g_strdup_printf(_("The file %s cannot be found."), target);
+ 
+                 wintc_messagebox_show(
+                     GTK_WINDOW(lnkwiz),
+@@ -754,8 +755,7 @@
+             {
+                 gchar* msg =
+                     g_strdup_printf(
+-                        "A shortcut named %s already exists in this folder. "
+-                        "Do you want to replace it?",
++                        _("A shortcut named %s already exists in this folder. Do you want to replace it?"),
+                         name
+                     );
+ 
+@@ -858,7 +858,7 @@
+ 
+     if (!test_name)
+     {
+-        test_name = g_strdup("New Shortcut");
++        test_name = g_strdup(_("New Shortcut"));
+     }
+ 
+     return test_name;
+@@ -930,7 +930,7 @@
+     //
+     GtkFileFilter* filter_all_files = gtk_file_filter_new();
+ 
+-    gtk_file_filter_set_name(filter_all_files, "All Files");
++    gtk_file_filter_set_name(filter_all_files, _("All Files"));
+     gtk_file_filter_add_pattern(filter_all_files, "*");
+ 
+     // Set up the file dialog
+@@ -1023,7 +1023,7 @@
+         {
+             wintc_messagebox_show(
+                 GTK_WINDOW(lnkwiz),
+-                "The operation could not be completed.", // FIXME: localise
++                _("The operation could not be completed."), // FIXME: localise
+                 K_TITLE_CREATE_SHORTCUT,
+                 WINTC_BUTTONS_OK,
+                 WINTC_MESSAGE_ERROR

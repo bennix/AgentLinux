@@ -1,0 +1,27 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: zh_CN\n"
+
+msgid "Create Shortcut"
+msgstr "创建快捷方式"
+
+msgid "Select a Title for the Program"
+msgstr "选择程序名称"
+
+#, c-format
+msgid "The file %s cannot be found."
+msgstr "找不到文件 %s。"
+
+#, c-format
+msgid "A shortcut named %s already exists in this folder. Do you want to replace it?"
+msgstr "此文件夹中已存在名为 %s 的快捷方式。是否替换？"
+
+msgid "New Shortcut"
+msgstr "新建快捷方式"
+
+msgid "All Files"
+msgstr "所有文件"
+
+msgid "The operation could not be completed."
+msgstr "无法完成操作。"
