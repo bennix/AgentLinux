@@ -167,7 +167,7 @@ def show_created(row):
 
 
 def create(_=None, initial=None):
-    dlg = Gtk.Dialog(title=tr("共享文件夹", "Share a Folder"), transient_for=window, modal=True)
+    dlg = Gtk.Dialog(title=tr("共享此文件夹", "Share a Folder"), transient_for=window, modal=True)
     dlg.add_button(tr("取消", "Cancel"), Gtk.ResponseType.CANCEL)
     dlg.add_button(tr("共享", "Share"), Gtk.ResponseType.OK)
     box = dlg.get_content_area()
