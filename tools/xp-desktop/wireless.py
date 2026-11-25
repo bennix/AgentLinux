@@ -201,6 +201,8 @@ class Wireless(Gtk.Application):
         self.list.set_has_tooltip(True)
         self.list.connect("query-tooltip", self.network_tooltip)
         self.list.connect("key-press-event", self.network_key_press)
+        self.list.connect("button-press-event", self.network_menu)
+        self.list.connect("popup-menu", self.network_menu)
         self.list.connect("row-activated", self.activate_network)
         self.preferred_network = None
         self.list.get_selection().connect("changed", self.selection_changed)
@@ -309,6 +311,45 @@ class Wireless(Gtk.Application):
                 self.pending = None
                 self.busy = False
         self.update_button()
+        return True
+
+    def network_menu(self, view, event=None):
+        if event is not None:
+            if event.button != 3 or event.window != view.get_bin_window():
+                return False
+            hit = view.get_path_at_pos(int(event.x), int(event.y))
+            if hit:
+                view.set_cursor(hit[0])
+            else:
+                view.get_selection().unselect_all()
+        model, item = view.get_selection().get_selected()
+        key = model[item][6] if item is not None else None
+        menu = Gtk.Menu()
+        menu.attach_to_widget(view, None)
+
+        def activate(_entry, button):
+            current, selected = view.get_selection().get_selected()
+            if button == self.refresh_button or (selected is not None and current[selected][6] == key):
+                if button.get_sensitive():
+                    button.clicked()
+
+        buttons = (self.status_button, self.ip_button, self.refresh_button) if item is not None else (self.refresh_button,)
+        for button in buttons:
+            entry = Gtk.MenuItem(label=button.get_label())
+            entry.set_sensitive(button.get_sensitive())
+            entry.connect("activate", activate, button)
+            menu.append(entry)
+        menu.connect("selection-done", lambda widget: widget.destroy())
+        menu.show_all()
+        if event is not None:
+            menu.popup_at_pointer(event)
+        elif item is not None:
+            rect = view.get_cell_area(model.get_path(item), view.get_column(0))
+            menu.popup_at_rect(view.get_bin_window(), rect, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, None)
+            menu.select_first(True)
+        else:
+            menu.popup_at_widget(view, Gdk.Gravity.NORTH_WEST, Gdk.Gravity.NORTH_WEST, None)
+            menu.select_first(True)
         return True
 
     def network_key_press(self, _view, event):
