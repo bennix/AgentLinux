@@ -85,6 +85,9 @@ subfolders = Gtk.CheckButton(label=tr("搜索子文件夹", "Search subfolders")
 subfolders.set_active(True)
 advanced_choices = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
 advanced_section.add(advanced_choices)
+hidden_files = Gtk.CheckButton(label=tr("搜索隐藏文件和文件夹", "Search hidden files and folders"))
+hidden_files.set_active(Gio.Settings.new("org.ukui.peony.settings").get_boolean("show-hidden-file"))
+advanced_choices.add(hidden_files)
 advanced_choices.add(subfolders)
 match_case = Gtk.CheckButton(label=tr("区分大小写", "Case sensitive"))
 advanced_choices.add(match_case)
@@ -175,6 +178,7 @@ def search(_widget):
     tomorrow = datetime.combine(today + timedelta(days=1), midnight).timestamp()
     minimum, maximum = next((low, high) for option, low, high in size_filters if option.get_active())
     recursive = subfolders.get_active()
+    include_hidden = hidden_files.get_active()
     case_sensitive = match_case.get_active()
     term = query.get_text()
     if not case_sensitive:
@@ -201,6 +205,9 @@ def search(_widget):
         for directory, folders, files in os.walk(root):
             if cancel.is_set():
                 return
+            if not include_hidden:
+                folders[:] = [name for name in folders if not name.startswith(".")]
+                files = [name for name in files if not name.startswith(".")]
             folder_names = set(folders)
             for name in folders + files:
                 if cancel.is_set():
