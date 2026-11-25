@@ -17,13 +17,17 @@ Hidden=true
 ENTRY
     gsettings set org.ukui.session.required-components filemanager agentlinux-xp-desktop
 fi
-chmod +x "$assets/lid-backlight.py"
+lid_helper=/usr/local/libexec/agentlinux-xp-lid
+if [ ! -x "$lid_helper" ]; then
+    lid_helper="$assets/lid-backlight.py"
+    chmod +x "$lid_helper"
+fi
 cat > "$HOME/.config/autostart/agentlinux-xp-lid.desktop" <<ENTRY
 [Desktop Entry]
 Type=Application
 Name=Internal display power
 Name[zh_CN]=内屏电源管理
-Exec="$assets/lid-backlight.py"
+Exec="$lid_helper"
 ENTRY
 python3 - <<'PY'
 from gi.repository import GLib
