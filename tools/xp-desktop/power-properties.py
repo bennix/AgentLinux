@@ -24,16 +24,26 @@ window.connect("key-press-event", cycle_property_pages, tabs)
 window.get_content_area().pack_start(tabs, True, True, 0)
 grid = Gtk.Grid(column_spacing=12, row_spacing=14, border_width=12)
 tabs.append_page(grid, Gtk.Label(label=tr("电源使用方案", "Power Schemes")))
-for col, (suffix, title) in enumerate([("ac", tr("使用交流电源", "Plugged in")), ("battery", tr("使用电池", "Running on batteries"))], 1):
-    grid.attach(Gtk.Label(label=title), col, 0, 1, 1)
+for col, (suffix, source_title) in enumerate([("ac", tr("使用交流电源", "Plugged in")), ("battery", tr("使用电池", "Running on batteries"))], 1):
+    grid.attach(Gtk.Label(label=source_title), col, 0, 1, 1)
     for row, (key, title) in enumerate([("sleep-display-", tr("关闭显示器", "Turn off monitor")), ("sleep-computer-", tr("系统待机", "System standby"))], 1):
         if col == 1:
             grid.attach(Gtk.Label(label=title, xalign=0), 0, row, 1, 1)
         name = key + suffix
         current = settings.get_int(name)
         combo = Gtk.ComboBoxText()
-        for sec in sorted({0, 60, 180, 300, 600, 900, 1200, 1800, 3600, current}):
-            text = tr("从不", "Never") if sec == 0 else (tr(f"{sec//60} 分钟", f"{sec//60} min") if sec % 60 == 0 else tr(f"{sec} 秒", f"{sec} s"))
+        combo.get_accessible().set_name(f"{title} · {source_title}")
+        presets = {60, 120, 180, 300, 600, 900, 1200, 1500, 1800, 2700, 3600, 7200, 10800, 14400, 18000}
+        for sec in sorted((presets | {current}) - {0}) + [0]:
+            if sec == 0:
+                text = tr("从不", "Never")
+            elif sec % 3600 == 0:
+                hours = sec // 3600
+                text = tr(f"{hours} 小时", f"{hours} hr")
+            elif sec % 60 == 0:
+                text = tr(f"{sec // 60} 分钟", f"{sec // 60} min")
+            else:
+                text = tr(f"{sec} 秒", f"{sec} s")
             combo.append(str(sec), text)
         combo.set_active_id(str(current))
         settings.bind_writable(name, combo, "sensitive", False)
