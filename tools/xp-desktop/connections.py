@@ -1,9 +1,7 @@
 #!/usr/bin/python3
-import socket
 import subprocess
-import time
 from pathlib import Path
-from network_details import address_fields
+from network_details import address_fields, connection_duration
 from dns_properties import dns_properties
 
 from task_pane import cycle_property_pages, fit_window, add_task_pane, task_button
@@ -145,17 +143,8 @@ def show_status(*_):
             active = device.get_active_connection()
             if active:
                 general.append((tr("连接名称", "Connection name"), active.get_id()))
-                try:
-                    index = socket.if_nametoindex(device.get_iface())
-                    record = Path("/run/agentlinux-connection-time") / str(index)
-                    uuid, start = record.read_text().split()
-                    elapsed = int(time.clock_gettime(time.CLOCK_BOOTTIME)) - int(start)
-                    if uuid == active.get_uuid() and elapsed >= 0:
-                        hours, remainder = divmod(elapsed, 3600)
-                        minutes, seconds = divmod(remainder, 60)
-                        general.append((tr("持续时间", "Duration"), f"{hours}:{minutes:02}:{seconds:02}"))
-                except (OSError, ValueError):
-                    pass
+                if duration := connection_duration(device):
+                    general.append((tr("持续时间", "Duration"), duration))
             if isinstance(device, NM.DeviceWifi):
                 speed = device.get_bitrate() / 1000
                 ap = device.get_active_access_point()

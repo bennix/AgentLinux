@@ -6,7 +6,7 @@ from pathlib import Path
 
 import cairo
 
-from network_details import address_fields
+from network_details import address_fields, connection_duration
 from dns_properties import dns_properties
 from task_pane import add_task_pane, cycle_property_pages, task_button
 
@@ -429,6 +429,7 @@ class Wireless(Gtk.Application):
         properties.set_sensitive(bool(ipv4 and ipv4.get_method() in ("auto", "manual")))
         properties.connect("clicked", lambda _: dns_properties(dialog, profile, tr))
         statistics = Path("/sys/class/net") / dev.get_iface() / "statistics"
+        duration = Gtk.Label(selectable=True, xalign=0)
         sent = Gtk.Label(selectable=True, xalign=0)
         received = Gtk.Label(selectable=True, xalign=0)
         page(tr("常规", "General"), [
@@ -437,6 +438,7 @@ class Wireless(Gtk.Application):
             (tr("无线频率", "Radio frequency"), frequency),
             (tr("安全性", "Security"), security),
             (tr("状态", "Status"), tr("已连接", "Connected")),
+            (tr("持续时间", "Duration"), duration),
             (tr("连接速度", "Link speed"), speed),
             (tr("信号强度", "Signal strength"), signal),
             (tr("发送的数据包", "Packets sent"), sent),
@@ -457,6 +459,7 @@ class Wireless(Gtk.Application):
 
         def refresh_addresses():
             nonlocal displayed
+            duration.set_text(connection_duration(dev) or "—")
             update_access_point()
             for field, counter in ((sent, "tx_packets"), (received, "rx_packets")):
                 try:

@@ -1,5 +1,7 @@
 import ipaddress
 import re
+import socket
+import time
 from urllib.parse import quote, unquote, urlsplit
 
 import json
@@ -7,6 +9,24 @@ import subprocess
 from pathlib import Path
 from datetime import datetime
 from ipaddress import IPv4Network
+
+
+def connection_duration(device):
+    active = device.get_active_connection()
+    if not active:
+        return None
+    try:
+        index = socket.if_nametoindex(device.get_iface())
+        record = Path("/run/agentlinux-connection-time") / str(index)
+        uuid, start = record.read_text().split()
+        elapsed = int(time.clock_gettime(time.CLOCK_BOOTTIME)) - int(start)
+    except (OSError, ValueError):
+        return None
+    if uuid != active.get_uuid() or elapsed < 0:
+        return None
+    hours, remainder = divmod(elapsed, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours}:{minutes:02}:{seconds:02}"
 
 
 def address_fields(dev, tr):
