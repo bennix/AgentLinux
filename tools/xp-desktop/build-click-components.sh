@@ -27,6 +27,7 @@ cp -R "$wintc/shared/shell" "$work/shared/"
 (
     cd "$work"
     patch --batch --forward -p1 < "$assets/explorer-volume.patch"
+    patch --batch --forward -p1 < "$assets/explorer-new-label.patch"
     cd shared/shell
     (cd src/res && glib-compile-resources --generate-source --target=../resources.c resources.xml)
     # Ubuntu 24.04 uses the original names for these GLib mount functions.

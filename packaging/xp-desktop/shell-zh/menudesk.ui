@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <menu id="menu">
+    <section>
+      <item>
+        <attribute name="action">control.no-op</attribute>
+        <attribute name="label">粘贴</attribute>
+      </item>
+      <item>
+        <attribute name="action">control.no-op</attribute>
+        <attribute name="label">粘贴快捷方式</attribute>
+      </item>
+    </section>
+    <section id="section-new" />
+    <section>
+      <item>
+        <attribute name="action">control.view-op</attribute>
+        <attribute name="label">属性</attribute>
+        <attribute name="target" type="i">14</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>

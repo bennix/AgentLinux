@@ -1,0 +1,22 @@
+--- a/shared/shell/src/vwdesk.c
++++ b/shared/shell/src/vwdesk.c
+@@ -753,7 +753,7 @@
+     g_menu_insert_submenu(
+         section_new,
+         0,
+-        "New",
++        g_str_has_prefix(g_get_language_names()[0], "zh_CN") ? "新建" : "New",
+         menu_new
+     );
+ 
+--- a/shared/shell/src/vwfs.c
++++ b/shared/shell/src/vwfs.c
+@@ -898,7 +898,7 @@
+     g_menu_insert_submenu(
+         section_new_templates,
+         0,
+-        "New",
++        g_str_has_prefix(g_get_language_names()[0], "zh_CN") ? "新建" : "New",
+         menu_new
+     );
+ 

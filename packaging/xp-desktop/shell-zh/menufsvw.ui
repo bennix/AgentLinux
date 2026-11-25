@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <menu id="menu">
+    <section>
+      <item>
+        <attribute name="action">control.view-op</attribute>
+        <attribute name="label">打开</attribute>
+        <attribute name="target" type="i">1</attribute>
+      </item>
+      <item>
+        <attribute name="action">control.no-op</attribute>
+        <attribute name="label">资源管理器</attribute>
+      </item>
+      <item>
+        <attribute name="action">control.no-op</attribute>
+        <attribute name="label">搜索</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="action">control.no-op</attribute>
+        <attribute name="label">共享和安全…</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="action">control.no-op</attribute>
+        <attribute name="label">发送到</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="action">control.no-op</attribute>
+        <attribute name="label">剪切</attribute>
+      </item>
+      <item>
+        <attribute name="action">control.no-op</attribute>
+        <attribute name="label">复制</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="action">control.no-op</attribute>
+        <attribute name="label">创建快捷方式</attribute>
+      </item>
+      <item>
+        <attribute name="action">control.view-op</attribute>
+        <attribute name="label">删除</attribute>
+        <attribute name="target" type="i">9</attribute>
+      </item>
+      <item>
+        <attribute name="action">control.no-op</attribute>
+        <attribute name="label">重命名</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="action">control.no-op</attribute>
+        <attribute name="label">属性</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>

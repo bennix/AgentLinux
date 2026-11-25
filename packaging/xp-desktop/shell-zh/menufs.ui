@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <menu id="menu">
+    <section>
+      <item>
+        <attribute name="action">control.no-op</attribute>
+        <attribute name="label">自定义此文件夹…</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="action">control.paste-op</attribute>
+        <attribute name="label">粘贴</attribute>
+        <attribute name="target" type="i">6</attribute>
+      </item>
+      <item>
+        <attribute name="action">control.paste-op</attribute>
+        <attribute name="label">粘贴快捷方式</attribute>
+        <attribute name="target" type="i">7</attribute>
+      </item>
+    </section>
+    <section id="section-new" />
+    <section>
+      <item>
+        <attribute name="action">control.no-op</attribute>
+        <attribute name="label">属性</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>

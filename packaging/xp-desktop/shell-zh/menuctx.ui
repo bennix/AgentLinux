@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <menu id="menu">
+    <section>
+      <item>
+        <attribute name="label">查看</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label">排列图标</attribute>
+      </item>
+      <item>
+        <attribute name="label">刷新</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>
