@@ -9,6 +9,8 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gio, GLib, GObject, Gtk, Pango
 
+from task_pane import cycle_property_pages
+
 def tr(zh, en):
     return zh if os.getenv("LANGUAGE", os.getenv("LANG", "")).startswith("zh") else en
 
@@ -68,6 +70,7 @@ dialog.set_default_size(445, 330)
 for label, response in [(tr("确定", "OK"), Gtk.ResponseType.OK), (tr("取消", "Cancel"), Gtk.ResponseType.CANCEL), (tr("应用", "Apply"), Gtk.ResponseType.APPLY)]:
     dialog.add_button(label, response)
 tabs = Gtk.Notebook(border_width=8)
+dialog.connect("key-press-event", cycle_property_pages, tabs)
 dialog.get_content_area().pack_start(tabs, True, True, 0)
 
 def page(title):

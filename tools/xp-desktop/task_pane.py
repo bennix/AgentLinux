@@ -4,6 +4,17 @@ gi.require_version("Gdk", "3.0")
 from gi.repository import Gdk, Gtk
 
 
+def cycle_property_pages(_dialog, event, tabs):
+    modifiers = event.state & Gtk.accelerator_get_default_mod_mask()
+    ctrl = Gdk.ModifierType.CONTROL_MASK
+    shift = Gdk.ModifierType.SHIFT_MASK
+    if event.keyval not in (Gdk.KEY_Tab, Gdk.KEY_ISO_Left_Tab) or modifiers not in (ctrl, ctrl | shift):
+        return False
+    step = -1 if modifiers & shift else 1
+    tabs.set_current_page((tabs.get_current_page() + step) % tabs.get_n_pages())
+    tabs.grab_focus()
+    return True
+
 def fit_window(window, width, height):
     display = window.get_display()
     monitor = display.get_primary_monitor() or display.get_monitor(0)
