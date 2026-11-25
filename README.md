@@ -28,22 +28,26 @@ Agent 可直接打开显示属性、系统设置、文件夹选项和界面语�
 
 Agents can open Display Properties, System Settings, Folder Options and Display Language directly. All 24 Control Panel entries were launched on a physical laptop in Chinese and English.
 
+新版「关于 AgentLinux」显示学院标识、系统版本、内核与架构。可运行 `winver`，也可通过 Agent 组件目录打开。
+
+About AgentLinux now shows the college emblem, operating system version, kernel and architecture. Open it with `winver` or from the agent component catalog.
+
 系统设置采用 XP 经典图标布局，可从开始菜单或终端命令 `control settings` 打开。
 
 Open the classic XP System Settings grid from the Start menu or with `control settings`.
 
-XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。v2026.11.26.4 已在 BIOS 和 UEFI 虚拟机中从只读虚拟 USB 启动至中文桌面。
+XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。v2026.11.26.5 已在 BIOS 和 UEFI 虚拟机中从只读虚拟 USB 启动至中文桌面。
 
 快捷方式向导支持含空格的路径和同名文件。右键点击已连接的 Wi-Fi 可查看连接状态和 TCP/IPv4 属性。
 
 The shortcut wizard handles paths with spaces and existing filenames. Right-click a connected Wi-Fi network to view its status and TCP/IPv4 properties.
 
-**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.26.4/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.26.4/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
+**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.26.5/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.26.5/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
 
-ISO SHA-256 (v2026.11.26.4)
+ISO SHA-256 (v2026.11.26.5)
 
-`429988cf118e6adc33e00e226fb98ea7fdd1f53fe6d9d73f918b7999b06fcb09`
+`563048554aff04120db4be7d4c7baa69e774bb6598ef4badf7f381ed93b65935`
 
 | 启动方式 / Boot mode | 用户名 / Username | 密码 / Password |
 | --- | --- | --- |
@@ -51,7 +55,7 @@ ISO SHA-256 (v2026.11.26.4)
 | 预装 SanDisk U 盘 / Preinstalled SanDisk USB | `agent` | `agentfudan` |
 | 自行安装到硬盘 / Installation on your own disk | 安装时创建 / Set during installation | 安装时设置 / Set during installation |
 
-[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.26.4)
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.26.5)
 
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可双击桌面的“安装到硬盘”启动安装器。
 
@@ -102,7 +106,7 @@ unsquashfs -ll xp-standard.squashfs
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.26.4)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.26.5)
 
 运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。需要至少 8 GB 可用空间。Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
