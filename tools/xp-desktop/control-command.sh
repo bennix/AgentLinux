@@ -39,7 +39,7 @@ case "$name" in
     sysdm.cpl,,2) exec "$HOME/.local/share/agentlinux-xp/system-properties.py" --hardware ;;
     sysdm.cpl|sysdm.cpl,,0|system) app=system ;;
     mmsys.cpl) app=audio ;;
-    mmsys.cpl,,[0124])
+    mmsys.cpl,,[0-4])
         exec "$HOME/.local/share/agentlinux-xp/sound-properties.py" "${name##*,}" ;;
     powercfg.cpl) app=power ;;
     main.cpl,,[0-3]|main.cpl,@0,[0-3])

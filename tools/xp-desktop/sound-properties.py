@@ -7,7 +7,7 @@ from pathlib import Path
 
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gio, GLib, Gtk
+from gi.repository import Gio, GLib, GObject, Gtk
 
 def tr(zh, en):
     return zh if os.getenv("LANGUAGE", os.getenv("LANG", "")).startswith("zh") else en
@@ -90,6 +90,7 @@ volume = page(tr("音量", "Volume"))
 sound = page(tr("声音", "Sounds"))
 audio = page(tr("音频", "Audio"))
 
+voice = page(tr("语音", "Voice"))
 hardware = page(tr("硬件", "Hardware"))
 hardware_devices = Gtk.ComboBoxText()
 hardware.pack_start(hardware_devices, False, False, 0)
@@ -198,7 +199,18 @@ def configure():
         combo.set_sensitive(bool(names))
         combo.get_accessible().set_name(title)
         group(audio, title).add(combo)
+        voice_title = tr("语音播放", "Voice playback") if kind == "sink" else tr("语音录制", "Voice recording")
+        voice_combo = Gtk.ComboBoxText()
+        voice_combo.set_model(combo.get_model())
+        voice_combo.get_accessible().set_name(voice_title)
+        voice_combo.set_sensitive(combo.get_sensitive())
+        combo.bind_property("active", voice_combo, "active",
+                            GObject.BindingFlags.BIDIRECTIONAL | GObject.BindingFlags.SYNC_CREATE)
+        group(voice, voice_title).add(voice_combo)
         selectors.append([kind, combo, default])
+    voice.pack_start(Gtk.Label(label=tr("语音与音频使用相同的系统默认设备。",
+                                        "Voice and audio share the system default devices."),
+                               xalign=0, wrap=True), False, False, 0)
     apply_button = dialog.get_widget_for_response(Gtk.ResponseType.APPLY)
 
     sound_backends = [Gio.Settings.new(schema) for schema in ("org.gnome.desktop.sound", "org.ukui.sound")]
@@ -314,11 +326,8 @@ def configure():
         watch = GLib.io_add_watch(channel, GLib.PRIORITY_DEFAULT, GLib.IO_IN | GLib.IO_HUP | GLib.IO_ERR, sync_volume)
     try:
         dialog.show_all()
-        # XP numbers Hardware after its Voice tab.
-        pages = {"0": volume, "1": sound, "2": audio, "4": hardware}
-        if len(sys.argv) == 2 and sys.argv[1] in pages:
-            page_widget = pages[sys.argv[1]].get_ancestor(Gtk.ScrolledWindow)
-            tabs.set_current_page(tabs.page_num(page_widget))
+        if len(sys.argv) == 2 and sys.argv[1] in ("0", "1", "2", "3", "4"):
+            tabs.set_current_page(int(sys.argv[1]))
         while True:
             response = dialog.run()
             if response not in (Gtk.ResponseType.APPLY, Gtk.ResponseType.OK):
