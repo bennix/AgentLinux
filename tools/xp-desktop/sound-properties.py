@@ -278,9 +278,15 @@ def configure():
     play = Gtk.Button(label=tr("试听", "Preview"))
     play.set_sensitive(selection.count_selected_rows() > 0)
     preview_process = None
+    preview_error = Gtk.Label(xalign=0, wrap=True, selectable=True, no_show_all=True)
+
+    def report_preview_error(detail):
+        preview_error.set_text(tr("无法试听。", "Could not play the preview.") + " " + detail)
+        preview_error.show()
 
     def stop_preview(*_):
         nonlocal preview_process
+        preview_error.hide()
         if preview_process is not None:
             preview_process.force_exit()
             preview_process = None
@@ -289,11 +295,15 @@ def configure():
     def preview_finished(process, result):
         nonlocal preview_process
         try:
-            process.wait_finish(result)
-        finally:
-            if process is preview_process:
-                preview_process = None
-                play.set_label(tr("试听", "Preview"))
+            _, _, diagnostic = process.communicate_utf8_finish(result)
+        except GLib.Error as error:
+            diagnostic = error.message
+        if process is not preview_process:
+            return
+        preview_process = None
+        play.set_label(tr("试听", "Preview"))
+        if not process.get_successful():
+            report_preview_error((diagnostic or "").strip() or tr("请检查音频输出设备。", "Check the audio output device."))
 
     def toggle_preview(_):
         nonlocal preview_process
@@ -304,12 +314,13 @@ def configure():
             model, item = selection.get_selected()
             if item is None:
                 return
-            preview_process = Gio.Subprocess.new(["paplay", model[item][0]], Gio.SubprocessFlags.NONE)
+            preview_error.hide()
+            preview_process = Gio.Subprocess.new(["paplay", model[item][0]], Gio.SubprocessFlags.STDERR_PIPE)
         except GLib.Error as error:
-            play.set_tooltip_text(error.message)
+            report_preview_error(error.message)
             return
         play.set_label(tr("停止试听", "Stop preview"))
-        preview_process.wait_async(None, preview_finished)
+        preview_process.communicate_utf8_async(None, None, preview_finished)
 
     play.connect("clicked", toggle_preview)
     def event_selected(*_):
@@ -319,6 +330,7 @@ def configure():
     selection.connect("changed", event_selected)
     events.connect("row-activated", lambda *_: play.clicked())
     event_group.add(play)
+    event_group.add(preview_error)
 
     def scheme_changed(*_):
         stop_preview()
