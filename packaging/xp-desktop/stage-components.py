@@ -99,6 +99,12 @@ catalog = args.overlay / "usr/share/locale/zh_CN/LC_MESSAGES/agentlinux.mo"
 catalog.parent.mkdir(parents=True, exist_ok=True)
 subprocess.run(["msgfmt", "-o", catalog, assets.parents[1] / "packaging/i18n/zh_CN.po"], check=True)
 
+browser = Path("opt/obscura-firefox")
+for resource in ("defaults/pref/agentlinux-system-language.js",
+                 "distribution/extensions/langpack-zh-CN@firefox.mozilla.org.xpi"):
+    relative = browser / resource
+    files.append((assets.parents[1] / "overlay" / relative, relative, 0o644))
+
 for name in ("accessible.py", "backend.py", "desktop.py"):
     relative = Path("usr/local/lib/zenmux") / name
     files.append((assets.parents[1] / "overlay" / relative, relative, 0o755 if name == "desktop.py" else 0o644))
