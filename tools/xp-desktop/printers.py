@@ -478,6 +478,9 @@ def printer_properties(name, parent, feedback_label):
     try:
         device = urlsplit(attrs.get("device-uri") or "")
         protocol, host, port = device.scheme.upper(), device.hostname, device.port
+        if host and port is None:
+            port = {"ipp": 631, "ipps": 631, "socket": 9100, "lpd": 515,
+                    "http": 80, "https": 443}.get(device.scheme)
     except ValueError:
         protocol, host, port = None, None, None
     page(tr("端口", "Ports"), [(tr("连接方式", "Connection type"), protocol),
