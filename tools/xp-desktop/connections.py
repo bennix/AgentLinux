@@ -153,7 +153,9 @@ def show_status(*_):
             if speed:
                 general.append((tr("连接速度", "Link speed"), f"{speed:g} Mbps"))
             stats = Path("/sys/class/net") / device.get_iface() / "statistics"
-            for counter, label in (("tx_bytes", tr("已发送（字节）", "Bytes sent")),
+            for counter, label in (("tx_packets", tr("发送的数据包", "Packets sent")),
+                                   ("rx_packets", tr("收到的数据包", "Packets received")),
+                                   ("tx_bytes", tr("已发送（字节）", "Bytes sent")),
                                    ("rx_bytes", tr("已接收（字节）", "Bytes received"))):
                 try:
                     total = int((stats / counter).read_text())
