@@ -13,6 +13,7 @@ case "$name" in
     access.cpl,,[03]) exec "$HOME/.local/share/agentlinux-xp/accessibility.py" "${name##*,}" ;;
     access.cpl|accessibility) app=access ;;
     intl.cpl|international) exec "$HOME/.local/share/agentlinux-xp/control-panel.py" --language ;;
+    appwiz.cpl,,3) exec "$HOME/.local/share/agentlinux-xp/default-programs.py" ;;
     appwiz.cpl) app=programs ;;
     panel) app=control ;;
     winver) exec "$HOME/.local/share/agentlinux-xp/system-properties.py" --version ;;
