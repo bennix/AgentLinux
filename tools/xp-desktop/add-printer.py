@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """XP-style welcome page for Ubuntu's CUPS printer installation wizard."""
+import grp
 import locale
 import os
 import subprocess
@@ -145,6 +146,17 @@ wizard = None
 class PrinterWizard(newprinter.NewPrinterGUI):
     back_to_welcome = False
     returning = False
+
+    def on_btnNPApply_clicked(self, widget):
+        # On Ubuntu local print administrators can authenticate to cupsd over
+        # its Unix socket even in sessions without a graphical PolicyKit agent.
+        try:
+            local_admin = grp.getgrnam("lpadmin").gr_gid in os.getgroups()
+        except KeyError:
+            local_admin = False
+        if local_admin and self._host.startswith("/"):
+            self.cups._connect(allow_pk=False)
+        super().on_btnNPApply_clicked(widget)
 
     def device_key(self, _window, event):
         if event.keyval == Gdk.KEY_Escape and not (event.state & Gtk.accelerator_get_default_mod_mask()):
