@@ -223,7 +223,11 @@ zone_preview = Gtk.Label(xalign=0, selectable=True)
 zone.add(zone_preview)
 preview_zone = None
 apply_zone = Gtk.Button(label=tr("应用时区", "Apply time zone"))
-zone.add(apply_zone)
+zone_actions = Gtk.Box(spacing=6)
+zone.add(zone_actions)
+zone_actions.add(apply_zone)
+reset_zone = Gtk.Button(label=tr("返回当前时区", "Return to current time zone"))
+zone_actions.add(reset_zone)
 zone_feedback = Gtk.Label(xalign=0, wrap=True)
 zone.add(zone_feedback)
 current_zone = None
@@ -245,6 +249,7 @@ def update_zone_button(*_):
     name = zone_picker.get_child().get_text().strip()
     preview_zone = ZoneInfo(name) if name in zones else None
     update_preview()
+    reset_zone.set_sensitive(zone_request is None and current_zone is not None and name != current_zone)
     apply_zone.set_sensitive(zone_request is None and current_zone is not None and name in zones and name != current_zone)
 
 
@@ -280,6 +285,7 @@ def change_zone(_):
 
 zone_picker.get_child().connect("changed", update_zone_button)
 apply_zone.connect("clicked", change_zone)
+reset_zone.connect("clicked", lambda _: zone_picker.get_child().set_text(current_zone))
 for box, label in [(general, tr("更改日期和时间…", "Change date and time…")), (internet, tr("更改校时设置…", "Change synchronization settings…"))]:
     button = Gtk.Button(label=label)
     button.connect("clicked", lambda _: subprocess.Popen(["/usr/bin/ukui-control-center", "-p", "datetime"]))
