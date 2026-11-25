@@ -4,7 +4,8 @@ import sys
 from pathlib import Path
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gio, GLib, GObject, Gtk
+gi.require_version("GUdev", "1.0")
+from gi.repository import Gio, GLib, GObject, Gtk, GUdev
 
 from task_pane import cycle_property_pages
 
@@ -166,6 +167,8 @@ def refresh():
         meter.add(Gtk.Label(label=tr("未检测到电池", "No battery detected")))
     meter.show_all()
     return True
+power_devices = GUdev.Client.new(["power_supply"])
+power_handler = power_devices.connect("uevent", lambda *_: refresh())
 refresh()
 timer = GLib.timeout_add_seconds(15, refresh)
 apply_button = window.get_widget_for_response(Gtk.ResponseType.APPLY)
@@ -182,6 +185,7 @@ while True:
         Gio.Settings.sync()
     if response != Gtk.ResponseType.APPLY:
         break
+power_devices.disconnect(power_handler)
 GLib.source_remove(timer)
 settings.revert()
 window.destroy()
