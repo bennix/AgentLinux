@@ -10,7 +10,7 @@ gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
 from gi.repository import Gdk, Gio, GLib, GObject, Gtk, Pango
 from printer_test_page import submit_test_page
-from task_pane import add_task_pane, task_button
+from task_pane import add_task_pane, cycle_property_pages, task_button
 
 
 def tr(zh, en):
@@ -382,6 +382,7 @@ def printer_properties(name, parent, feedback_label):
     dialog.add_button(tr("关闭", "Close"), Gtk.ResponseType.CLOSE)
     dialog.set_default_response(Gtk.ResponseType.CLOSE)
     tabs = Gtk.Notebook()
+    dialog.connect("key-press-event", cycle_property_pages, tabs)
     dialog.get_content_area().add(tabs)
 
     def page(title, details):
@@ -439,14 +440,6 @@ def printer_properties(name, parent, feedback_label):
 
     save.connect("clicked", save_details)
     general.attach(save, 0, len(details) + 1, 1, 1)
-    try:
-        device = urlsplit(attrs.get("device-uri") or "")
-        protocol, host, port = device.scheme.upper(), device.hostname, device.port
-    except ValueError:
-        protocol, host, port = None, None, None
-    page(tr("端口", "Ports"), [(tr("连接方式", "Connection type"), protocol),
-                             (tr("设备主机", "Device host"), host),
-                             (tr("端口号", "Port number"), port)])
     shared = attrs.get("printer-is-shared")
     sharing = page(tr("共享", "Sharing"), [(tr("共享名", "Share name"), name)])
     try:
@@ -482,6 +475,14 @@ def printer_properties(name, parent, feedback_label):
 
     toggle.connect("toggled", lambda button: apply.set_sensitive(button.get_active() != shared))
     apply.connect("clicked", save_sharing)
+    try:
+        device = urlsplit(attrs.get("device-uri") or "")
+        protocol, host, port = device.scheme.upper(), device.hostname, device.port
+    except ValueError:
+        protocol, host, port = None, None, None
+    page(tr("端口", "Ports"), [(tr("连接方式", "Connection type"), protocol),
+                             (tr("设备主机", "Device host"), host),
+                             (tr("端口号", "Port number"), port)])
     dialog.show_all()
     dialog.run()
     dialog.destroy()
