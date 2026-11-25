@@ -28,6 +28,17 @@ gboolean wintc_launch_action(WinTCAction action, GError **error)
         char *argv[] = { launcher, "--my-documents", NULL };
         return g_spawn_async(NULL, argv, NULL, G_SPAWN_DEFAULT, NULL, NULL, NULL, error);
     }
+    case WINTC_ACTION_MYPICS:
+    case WINTC_ACTION_MYMUSIC: {
+        GUserDirectory kind = action == WINTC_ACTION_MYPICS ? G_USER_DIRECTORY_PICTURES
+                                                            : G_USER_DIRECTORY_MUSIC;
+        const char *folder = g_get_user_special_dir(kind);
+        if (!folder) break;
+        g_autofree char *launcher = g_build_filename(g_get_home_dir(), ".local", "share",
+                                                     "agentlinux-xp", "explorer-launch.sh", NULL);
+        char *argv[] = { launcher, (char *)folder, NULL };
+        return g_spawn_async(NULL, argv, NULL, G_SPAWN_DEFAULT, NULL, NULL, NULL, error);
+    }
     case WINTC_ACTION_SEARCH:    script = "search-files.py"; break;
     case WINTC_ACTION_CONNECTTO: script = "connections.py"; break;
     case WINTC_ACTION_MIMEMGMT: script = "default-programs.py"; break;
