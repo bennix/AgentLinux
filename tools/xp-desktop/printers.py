@@ -58,6 +58,14 @@ right.add(message)
 last_queue_status = ""
 
 
+def printer_status(attrs):
+    state = attrs.get("printer-state")
+    if state == 5 and "paused" in attrs.get("printer-state-reasons", ()):
+        return tr("已暂停", "Paused")
+    return {3: tr("就绪", "Ready"), 4: tr("正在打印", "Printing"),
+            5: tr("已停止", "Stopped")}.get(state, tr("未知", "Unknown"))
+
+
 def refresh(*_, select_name=None, background=False):
     global last_queue_status
     model, selected = table.get_selection().get_selected()
@@ -73,7 +81,6 @@ def refresh(*_, select_name=None, background=False):
         message.set_text(last_queue_status)
         return
     updated = []
-    states = {3: tr("就绪", "Ready"), 4: tr("正在打印", "Printing"), 5: tr("已停止", "Stopped")}
     for name, attrs in sorted(printers.items()):
         caption = name + tr("（默认）", " (default)") if name == default else name
         count = attrs.get("queued-job-count")
@@ -83,7 +90,7 @@ def refresh(*_, select_name=None, background=False):
                 count = details.get("queued-job-count")
             except RuntimeError:
                 pass
-        updated.append([name, states.get(attrs.get("printer-state"), tr("未知", "Unknown")),
+        updated.append([name, printer_status(attrs),
                         caption, str(count) if count is not None else "—"])
     if updated != [list(row) for row in rows]:
         rows.clear()
@@ -176,15 +183,16 @@ def open_queue(*_):
         _, selected = view.get_selection().get_selected()
         previous = jobs[selected][0] if selected is not None else None
         try:
-            attrs = ["job-id", "job-printer-uri", "job-state", "job-name", "job-originating-user-name",
+            job_attributes = ["job-id", "job-printer-uri", "job-state", "job-name", "job-originating-user-name",
                      "job-impressions", "job-k-octets", "time-at-creation"]
             server = cups.Connection()
-            state = server.getPrinterAttributes(name, requested_attributes=["printer-state"]).get("printer-state")
+            attrs = server.getPrinterAttributes(name, requested_attributes=["printer-state", "printer-state-reasons"])
+            state = attrs.get("printer-state")
             stopped = state == 5
-            queue.set_title(name + tr(" - 已暂停", " - Paused") if stopped else name)
+            queue.set_title(f"{name} - {printer_status(attrs)}" if stopped else name)
             pause_printing.set_sensitive(state in (3, 4, 5))
             pause_printing.set_label(tr("恢复打印", "Resume Printing") if stopped else tr("暂停打印", "Pause Printing"))
-            listing = server.getJobs(requested_attributes=attrs)
+            listing = server.getJobs(requested_attributes=job_attributes)
             # CUPS can omit private titles from the all-users listing even for
             # the caller's own jobs. Request only the missing owner metadata.
             if any("job-name" not in job or "job-originating-user-name" not in job
