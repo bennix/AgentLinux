@@ -74,13 +74,13 @@ def folder_options(_button):
     settings.bind("show-hidden-file", show_hidden, "active", Gio.SettingsBindFlags.DEFAULT)
     settings.bind_writable("show-hidden-file", hidden_group, "sensitive", False)
     options = [
-        ("show-file-extension", tr("隐藏文件扩展名", "Hide file extensions"), True),
-        ("do-not-thumbnail", tr("显示缩略图", "Show thumbnails"), True),
-        ("show-trash-dialog", tr("移入回收站前显示确认对话框", "Ask before moving items to the Recycle Bin"), False),
-        ("folder-first", tr("文件夹排在文件前面", "List folders before files"), False),
+        ("show-file-extension", tr("隐藏文件扩展名(_E)", "Hide file _extensions"), True),
+        ("do-not-thumbnail", tr("显示缩略图(_T)", "Show _thumbnails"), True),
+        ("show-trash-dialog", tr("移入回收站前显示确认对话框(_R)", "Ask before moving items to the _Recycle Bin"), False),
+        ("folder-first", tr("文件夹排在文件前面(_F)", "List _folders before files"), False),
     ]
     for key, label, inverted in options:
-        check = Gtk.CheckButton(label=label)
+        check = Gtk.CheckButton.new_with_mnemonic(label)
         flags = Gio.SettingsBindFlags.DEFAULT
         if inverted:
             flags |= Gio.SettingsBindFlags.INVERT_BOOLEAN
