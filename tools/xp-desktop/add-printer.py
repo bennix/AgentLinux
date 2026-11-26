@@ -314,6 +314,12 @@ def advance(_button):
     if wizard.init("printer_with_uri" if uri else "printer", device_uri=uri, parent=window):
         wizard.btnNPBack.set_label("< 上一步(_B)" if zh else "< _Back")
         wizard.btnNPBack.set_use_underline(True)
+        for builder in wizard._bld:
+            cancel = builder.get_object("btnNPCancel")
+            if cancel:
+                cancel.set_label("取消(_C)" if zh else "_Cancel")
+                cancel.set_use_underline(True)
+                break
         wizard.btnNPForward.set_label("下一步(_N) >" if zh else "_Next >")
         wizard.btnNPForward.set_use_underline(True)
         wizard.btnNPApply.set_label("完成(_F)" if zh else "_Finish")
