@@ -106,14 +106,14 @@ unsquashfs -ll xp-standard.squashfs
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [完整镜像 / Full image](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.27.1)
 
-从上方链接下载完整 ISO 和校验文件。请为 ISO 预留至少 9 GB 可用空间。Allow at least 9 GB of free space for the ISO. Download the ISO and checksum from the links above. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
+运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。请为 ISO 预留至少 9 GB 可用空间。Allow at least 9 GB of free space for the ISO. Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
 在干净的克隆中按以下步骤还原构建层。Restore the full layer before rebuilding from a clean clone (Linux, xorriso and squashfs-tools):
 
 ```sh
-sha256sum -c AgentLinux-24.04.5-desktop-amd64.iso.sha256
+python3 download-iso.py
 mkdir -p build
 xorriso -osirrox on -indev AgentLinux-24.04.5-desktop-amd64.iso -extract /casper/minimal.agent.squashfs build/agent.squashfs
 unsquashfs -d build/restored-overlay build/agent.squashfs
