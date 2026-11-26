@@ -238,6 +238,19 @@ def printer_added(_wizard, name):
     test_page = Gtk.Button.new_with_mnemonic("打印测试页(_T)" if zh else "Print _test page")
     test_page.set_halign(Gtk.Align.START)
     feedback = Gtk.Label(xalign=0, wrap=True, selectable=True)
+    default_button = Gtk.Button.new_with_mnemonic("设为我的默认打印机(_D)" if zh else "Set as my _default printer")
+    default_button.set_halign(Gtk.Align.START)
+
+    def choose_default(button):
+        result = subprocess.run(["lpoptions", "-d", name], capture_output=True, text=True)
+        if result.returncode:
+            feedback.set_text(("设置失败：" if zh else "Could not set default: ") + result.stderr.strip())
+            return
+        button.set_sensitive(False)
+        feedback.set_text(("我的默认打印机：" if zh else "My default printer: ") + name)
+
+    default_button.connect("clicked", choose_default)
+    body.pack_start(default_button, False, False, 0)
     test_page.connect("clicked", lambda _: feedback.set_text(submit_test_page(name)))
     body.pack_start(test_page, False, False, 0)
     body.pack_start(feedback, False, False, 0)
