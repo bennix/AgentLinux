@@ -69,12 +69,36 @@ driverless.set_no_show_all(True)
 body.pack_start(driverless, False, False, 0)
 
 
-def update_driverless(*_):
-    driverless.set_visible(known_address.get_active() and
-                           address.get_text().strip().strip('"').lower().startswith(("ipp://", "ipps://")))
+def printer_uri(text):
+    uri = text.strip()
+    if len(uri) >= 2 and uri[0] == uri[-1] == '"':
+        uri = uri[1:-1]
+    if uri.startswith("\\\\") or uri.lower().startswith("smb://"):
+        uri = smb_uri(uri, lambda cn, en: cn if zh else en)
+    parsed = urlsplit(uri)
+    port = parsed.port
+    if (parsed.scheme not in {"ipp", "ipps", "smb", "socket", "lpd"} or
+            not parsed.hostname or parsed.password is not None or port == 0 or
+            any(c.isspace() for c in uri) or
+            (parsed.scheme == "smb" and not parsed.path.strip("/"))):
+        raise ValueError
+    return uri
 
 
-address.connect("changed", update_driverless)
+def update_address(*_):
+    active = known_address.get_active()
+    try:
+        uri = printer_uri(address.get_text()) if active else ""
+    except ValueError:
+        uri = ""
+    forward.set_sensitive(not active or bool(uri))
+    driverless.set_visible(uri.lower().startswith(("ipp://", "ipps://")))
+    invalid = active and address.get_text().strip() and not uri
+    hint = "请输入有效的网络打印机地址。" if zh else "Enter a valid network printer address."
+    error.set_text(hint if invalid else "")
+
+
+address.connect("changed", update_address)
 address.show()
 find.show()
 error = Gtk.Label(xalign=0, wrap=True)
@@ -83,8 +107,7 @@ body.pack_start(error, False, False, 0)
 
 def toggle_address(button):
     address_row.set_visible(button.get_active())
-    update_driverless()
-    error.set_text("")
+    update_address()
     if button.get_active():
         address.grab_focus()
 
@@ -280,19 +303,8 @@ def advance(_button):
     global wizard
     uri = None
     if known_address.get_active():
-        uri = address.get_text().strip()
         try:
-            if len(uri) >= 2 and uri[0] == uri[-1] == '"':
-                uri = uri[1:-1]
-            if uri.startswith("\\\\") or uri.lower().startswith("smb://"):
-                uri = smb_uri(uri, lambda cn, en: cn if zh else en)
-            parsed = urlsplit(uri)
-            port = parsed.port
-            if (parsed.scheme not in {"ipp", "ipps", "smb", "socket", "lpd"} or
-                    not parsed.hostname or parsed.password is not None or port == 0 or
-                    any(c.isspace() for c in uri) or
-                    (parsed.scheme == "smb" and not parsed.path.strip("/"))):
-                raise ValueError
+            uri = printer_uri(address.get_text())
         except ValueError:
             error.set_text("请输入有效的网络打印机地址。" if zh else "Enter a valid network printer address.")
             address.grab_focus()
