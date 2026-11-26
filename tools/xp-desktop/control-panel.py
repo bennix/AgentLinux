@@ -292,6 +292,7 @@ luna_icons = {
 def tile(label, icon, resource=None):
     button = Gtk.Button()
     button.get_accessible().set_name(label)
+    button.set_tooltip_text(label)
     caption = Gtk.Label(label=label, xalign=0)
     caption.set_halign(Gtk.Align.START)
     caption.set_line_wrap(True)
@@ -415,13 +416,14 @@ def navigation_key(_window, event):
             adjustment.set_value(adjustment.get_lower() if event.keyval == Gdk.KEY_Home else
                                  adjustment.get_upper() - adjustment.get_page_size())
             return True
-    if classic and modifiers in (0, Gdk.ModifierType.SHIFT_MASK):
+    if modifiers in (0, Gdk.ModifierType.SHIFT_MASK):
         initial = chr(Gdk.keyval_to_unicode(event.keyval)).casefold()
         if initial.isalnum():
             buttons = [row.get_child() for row in grid.get_children() if row.get_child().get_sensitive()]
             focus = window.get_focus()
             start = buttons.index(focus) + 1 if focus in buttons else 0
-            english_names = {tr(zh, en): en for zh, en, _, _ in entries}
+            visible_items = entries if classic or current_category else categories
+            english_names = {tr(zh, en): en for zh, en, _, _ in visible_items}
             for button in buttons[start:] + buttons[:start]:
                 label = button.get_accessible().get_name()
                 if label.casefold().startswith(initial) or english_names[label].casefold().startswith(initial):
