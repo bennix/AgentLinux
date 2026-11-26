@@ -548,9 +548,38 @@ properties_button.connect("clicked", show_properties)
 tasks.pack_start(properties_button, False, False, 0)
 
 
+def delete_printer(*_):
+    model, item = table.get_selection().get_selected()
+    if item is None:
+        return
+    name = model[item][0]
+    dialog = Gtk.MessageDialog(transient_for=window, modal=True, message_type=Gtk.MessageType.QUESTION,
+                               buttons=Gtk.ButtonsType.YES_NO,
+                               text=tr("确定删除打印机“{}”吗？", 'Delete printer “{}”?').format(name))
+    dialog.set_default_response(Gtk.ResponseType.NO)
+    response = dialog.run()
+    dialog.destroy()
+    if response != Gtk.ResponseType.YES:
+        return
+    try:
+        cups.Connection().deletePrinter(name)
+    except (RuntimeError, cups.IPPError) as error:
+        message.set_text(tr("删除打印机失败", "Could not delete printer") + " · " + str(error))
+        return
+    if name in queue_windows:
+        queue_windows[name].destroy()
+    refresh()
+
+
+delete_button = task_button(tr("删除打印机", "Delete printer"))
+delete_button.set_sensitive(False)
+delete_button.connect("clicked", delete_printer)
+tasks.pack_start(delete_button, False, False, 0)
+
+
 def selection_changed(selection):
     model, item = selection.get_selected()
-    for action_button in (queue_button, test_button, properties_button):
+    for action_button in (queue_button, test_button, properties_button, delete_button):
         action_button.set_sensitive(item is not None)
     default_button.set_sensitive(item is not None and not model[item][6])
 
@@ -576,7 +605,7 @@ def printer_menu(view, event=None):
     model, item = view.get_selection().get_selected()
     menu = Gtk.Menu()
     buttons = (add_button, refresh_button) if item is None else (
-        queue_button, default_button, test_button, properties_button)
+        queue_button, default_button, test_button, properties_button, delete_button)
     for button in buttons:
         entry = Gtk.MenuItem(label=button.get_label())
         entry.set_sensitive(button.get_sensitive())
@@ -643,6 +672,7 @@ for label, target in (
     (tr("添加打印机(_A)…", "_Add Printer…"), add_button),
     (tr("打开(_O)", "_Open"), queue_button),
     (tr("设为默认打印机(_D)", "Set as _Default Printer"), default_button),
+    (tr("删除(_L)", "De_lete"), delete_button),
     (tr("属性(_R)", "P_roperties"), properties_button),
 ):
     item = Gtk.MenuItem.new_with_mnemonic(label)
@@ -657,6 +687,9 @@ file_menu.append(close_item)
 
 def window_key(_window, event):
     modifiers = event.state & Gtk.accelerator_get_default_mod_mask()
+    if event.keyval == Gdk.KEY_Delete and not modifiers and table.has_focus():
+        delete_printer()
+        return True
     if event.keyval == Gdk.KEY_F5 and not modifiers:
         refresh()
         return True

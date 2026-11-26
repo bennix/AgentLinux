@@ -238,6 +238,7 @@ class Wireless(Gtk.Application):
         outer.pack_end(self.button, False, False, 0)
         self.populate()
         self.window.show_all()
+        self.list.grab_focus()
         GLib.timeout_add_seconds(4, self.populate)
         self.scan()
 
@@ -348,13 +349,15 @@ class Wireless(Gtk.Application):
         menu = Gtk.Menu()
         menu.attach_to_widget(view, None)
 
-        def activate(_entry, button):
+        def activate(entry, button):
+            if button == self.button and entry.get_label() != button.get_label():
+                return
             current, selected = view.get_selection().get_selected()
             if button == self.refresh_button or (selected is not None and current[selected][6] == key):
                 if button.get_sensitive():
                     button.clicked()
 
-        buttons = (self.status_button, self.ip_button, self.refresh_button) if item is not None else (self.refresh_button,)
+        buttons = (self.button, self.status_button, self.ip_button, self.refresh_button) if item is not None else (self.refresh_button,)
         for button in buttons:
             entry = Gtk.MenuItem(label=button.get_label())
             entry.set_sensitive(button.get_sensitive())
