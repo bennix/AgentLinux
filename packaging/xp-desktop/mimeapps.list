@@ -5,3 +5,4 @@ x-scheme-handler/http=obscura-firefox.desktop
 x-scheme-handler/https=obscura-firefox.desktop
 application/xhtml+xml=obscura-firefox.desktop
 x-scheme-handler/mailto=xfce4-mail-reader.desktop
+x-scheme-handler/agentlinux-network=network-settings-link.desktop

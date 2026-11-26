@@ -2,7 +2,7 @@
 Type=Application
 Name=System Network
 Name[zh_CN]=系统网络
-Exec=/usr/local/lib/agentlinux-network/settings
+Exec=/usr/bin/python3 /usr/local/lib/agentlinux-network/settings %u
 MimeType=x-scheme-handler/agentlinux-network;
 NoDisplay=true
 Terminal=false
