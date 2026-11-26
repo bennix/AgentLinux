@@ -21,10 +21,14 @@ jobs:
           python3 - <<'PY'
           import hashlib, json, pathlib, subprocess
           manifest = json.loads(pathlib.Path("release-manifest.json").read_text())
+          assets = json.loads(subprocess.check_output(["gh", "release", "view", manifest["tag"], "--json", "assets"]))["assets"]
+          verified = {a["name"]: a["digest"] for a in assets if a["state"] == "uploaded"}
           with open(manifest["iso"], "rb") as source:
               for part in manifest["parts"]:
                   data = source.read(part["size"])
                   assert hashlib.sha256(data).hexdigest() == part["sha256"]
+                  if verified.get(part["name"]) == "sha256:" + part["sha256"]:
+                      continue
                   path = pathlib.Path(part["name"])
                   path.write_bytes(data)
                   subprocess.run(["gh", "release", "upload", manifest["tag"], str(path), "--clobber"], check=True)
