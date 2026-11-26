@@ -1,0 +1,8 @@
+--- a/peony-qt-desktop/desktop-icon-view-delegate.cpp
++++ b/peony-qt-desktop/desktop-icon-view-delegate.cpp
+@@ -433,1 +433,4 @@
+-    int width = iconSize.width() + 41;
++    // Keep a six-character CJK shortcut label on one line at the desktop font size.
++    const int labelWidth = qApp->fontMetrics().horizontalAdvance(
++        QStringLiteral("无线网络连接")) + 16;
++    int width = qMax(iconSize.width() + 41, labelWidth);
