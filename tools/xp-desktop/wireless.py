@@ -6,7 +6,7 @@ from pathlib import Path
 
 import cairo
 
-from network_details import address_fields, connection_duration
+from network_details import address_fields, connection_duration, connection_status
 from dns_properties import dns_properties
 from task_pane import add_task_pane, cycle_property_pages, task_button
 
@@ -501,16 +501,7 @@ class Wireless(Gtk.Application):
                 dns_properties(dialog, profile, tr, dev)
 
         def update_state(*_):
-            state = dev.get_state()
-            if state == NM.DeviceState.ACTIVATED:
-                text = tr("已连接", "Connected")
-            elif NM.DeviceState.PREPARE <= state <= NM.DeviceState.SECONDARIES:
-                text = tr("正在连接", "Connecting")
-            elif state == NM.DeviceState.DEACTIVATING:
-                text = tr("正在断开", "Disconnecting")
-            else:
-                text = tr("未连接", "Disconnected")
-            state_label.set_text(text)
+            state_label.set_text(connection_status(dev.get_state(), tr))
             properties.set_sensitive(current_profile() is not None)
 
         properties.connect("clicked", edit_profile)

@@ -11,6 +11,25 @@ from datetime import datetime
 from ipaddress import IPv4Network
 
 
+def connection_status(state, tr):
+    from gi.repository import NM
+
+    if state == NM.DeviceState.ACTIVATED:
+        return tr("已连接", "Connected")
+    elif state == NM.DeviceState.NEED_AUTH:
+        return tr("需要验证", "Authentication required")
+    elif NM.DeviceState.PREPARE <= state <= NM.DeviceState.SECONDARIES:
+        return tr("正在连接", "Connecting")
+    elif state == NM.DeviceState.DEACTIVATING:
+        return tr("正在断开连接", "Disconnecting")
+    elif state == NM.DeviceState.FAILED:
+        return tr("连接失败", "Connection failed")
+    elif state == NM.DeviceState.UNAVAILABLE:
+        return tr("不可用", "Unavailable")
+    else:
+        return tr("未连接", "Disconnected")
+
+
 def connection_duration(device):
     active = device.get_active_connection()
     if not active:

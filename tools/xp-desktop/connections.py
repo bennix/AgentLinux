@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import subprocess
 from pathlib import Path
-from network_details import address_fields, connection_duration
+from network_details import address_fields, connection_duration, connection_status
 from dns_properties import dns_properties
 
 from task_pane import cycle_property_pages, fit_window, add_task_pane, task_button
@@ -43,23 +43,6 @@ for i, label in enumerate([tr("名称", "Name"), tr("状态", "Status"), tr("设
 scroll = Gtk.ScrolledWindow(shadow_type=Gtk.ShadowType.IN)
 scroll.add(table)
 layout.pack_start(scroll, True, True, 0)
-
-
-def connection_status(state):
-    if state == NM.DeviceState.ACTIVATED:
-        return tr("已连接", "Connected")
-    elif state == NM.DeviceState.NEED_AUTH:
-        return tr("需要验证", "Authentication required")
-    elif NM.DeviceState.PREPARE <= state <= NM.DeviceState.SECONDARIES:
-        return tr("正在连接", "Connecting")
-    elif state == NM.DeviceState.DEACTIVATING:
-        return tr("正在断开连接", "Disconnecting")
-    elif state == NM.DeviceState.FAILED:
-        return tr("连接失败", "Connection failed")
-    elif state == NM.DeviceState.UNAVAILABLE:
-        return tr("不可用", "Unavailable")
-    else:
-        return tr("未连接", "Disconnected")
 
 
 def selected():
@@ -152,7 +135,7 @@ def show_status(*_):
         edit.set_sensitive(present)
         state = device.get_state() if present else NM.DeviceState.UNAVAILABLE
         connected = state == NM.DeviceState.ACTIVATED
-        status = connection_status(state)
+        status = connection_status(state, tr)
         general = [(tr("状态", "Status"), status), (tr("设备", "Device"), device.get_iface())]
         if connected:
             active = device.get_active_connection()
@@ -310,7 +293,7 @@ def refresh(*_):
         is_wifi = isinstance(dev, NM.DeviceWifi)
         state = dev.get_state()
         active = dev.get_active_connection()
-        status = connection_status(state)
+        status = connection_status(state, tr)
         if state == NM.DeviceState.ACTIVATED and active:
             status += " · " + active.get_id()
         rows.append([tr("无线网络连接", "Wireless Network Connection") if is_wifi else tr("本地连接", "Local Area Connection"),
