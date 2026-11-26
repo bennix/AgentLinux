@@ -166,6 +166,17 @@ if legacy_lib.is_dir() and not legacy_lib.is_symlink():
 
 # WinTC references GTK touch handles and slider images supplied by the Kylin base.
 theme_assets = args.overlay / "usr/share/themes/Windows XP style (Blue)/gtk-3.0/assets"
+gtk2_resources = Path(__file__).with_name("gtk2-resources")
+for resource in gtk2_resources.rglob("*"):
+    target = theme_assets.parents[1] / resource.relative_to(gtk2_resources)
+    if resource.is_dir():
+        target.mkdir(parents=True, exist_ok=True)
+    elif resource.is_symlink():
+        if not target.is_symlink() or target.readlink() != resource.readlink():
+            target.unlink(missing_ok=True)
+            target.symlink_to(resource.readlink())
+    else:
+        shutil.copyfile(resource, target)
 if not theme_assets.exists() and not theme_assets.is_symlink():
     theme_assets.symlink_to("../../ukui/gtk-3.0/assets", target_is_directory=True)
 
