@@ -360,4 +360,8 @@ client.connect("notify::active-connections", refresh)
 window.connect("focus-in-event", refresh)
 refresh()
 window.show_all()
+model, initial = table.get_selection().get_selected()
+if initial is not None:
+    table.set_cursor(model.get_path(initial))
+    table.grab_focus()
 Gtk.main()
