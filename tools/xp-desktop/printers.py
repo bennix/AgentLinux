@@ -617,7 +617,7 @@ def add_printer(button):
             message.set_text(error.message)
 
     try:
-        process = Gio.Subprocess.new([str(Path(__file__).with_name("add-printer.py")), "--report-queue"],
+        process = Gio.Subprocess.new([str(Path(__file__).resolve().with_name("add-printer.py")), "--report-queue"],
                                      Gio.SubprocessFlags.STDOUT_PIPE)
     except GLib.Error as error:
         message.set_text(error.message)
