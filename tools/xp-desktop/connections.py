@@ -162,6 +162,10 @@ def show_status(*_):
                 speed = device.get_bitrate() / 1000
                 ap = device.get_active_access_point()
                 if ap:
+                    ssid = ap.get_ssid()
+                    if ssid and ssid.get_size():
+                        general.append((tr("网络名称（SSID）", "Network name (SSID)"),
+                                        NM.utils_ssid_to_utf8(ssid.get_data())))
                     general.append((tr("信号强度", "Signal strength"), f"{ap.get_strength()}%"))
             else:
                 speed = device.get_speed()
