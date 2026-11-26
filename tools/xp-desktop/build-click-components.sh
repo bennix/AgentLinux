@@ -54,7 +54,7 @@ cp -R "$peony" "$work/peony"
     make -j"${JOBS:-2}"
 )
 cc -Wall -Werror "$assets/accesskeys.c" -lX11 -o "$work/accesskeys"
-cc -Wall -Werror -shared -fPIC "$assets/start-actions.c" $(pkg-config --cflags --libs gtk+-3.0) -ldl -o "$work/start-actions.so"
+cc -Wall -Werror -shared -fPIC "$assets/start-actions.c" $(pkg-config --cflags --libs gtk+-3.0 garcon-1) -ldl -o "$work/start-actions.so"
 install -m755 "$work/start-actions.so" "$dest/start-actions.so"
 "$assets/build-new-task.sh" "$wintc/shell/run/src" "$dest"
 cc -Wall -Werror -shared -fPIC "$assets/task-manager-run.c" \

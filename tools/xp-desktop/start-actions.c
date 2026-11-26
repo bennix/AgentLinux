@@ -1,8 +1,26 @@
 #define _GNU_SOURCE
 #include <dlfcn.h>
+#include <garcon/garcon.h>
 #include <gio/gio.h>
 #include <gtk/gtk.h>
 #include <wintc/exec/action.h>
+
+/* WinTC seeds its frequently used list from all.menu, including hidden helpers. */
+GList *garcon_menu_get_elements(GarconMenu *menu)
+{
+    typedef GList *(*GetElements)(GarconMenu *);
+    GetElements original = (GetElements)dlsym(RTLD_NEXT, "garcon_menu_get_elements");
+    GList *elements = original(menu);
+    if (g_strcmp0(g_get_prgname(), "wintc-taskband") != 0)
+        return elements;
+
+    for (GList *item = elements, *next; item; item = next) {
+        next = item->next;
+        if (!garcon_menu_element_get_visible(item->data))
+            elements = g_list_delete_link(elements, item);
+    }
+    return elements;
+}
 
 /* Desktop entries may specify an absolute Icon path. WinTC passes both forms
  * to the theme loader, which only understands icon names. */
