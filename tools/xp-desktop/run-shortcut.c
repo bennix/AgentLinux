@@ -75,6 +75,7 @@ int main(void)
         KeyCode key;
     } shortcuts[] = {
         {XK_Escape, ControlMask, NULL, 0},
+        {XK_t, ControlMask | Mod1Mask, "mate-terminal", 0},
         {XK_r, super, "agentlinux-xp-run", 0},
         {XK_Escape, ControlMask | ShiftMask, "agentlinux-xp-taskmgr", 0},
         {XK_e, super, "agentlinux-xp-computer", 0},
