@@ -96,9 +96,11 @@ p.write_text(s)
 app = Path("application.c")
 source = app.read_text().replace("        first_run = FALSE;", """
     const gchar* goto_keys[] = {"<Primary>g", NULL};
+    const gchar* new_keys[] = {"<Primary>n", NULL};
     const gchar* open_keys[] = {"<Primary>o", NULL};
     const gchar* save_keys[] = {"<Primary>s", NULL};
     gtk_application_set_accels_for_action(GTK_APPLICATION(application), "win.go-to", goto_keys);
+    gtk_application_set_accels_for_action(GTK_APPLICATION(application), "win.new", new_keys);
     gtk_application_set_accels_for_action(GTK_APPLICATION(application), "win.open('')", open_keys);
     gtk_application_set_accels_for_action(GTK_APPLICATION(application), "win.save", save_keys);
     first_run = FALSE;""")
