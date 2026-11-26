@@ -31,21 +31,33 @@ if app.get_is_remote():
 window = Gtk.Window(title=tr('System Network · Subscription Proxy'))
 app.add_window(window)
 app.connect("activate", lambda *_: window.present())
-box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
-box.set_border_width(20)
+root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6, border_width=8)
+window.add(root)
 display = window.get_display()
 monitor = display.get_primary_monitor() or display.get_monitor(0)
 area = monitor.get_workarea()
-window.set_default_size(min(680, area.width - 24), min(720, area.height - 64))
-scroll = Gtk.ScrolledWindow()
-scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-scroll.add(box)
-window.add(scroll)
-status = Gtk.Label(wrap=True)
-box.add(Gtk.Label(label=tr('Enter a subscription URL or load your current Clash Verge profile, then select a node.'), wrap=True))
-box.add(Gtk.Label(label=tr('Smart Routing sends mainland sites and WeChat directly and other traffic through the selected node.'), wrap=True))
-box.add(Gtk.Label(label=tr('System routing applies to desktop apps, host terminals and background services. Claude Cage uses its own proxy.'), wrap=True))
-box.add(status)
+window.set_default_size(min(680, area.width - 24), min(480, area.height - 64))
+tabs = Gtk.Notebook()
+root.pack_start(tabs, True, True, 0)
+
+
+def page(title):
+    scroll = Gtk.ScrolledWindow()
+    scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+    content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, border_width=12)
+    scroll.add(content)
+    tabs.append_page(scroll, Gtk.Label(label=title))
+    return content
+
+
+connection = page(tr('Connection'))
+nodes = page(tr('Nodes'))
+diagnostics = page(tr('Diagnostics'))
+status = Gtk.Label(wrap=True, xalign=0, selectable=True)
+root.pack_end(status, False, False, 0)
+nodes.add(Gtk.Label(label=tr('Enter a subscription URL or load your current Clash Verge profile, then select a node.'), wrap=True))
+connection.add(Gtk.Label(label=tr('Smart Routing sends mainland sites and WeChat directly and other traffic through the selected node.'), wrap=True))
+connection.add(Gtk.Label(label=tr('System routing applies to desktop apps, host terminals and background services. Claude Cage uses its own proxy.'), wrap=True))
 
 
 def run(*command, **kwargs):
@@ -53,8 +65,7 @@ def run(*command, **kwargs):
 
 
 wifi = Gtk.Label(label=tr('Reading Wi-Fi addresses…'), selectable=True, wrap=True)
-box.pack_start(wifi, False, False, 0)
-box.reorder_child(wifi, 0)
+diagnostics.pack_start(wifi, False, False, 0)
 
 
 def wifi_addresses():
@@ -93,9 +104,9 @@ refresh_wifi()
 
 
 entry = Gtk.Entry(placeholder_text=tr('HTTPS subscription URL or VLESS link'), visibility=False)
-box.add(entry)
+nodes.add(entry)
 picker = Gtk.ComboBoxText()
-box.add(picker)
+nodes.add(picker)
 imported = {}
 
 
@@ -144,7 +155,7 @@ def load_nodes(button, local):
 for title, local in [(tr('Import subscription URL'), False), (tr('Load current Clash Verge profile'), True)]:
     btn = Gtk.Button(label=title)
     btn.connect("clicked", load_nodes, local)
-    box.add(btn)
+    nodes.add(btn)
 
 
 def measure(button):
@@ -189,7 +200,7 @@ def measure(button):
 
 speed = Gtk.Button(label=tr('Benchmark nodes (Google / ZenMux)'))
 speed.connect("clicked", measure)
-box.add(speed)
+nodes.add(speed)
 
 
 def test_google(button):
@@ -291,12 +302,12 @@ node_handler = picker.connect("changed", node_changed)
 for label, enable in [(tr('Smart Routing'), "smart"), (tr('Route all through proxy'), "proxy"), (tr('Direct (disconnect system tunnel)'), "direct")]:
     b = Gtk.Button(label=label)
     b.connect("clicked", change, enable)
-    box.add(b)
+    connection.add(b)
 b = Gtk.Button(label=tr('Test Google connectivity'))
 b.connect("clicked", test_google)
-box.add(b)
+diagnostics.add(b)
 b = Gtk.Button(label=tr('Open NetworkManager connections'))
 b.connect("clicked", lambda _: subprocess.Popen(["nm-connection-editor"]))
-box.add(b)
+diagnostics.add(b)
 window.show_all()
 sys.exit(app.run([]))

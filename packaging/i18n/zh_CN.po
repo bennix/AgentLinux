@@ -558,3 +558,12 @@ msgstr "在资源管理器中选中此项？"
 
 msgid "Open this item in Explorer?"
 msgstr "在资源管理器中打开此项？"
+
+msgid "Connection"
+msgstr "连接"
+
+msgid "Nodes"
+msgstr "节点"
+
+msgid "Diagnostics"
+msgstr "诊断"
