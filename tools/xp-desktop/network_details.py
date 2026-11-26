@@ -153,4 +153,8 @@ def smb_uri(text, tr):
         raise ValueError(tr("共享地址中的端口无效。", "Invalid port in the share address.")) from None
     if port == 0 or parsed.scheme != "smb" or not parsed.hostname or parsed.password is not None:
         raise ValueError(tr("请输入 SMB 地址或 Windows 共享路径。", "Enter an SMB address or Windows share path."))
-    return target
+    # Keep existing escapes (including encoded separators) intact when a user
+    # pastes an SMB URI containing both escaped and plain filename characters.
+    path = re.sub(r"%(?![0-9a-fA-F]{2})", "%25", parsed.path)
+    path = quote(path, safe="/%:@!$&'()*+,;=-._~")
+    return parsed._replace(path=path).geturl()
