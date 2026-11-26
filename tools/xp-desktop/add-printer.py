@@ -93,11 +93,17 @@ def finish_search(results, message):
     find.set_sensitive(True)
     if not window.get_visible() or not known_address.get_active():
         return False
+    if results:
+        count = len(results)
+        message = (f"找到 {count} 个网络打印地址。请选择地址，然后继续安装。" if zh else
+                   f"Network printer addresses found: {count}. Select an address to continue setup.")
     error.set_text(message)
     if results:
         menu = Gtk.Menu()
         for name, uri in results:
-            item = Gtk.MenuItem(label=f"{name}  ({uri})")
+            item = Gtk.MenuItem(label=f"{name}  ({urlsplit(uri).netloc})")
+            item.set_tooltip_text(uri)
+            item.get_accessible().set_description(uri)
             item.connect("activate", lambda _, value=uri: address.set_text(value))
             menu.append(item)
         menu.attach_to_widget(find, None)
