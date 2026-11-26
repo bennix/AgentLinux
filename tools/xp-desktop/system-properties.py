@@ -147,13 +147,14 @@ if server:
             return
         for child in addresses.get_children():
             child.destroy()
-        paths = [("Windows", '\\\\' + server),
-                 ("macOS", "smb://" + platform.node().split(".")[0] + ".local")]
+        paths = []
         for interface, host in lan_addresses():
             uri = "smb://" + (f"[{host}]" if ":" in host else host)
             if unc := windows_location(uri):
                 paths.append((f"Windows · {interface}", unc))
             paths.append((f"macOS · {interface}", uri))
+        paths.extend([("Windows", '\\\\' + server),
+                 ("macOS", "smb://" + platform.node().split(".")[0] + ".local")])
         for i, (label, address) in enumerate(paths):
             addresses.attach(Gtk.Label(label=label, xalign=0), 0, i, 1, 1)
             addresses.attach(Gtk.Label(label=address, selectable=True, xalign=0), 1, i, 1, 1)
