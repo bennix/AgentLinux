@@ -154,6 +154,7 @@ for archive in archives:
     subprocess.run(["dpkg-deb", "--extract", archive, args.overlay], check=True)
     files.append((archive, Path("usr/local/share/agentlinux-xp/packages") / archive.name, 0o644))
 files.extend([
+    (Path(__file__).with_name("normalize-gtk3-theme"), Path("usr/local/libexec/agentlinux-xp-normalize-gtk3-theme"), 0o755),
     (Path(__file__).with_name("register-packages"), Path("usr/local/libexec/agentlinux-xp-register-packages"), 0o755),
     (Path(__file__).with_name("register-packages.service"), Path("etc/systemd/system/agentlinux-xp-packages.service"), 0o644),
 ])
@@ -167,6 +168,7 @@ if legacy_lib.is_dir() and not legacy_lib.is_symlink():
 
 # WinTC references GTK touch handles and slider images supplied by the Kylin base.
 theme_assets = args.overlay / "usr/share/themes/Windows XP style (Blue)/gtk-3.0/assets"
+subprocess.run([Path(__file__).with_name("normalize-gtk3-theme"), args.overlay], check=True)
 gtk4_theme = theme_assets.parents[1] / "gtk-4.0"
 gtk4_theme.mkdir(parents=True, exist_ok=True)
 shutil.copyfile(Path(__file__).with_name("gtk4") / "gtk.css", gtk4_theme / "gtk.css")

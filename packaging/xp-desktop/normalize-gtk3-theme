@@ -1,0 +1,13 @@
+#!/usr/bin/python3
+"""Normalize the WinTC Luna theme's rotation declarations for GTK 3."""
+from pathlib import Path
+import sys
+
+theme = Path(sys.argv[1]) / "usr/share/themes/Windows XP style (Blue)/gtk-3.0/gtk.css"
+css = theme.read_bytes()
+fixed = css
+for old, new in ((b"1turn", b"360deg"), (b"0turn", b"0deg"), (b"-0.5turn", b"-180.0deg")):
+    fixed = fixed.replace(b"-gtk-icon-transform:rotate(" + old + b")}",
+                          b"-gtk-icon-transform:rotate(" + new + b");}")
+if fixed != css:
+    theme.write_bytes(fixed)

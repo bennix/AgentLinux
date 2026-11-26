@@ -24,4 +24,5 @@ if [ "$#" -gt 0 ]; then
     DEBIAN_FRONTEND=noninteractive apt-get -y -o DPkg::Lock::Timeout=120 \
         -o Dir::State::lists="$lists" --no-install-recommends --no-remove install "$@"
 fi
+/usr/local/libexec/agentlinux-xp-normalize-gtk3-theme /
 touch /var/lib/agentlinux-xp/packages-configured
