@@ -76,6 +76,7 @@ files.extend([
     (Path(__file__).with_name("xsettings.xml"), Path("etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml"), 0o644),
     (Path(__file__).with_name("classicui.conf"), Path("etc/skel/.config/fcitx5/conf/classicui.conf"), 0o644),
     (Path(__file__).with_name("gtk-settings.ini"), Path("etc/skel/.config/gtk-3.0/settings.ini"), 0o644),
+    (Path(__file__).with_name("gtkrc-2.0"), Path("etc/skel/.gtkrc-2.0"), 0o644),
     (Path(__file__).with_name("peony-desktop.desktop"), Path("etc/skel/.config/autostart/peony-desktop.desktop"), 0o644),
     (Path(__file__).with_name("panel-entries.desktop"), Path("etc/skel/.config/autostart/agentlinux-xp-panel-entries.desktop"), 0o644),
     (assets / "install-panel-entries.sh", Path("usr/local/libexec/agentlinux-xp-panel-setup"), 0o755),
