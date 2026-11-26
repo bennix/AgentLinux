@@ -292,9 +292,9 @@ def open_queue(*_):
             notice.destroy()
 
     actions = []
-    for label, operation in [(tr("暂停", "Pause"), "indefinite"), (tr("继续", "Resume"), "no-hold"),
-                             (tr("取消打印", "Cancel printing"), "cancel")]:
-        action = Gtk.MenuItem(label=label)
+    for label, operation in [(tr("暂停(_P)", "_Pause"), "indefinite"), (tr("继续(_R)", "_Resume"), "no-hold"),
+                             (tr("取消打印(_C)", "_Cancel printing"), "cancel")]:
+        action = Gtk.MenuItem.new_with_mnemonic(label)
         action.connect("activate", change_job, operation)
         menu.append(action)
         actions.append(action)
@@ -320,7 +320,7 @@ def open_queue(*_):
         target = jobs[selected][0], jobs[selected][1]
         popup = Gtk.Menu()
         for action, operation in zip(actions, ("indefinite", "no-hold", "cancel")):
-            entry = Gtk.MenuItem(label=action.get_label())
+            entry = Gtk.MenuItem.new_with_mnemonic(action.get_label())
             entry.set_sensitive(action.get_sensitive())
             entry.connect("activate", change_job, operation, target)
             popup.append(entry)
