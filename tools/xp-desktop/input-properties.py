@@ -304,12 +304,14 @@ def refresh_hardware(*_):
     if found != [tuple(row) for row in device_rows]:
         selection = device_view.get_selection()
         model, item = selection.get_selected()
-        previous = tuple(model[item]) if item is not None else None
+        previous_node = model[item][1] if item is not None else None
         device_rows.clear()
         for record in found:
             row = device_rows.append(record)
-            if record == previous or (previous is None and record == found[0]):
+            if record[1] == previous_node:
                 selection.select_iter(row)
+        if found and not selection.count_selected_rows():
+            selection.select_path(0)
         device_selected(selection)
 
 
