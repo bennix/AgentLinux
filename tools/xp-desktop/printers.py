@@ -114,7 +114,7 @@ def refresh(*_, select_name=None, background=False):
             if select_name:
                 table.scroll_to_cell(rows.get_path(item))
     status = "" if printers else tr("尚未安装打印机。", "No printers are installed.")
-    if not background or status or message.get_text() == last_queue_status:
+    if not background or message.get_text() == last_queue_status:
         message.set_text(status)
     last_queue_status = status
 
