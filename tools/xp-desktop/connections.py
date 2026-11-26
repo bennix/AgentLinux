@@ -283,7 +283,7 @@ table.connect("popup-menu", device_menu)
 def refresh(*_):
     device = selected()
     old = device.get_path() if device else None
-    store.clear()
+    rows = []
     preferred = None
     best_rank = (False, False, False)
     for dev in client.get_devices():
@@ -300,13 +300,22 @@ def refresh(*_):
             status = tr("不可用", "Unavailable")
         else:
             status = tr("未连接", "Disconnected")
-        it = store.append([tr("无线网络连接", "Wireless Network Connection") if is_wifi else tr("本地连接", "Local Area Connection"),
+        rows.append([tr("无线网络连接", "Wireless Network Connection") if is_wifi else tr("本地连接", "Local Area Connection"),
                            status, dev.get_iface(), "network-wireless" if is_wifi else "network-wired", dev])
         rank = (dev.get_path() == old, state == NM.DeviceState.ACTIVATED, is_wifi)
         if preferred is None or rank > best_rank:
-            preferred, best_rank = it, rank
+            preferred, best_rank = len(rows) - 1, rank
+    if [row[4].get_path() for row in store] == [row[4].get_path() for row in rows]:
+        for current, updated in zip(store, rows):
+            for column, value in enumerate(updated):
+                if current[column] != value:
+                    current[column] = value
+    else:
+        store.clear()
+        for row in rows:
+            store.append(row)
     if preferred is not None:
-        table.get_selection().select_iter(preferred)
+        table.get_selection().select_path(preferred)
     selection_changed()
 
 
