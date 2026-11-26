@@ -8,14 +8,6 @@ cp -R "$src/." "$work/"
 cd "$work"
 python3 - <<'PY'
 from pathlib import Path
-app = Path("application.c")
-source = app.read_text()
-anchor = "    return app;"
-if source.count(anchor) != 1:
-    raise RuntimeError("Unexpected Notepad application constructor")
-app.write_text(source.replace(anchor, """    const gchar* save_keys[] = { "<Control>s", NULL };
-    gtk_application_set_accels_for_action(GTK_APPLICATION(app), "win.save", save_keys);
-""" + anchor))
 p = Path("window.c")
 s = p.read_text()
 start = s.index("    // FIXME: Double check this works with localization")
@@ -80,6 +72,26 @@ if len(pieces) != 3:
     raise RuntimeError("Unexpected Notepad URI handlers")
 s = pieces[0] + "".join('    else if (g_strcmp0(uri_scheme, "smb") == 0)\n    {' + branch +
                         '    }\n' + unsupported + tail for branch, tail in zip(branches, pieces[1:]))
+# GTK's saved chooser dimensions can exceed the work area on compact displays.
+anchor = "    return dlg;"
+if s.count(anchor) != 1:
+    raise RuntimeError("Unexpected Notepad file chooser")
+s = s.replace(anchor, """    if (g_str_has_prefix(g_get_language_names()[0], "zh")) {
+        gboolean saving = action == GTK_FILE_CHOOSER_ACTION_SAVE;
+        gtk_window_set_title(GTK_WINDOW(dlg), saving ? "另存为" : "打开");
+        gtk_button_set_label(GTK_BUTTON(gtk_dialog_get_widget_for_response(
+            GTK_DIALOG(dlg), GTK_RESPONSE_CANCEL)), "取消");
+        gtk_button_set_label(GTK_BUTTON(gtk_dialog_get_widget_for_response(
+            GTK_DIALOG(dlg), GTK_RESPONSE_ACCEPT)), saving ? "保存" : "打开");
+    }
+    GdkMonitor* monitor = gdk_display_get_monitor_at_window(
+        gtk_widget_get_display(GTK_WIDGET(wnd)), gtk_widget_get_window(GTK_WIDGET(wnd)));
+    GdkRectangle area;
+    gdk_monitor_get_workarea(monitor, &area);
+    if (area.width <= 1280 || area.height <= 800)
+        gtk_window_maximize(GTK_WINDOW(dlg));
+
+""" + anchor)
 p.write_text(s)
 app = Path("application.c")
 source = app.read_text().replace("        first_run = FALSE;", """
