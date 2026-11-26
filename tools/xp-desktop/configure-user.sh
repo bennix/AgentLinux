@@ -33,13 +33,18 @@ python3 - <<'PY'
 from gi.repository import GLib
 from pathlib import Path
 
-path = Path(GLib.get_user_config_dir()) / "gtk-3.0/settings.ini"
-path.parent.mkdir(parents=True, exist_ok=True)
-settings = GLib.KeyFile()
-if path.exists():
-    settings.load_from_file(str(path), GLib.KeyFileFlags.KEEP_COMMENTS | GLib.KeyFileFlags.KEEP_TRANSLATIONS)
-settings.set_string("Settings", "gtk-icon-theme-name", "luna")
-settings.save_to_file(str(path))
+for version in ("gtk-3.0", "gtk-4.0"):
+    path = Path(GLib.get_user_config_dir()) / version / "settings.ini"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    settings = GLib.KeyFile()
+    if path.exists():
+        settings.load_from_file(str(path), GLib.KeyFileFlags.KEEP_COMMENTS | GLib.KeyFileFlags.KEEP_TRANSLATIONS)
+    keys = settings.get_keys("Settings")[0] if settings.has_group("Settings") else ()
+    if version == "gtk-3.0" or "gtk-icon-theme-name" not in keys:
+        settings.set_string("Settings", "gtk-icon-theme-name", "luna")
+    if version == "gtk-4.0" and "gtk-theme-name" not in keys:
+        settings.set_string("Settings", "gtk-theme-name", "Windows XP style (Blue)")
+    settings.save_to_file(str(path))
 PY
 # ZenOffice ships its artwork in a size absent from Ubuntu's hicolor index.
 office_art=/usr/share/icons/hicolor/1024x1024/apps/genoffice.png

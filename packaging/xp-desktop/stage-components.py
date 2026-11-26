@@ -76,6 +76,7 @@ files.extend([
     (Path(__file__).with_name("xsettings.xml"), Path("etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml"), 0o644),
     (Path(__file__).with_name("classicui.conf"), Path("etc/skel/.config/fcitx5/conf/classicui.conf"), 0o644),
     (Path(__file__).with_name("gtk-settings.ini"), Path("etc/skel/.config/gtk-3.0/settings.ini"), 0o644),
+    (Path(__file__).with_name("gtk-settings.ini"), Path("etc/skel/.config/gtk-4.0/settings.ini"), 0o644),
     (Path(__file__).with_name("gtkrc-2.0"), Path("etc/skel/.gtkrc-2.0"), 0o644),
     (Path(__file__).with_name("peony-desktop.desktop"), Path("etc/skel/.config/autostart/peony-desktop.desktop"), 0o644),
     (Path(__file__).with_name("panel-entries.desktop"), Path("etc/skel/.config/autostart/agentlinux-xp-panel-entries.desktop"), 0o644),
@@ -166,6 +167,9 @@ if legacy_lib.is_dir() and not legacy_lib.is_symlink():
 
 # WinTC references GTK touch handles and slider images supplied by the Kylin base.
 theme_assets = args.overlay / "usr/share/themes/Windows XP style (Blue)/gtk-3.0/assets"
+gtk4_theme = theme_assets.parents[1] / "gtk-4.0"
+gtk4_theme.mkdir(parents=True, exist_ok=True)
+shutil.copyfile(Path(__file__).with_name("gtk4") / "gtk.css", gtk4_theme / "gtk.css")
 gtk2_resources = Path(__file__).with_name("gtk2-resources")
 for resource in gtk2_resources.rglob("*"):
     target = theme_assets.parents[1] / resource.relative_to(gtk2_resources)
