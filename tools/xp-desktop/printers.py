@@ -188,8 +188,6 @@ def open_queue(*_):
 
     def reload_jobs():
         nonlocal stopped
-        _, selected = view.get_selection().get_selected()
-        previous = jobs[selected][0] if selected is not None else None
         try:
             job_attributes = ["job-id", "job-printer-uri", "job-state", "job-name", "job-originating-user-name",
                      "job-impressions", "job-k-octets", "time-at-creation"]
@@ -226,12 +224,21 @@ def open_queue(*_):
                                 f"{size} KiB" if size is not None else "—",
                                 datetime.fromtimestamp(submitted).strftime("%x %H:%M") if submitted > 0 else "—",
                                 pages, size if size is not None else -1, submitted])
-            if updated != sorted((list(row) for row in jobs), key=lambda row: row[0]):
-                jobs.clear()
-                for values in updated:
-                    row = jobs.append(values)
-                    if values[0] == previous:
-                        view.get_selection().select_iter(row)
+            existing = {row[0]: row.iter for row in jobs}
+            for values in updated:
+                item = existing.pop(values[0], None)
+                if item is None:
+                    jobs.append(values)
+                elif list(jobs[item]) != values:
+                    jobs.set(item, list(range(len(values))), values)
+            selection = view.get_selection()
+            _, selected = selection.get_selected()
+            removed_selection = selected is not None and jobs[selected][0] in existing
+            for item in existing.values():
+                jobs.remove(item)
+            if removed_selection:
+                selection.unselect_all()
+            update_actions()
             status.set_text(tr("队列中的文档数", "Documents in queue") + f" · {len(jobs)}")
         except (RuntimeError, cups.IPPError) as error:
             queue.set_title(name)
