@@ -30,6 +30,48 @@ s, count = re.subn(r"(?m)^( +)wnd->file_uri = g_strdup\(uri\);$",
                    r"\g<0>\n\1gtk_recent_manager_add_item(gtk_recent_manager_get_default(), wnd->file_uri);", s)
 if count != 2:
     raise RuntimeError("Unexpected Notepad open/save implementation")
+# GVfs supplies smb:// URIs when a shared document is opened from Peony.
+unsupported = '    else\n    {\n        wintc_messagebox_show(\n            GTK_WINDOW(wnd),\n            "Sorry, only local files'
+branches = ["""
+        g_autoptr(GFile) file = g_file_new_for_uri(uri);
+        g_autofree gchar* text = NULL;
+        gsize length;
+        GError* error = NULL;
+        if (g_file_load_contents(file, NULL, &text, &length, NULL, &error)) {
+            if (length > G_MAXINT || !g_utf8_validate(text, length, NULL))
+                g_set_error_literal(&error, G_IO_ERROR, G_IO_ERROR_INVALID_DATA,
+                    g_str_has_prefix(g_get_language_names()[0], "zh") ?
+                    "无法打开此 UTF-8 文本文档。" : "Cannot open this document as UTF-8 text.");
+            else {
+                gtk_text_buffer_set_text(wnd->text_buffer, text, length);
+                gtk_text_buffer_set_modified(wnd->text_buffer, FALSE);
+                g_free(wnd->file_uri);
+                wnd->file_uri = g_strdup(uri);
+                gtk_recent_manager_add_item(gtk_recent_manager_get_default(), uri);
+                wintc_notepad_window_update_title(wnd);
+            }
+        }
+        if (error) wintc_display_error_and_clear(&error, GTK_WINDOW(wnd));
+""", """
+        g_autoptr(GFile) file = g_file_new_for_uri(uri);
+        GtkTextIter start, end;
+        gtk_text_buffer_get_bounds(wnd->text_buffer, &start, &end);
+        g_autofree gchar* text = gtk_text_buffer_get_text(wnd->text_buffer, &start, &end, FALSE);
+        GError* error = NULL;
+        if (g_file_replace_contents(file, text, strlen(text), NULL, FALSE,
+                                    G_FILE_CREATE_NONE, NULL, NULL, &error)) {
+            g_free(wnd->file_uri);
+            wnd->file_uri = g_strdup(uri);
+            gtk_recent_manager_add_item(gtk_recent_manager_get_default(), uri);
+            gtk_text_buffer_set_modified(wnd->text_buffer, FALSE);
+            wintc_notepad_window_update_title(wnd);
+        } else wintc_display_error_and_clear(&error, GTK_WINDOW(wnd));
+"""]
+pieces = s.split(unsupported)
+if len(pieces) != 3:
+    raise RuntimeError("Unexpected Notepad URI handlers")
+s = pieces[0] + "".join('    else if (g_strcmp0(uri_scheme, "smb") == 0)\n    {' + branch +
+                        '    }\n' + unsupported + tail for branch, tail in zip(branches, pieces[1:]))
 p.write_text(s)
 app = Path("application.c")
 source = app.read_text().replace("        first_run = FALSE;", """
