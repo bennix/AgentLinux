@@ -152,7 +152,7 @@ menu_link() {
 accessories="${XDG_CONFIG_HOME:-$HOME/.config}/wintc/start-menu/Accessories"
 mkdir -p "$accessories"
 menu_link "$apps/agentlinux-xp-printers.desktop" "$(dirname "$accessories")/agentlinux-xp-printers.desktop"
-for entry in zcode.desktop zenmux-agent.desktop; do
+for entry in zcode.desktop zenmux-agent.desktop agentlinux-system-network.desktop; do
     launcher="/usr/share/applications/$entry"
     destination="$(dirname "$accessories")/$entry"
     if [ -f "$launcher" ] && [ ! -e "$destination" ] && [ ! -L "$destination" ]; then

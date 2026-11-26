@@ -1,0 +1,37 @@
+#!/usr/bin/python3
+"""Extend the installed NetworkManager proxy page with the system-wide settings link."""
+import os
+import subprocess
+import sys
+import tempfile
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+from gi.repository import GLib
+
+editor = "/usr/bin/nm-connection-editor"
+prefix = "/org/gnome/nm_connection_editor"
+resource = "ce-page-proxy.ui"
+env = os.environ.copy()
+with tempfile.TemporaryDirectory(prefix="agentlinux-nm-") as directory:
+    try:
+        ui = ET.fromstring(subprocess.check_output(["gresource", "extract", editor, prefix + "/" + resource]))
+        grid = ui.find(".//object[@id='ProxyPage']")
+        if grid is not None:
+            row = max(int(p.text) for p in grid.findall("./child/packing/property[@name='top_attach']")) + 1
+            child = ET.SubElement(grid, "child")
+            link = ET.SubElement(child, "object", {"class": "GtkLinkButton", "id": "agentlinux_system_network"})
+            label = ("系统网络 · 机场代理…" if GLib.get_language_names()[0].startswith("zh")
+                     else "System Network · Subscription Proxy…")
+            for name, value in (("visible", "True"), ("halign", "start"), ("label", label),
+                                ("uri", "agentlinux-network:settings")):
+                ET.SubElement(link, "property", name=name).text = value
+            packing = ET.SubElement(child, "packing")
+            for name, value in (("left_attach", "0"), ("top_attach", str(row)), ("width", "2")):
+                ET.SubElement(packing, "property", name=name).text = value
+            ET.ElementTree(ui).write(Path(directory) / resource, encoding="utf-8")
+            env["G_RESOURCE_OVERLAYS"] = os.pathsep.join(filter(None, (
+                prefix + "=" + directory, env.get("G_RESOURCE_OVERLAYS"))))
+    except (OSError, ValueError, ET.ParseError, subprocess.CalledProcessError) as error:
+        print(error, file=sys.stderr)
+    sys.exit(subprocess.call([editor, *sys.argv[1:]], env=env))

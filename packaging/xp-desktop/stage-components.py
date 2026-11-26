@@ -81,6 +81,8 @@ files.extend([
     (Path(__file__).with_name("gtkrc-2.0"), Path("etc/skel/.gtkrc-2.0"), 0o644),
     (Path(__file__).with_name("peony-desktop.desktop"), Path("etc/skel/.config/autostart/peony-desktop.desktop"), 0o644),
     (Path(__file__).with_name("panel-entries.desktop"), Path("etc/skel/.config/autostart/agentlinux-xp-panel-entries.desktop"), 0o644),
+    (assets / "nm-connection-editor", Path("usr/local/bin/nm-connection-editor"), 0o755),
+    (Path(__file__).with_name("network-settings-link.desktop"), Path("usr/share/applications/network-settings-link.desktop"), 0o644),
     (assets / "install-panel-entries.sh", Path("usr/local/libexec/agentlinux-xp-panel-setup"), 0o755),
     (assets / "start-desktop-manager.sh", Path("usr/local/libexec/agentlinux-xp-desktop"), 0o755),
     (assets / "agentlinux-xp-desktop.desktop", Path("usr/share/applications/agentlinux-xp-desktop.desktop"), 0o644),
