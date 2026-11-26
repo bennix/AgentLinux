@@ -106,6 +106,20 @@ s += "\n" + declaration + """
     g_signal_emit_by_name(wnd->text_view, g_action_get_name(G_ACTION(action)));
 }
 """
+# Restore menu mnemonics after WinTC rewrites GtkLabel text during localization.
+anchor = "    wintc_lc_builder_preprocess_widget_text(builder);"
+assert s.count(anchor) == 1
+s = s.replace(anchor, anchor + """
+    gboolean zh = g_str_has_prefix(g_get_language_names()[0], "zh");
+    const gchar* ids[] = {"file-menu", "edit-menu", "format-menu", "view-menu", "help-menu"};
+    const gchar* en_labels[] = {"_File", "_Edit", "F_ormat", "_View", "_Help"};
+    const gchar* zh_labels[] = {"文件(_F)", "编辑(_E)", "格式(_O)", "查看(_V)", "帮助(_H)"};
+    for (guint i = 0; i < G_N_ELEMENTS(ids); i++) {
+        GtkMenuItem* item = GTK_MENU_ITEM(gtk_builder_get_object(builder, ids[i]));
+        gtk_menu_item_set_use_underline(item, TRUE);
+        gtk_menu_item_set_label(item, zh ? zh_labels[i] : en_labels[i]);
+    }
+""")
 p.write_text(s)
 app = Path("application.c")
 source = app.read_text().replace("        first_run = FALSE;", """
@@ -156,6 +170,8 @@ for stem, source in [("notepad", "window.c"), ("dlggoto", "dlggoto.c")]:
     if stem == "notepad":
         for item in tree.iter("object"):
             label = item.find("property[@name='label']")
+            if item.find("child[@type='submenu']") is not None and label is not None:
+                item.set("id", label.text.removeprefix("%CTL_").removesuffix("MENU%").lower() + "-menu")
             for key, signal in clipboard_actions.items():
                 if label is not None and label.text == "%CTL_" + key + "%":
                     item.find("property[@name='action-name']").text = "win." + signal
