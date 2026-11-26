@@ -1250,13 +1250,14 @@ if __name__ == "__main__":
     def location_properties(name, uri):
         dialog = Gtk.Dialog(title=tr("{} 属性", "{} Properties").format(name), transient_for=window, modal=True)
         dialog.add_button(tr("关闭", "Close"), Gtk.ResponseType.CLOSE)
+        dialog.set_default_response(Gtk.ResponseType.CLOSE)
         grid = Gtk.Grid(column_spacing=12, row_spacing=8, border_width=12)
-        dialog.get_content_area().add(grid)
         add_detail(grid, 0, tr("名称", "Name"), name)
         add_detail(grid, 1, tr("网络地址", "Network address"), uri, tr("复制网络地址", "Copy network address"))
         unc = windows_location(uri)
         if unc:
             add_detail(grid, 2, tr("Windows 路径", "Windows path"), unc, tr("复制 Windows 路径", "Copy Windows path"))
+        scroll_share_details(dialog, grid)
         dialog.show_all()
         dialog.run()
         dialog.destroy()
