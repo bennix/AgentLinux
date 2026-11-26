@@ -205,7 +205,7 @@
                             <property name="label">我的文档</property>
                             <property name="max-width-chars">24</property>
                             <property name="tooltip-text" translatable="no">打开用于存放文档的文件夹。</property>
-                            <property name="wrap">True</property>
+                            <property name="wrap">False</property>
                             <property name="xalign">0.0</property>
                           </object>
                           <packing>
@@ -250,7 +250,7 @@
                             <property name="label">%PLACE_RECENTS%</property>
                             <property name="max-width-chars">24</property>
                             <property name="tooltip-text" translatable="yes">Displays recently opened documents and folders.</property>
-                            <property name="wrap">True</property>
+                            <property name="wrap">False</property>
                             <property name="xalign">0.0</property>
                           </object>
                           <packing>
@@ -295,7 +295,7 @@
                             <property name="label">图片收藏</property>
                             <property name="max-width-chars">24</property>
                             <property name="tooltip-text" translatable="no">打开用于存放照片和图片的文件夹。</property>
-                            <property name="wrap">True</property>
+                            <property name="wrap">False</property>
                             <property name="xalign">0.0</property>
                           </object>
                           <packing>
@@ -340,7 +340,7 @@
                             <property name="label">我的音乐</property>
                             <property name="max-width-chars">24</property>
                             <property name="tooltip-text" translatable="no">打开用于存放音乐和音频文件的文件夹。</property>
-                            <property name="wrap">True</property>
+                            <property name="wrap">False</property>
                             <property name="xalign">0.0</property>
                           </object>
                           <packing>
@@ -385,7 +385,7 @@
                             <property name="label">%PLACE_DRIVES%</property>
                             <property name="max-width-chars">24</property>
                             <property name="tooltip-text" translatable="yes">Gives access to, and information about, the disk drives, cameras, scanners, and other hardware connected to your computer.</property>
-                            <property name="wrap">True</property>
+                            <property name="wrap">False</property>
                             <property name="xalign">0.0</property>
                           </object>
                           <packing>
@@ -436,7 +436,7 @@
                             <property name="label">%PLACE_CONTROLPANEL%</property>
                             <property name="max-width-chars">24</property>
                             <property name="tooltip-text" translatable="yes">Provides options for you to customize the appearance and functionality of your computer, add or remove programs, and set up network connections and user accounts.</property>
-                            <property name="wrap">True</property>
+                            <property name="wrap">False</property>
                             <property name="xalign">0.0</property>
                           </object>
                           <packing>
@@ -478,7 +478,7 @@
                             <property name="label" translatable="yes">Set Program Access and Defaults</property>
                             <property name="max-width-chars">24</property>
                             <property name="tooltip-text" translatable="yes">Chooses default programs for certain activities, such as Web browsing or sending e-mail, and specifies which programs are accessible from the Start menu, desktop, and other locations.</property>
-                            <property name="wrap">True</property>
+                            <property name="wrap">False</property>
                             <property name="xalign">0.0</property>
                           </object>
                           <packing>
@@ -520,7 +520,7 @@
                             <property name="label" translatable="yes">Connect To</property>
                             <property name="max-width-chars">24</property>
                             <property name="tooltip-text" translatable="yes">Connects to other computers, networks, and the Internet.</property>
-                            <property name="wrap">True</property>
+                            <property name="wrap">False</property>
                             <property name="xalign">0.0</property>
                           </object>
                           <packing>
@@ -562,7 +562,7 @@
                             <property name="label">%PLACE_PRINTERS%</property>
                             <property name="max-width-chars">24</property>
                             <property name="tooltip-text" translatable="yes">Shows installed printers and fax printers and helps you add new ones.</property>
-                            <property name="wrap">True</property>
+                            <property name="wrap">False</property>
                             <property name="xalign">0.0</property>
                           </object>
                           <packing>
@@ -610,7 +610,7 @@
                             <property name="label" translatable="yes">Help and Support</property>
                             <property name="max-width-chars">24</property>
                             <property name="tooltip-text" translatable="yes">Opens a central location for Help topics, tutorials, troubleshooting, and other support services.</property>
-                            <property name="wrap">True</property>
+                            <property name="wrap">False</property>
                             <property name="xalign">0.0</property>
                           </object>
                           <packing>
@@ -652,7 +652,7 @@
                             <property name="label" translatable="yes">Search</property>
                             <property name="max-width-chars">24</property>
                             <property name="tooltip-text" translatable="yes">Opens a window where you can pick search options and work with search results.</property>
-                            <property name="wrap">True</property>
+                            <property name="wrap">False</property>
                             <property name="xalign">0.0</property>
                           </object>
                           <packing>
@@ -694,7 +694,7 @@
                             <property name="label" translatable="yes">Run...</property>
                             <property name="max-width-chars">24</property>
                             <property name="tooltip-text" translatable="yes">Opens a program, folder, document, or Web site.</property>
-                            <property name="wrap">True</property>
+                            <property name="wrap">False</property>
                             <property name="xalign">0.0</property>
                           </object>
                           <packing>
