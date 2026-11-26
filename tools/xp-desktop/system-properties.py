@@ -143,7 +143,7 @@ if server:
     address_scroll.add(addresses)
     computer.pack_start(address_scroll, True, True, 0)
     def refresh_addresses(_tabs, selected, _index):
-        if selected != computer:
+        if selected != computer.get_ancestor(Gtk.ScrolledWindow):
             return
         for child in addresses.get_children():
             child.destroy()
