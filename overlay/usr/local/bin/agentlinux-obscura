@@ -2,6 +2,8 @@
 const { start } = require('/opt/obscura-firefox/obscura-desktop/firefox/start.cjs');
 const { pathToFileURL } = require('node:url');
 const path = require('node:path');
+const fs = require('node:fs/promises');
+const os = require('node:os');
 
 const argument = process.argv[2];
 const url = argument && path.isAbsolute(argument) ? pathToFileURL(argument).href : argument;
@@ -9,10 +11,26 @@ if (url && !/^(https?:\/\/|file:\/\/)/i.test(url)) {
     console.error('Unsupported browser URL');
     process.exit(1);
 }
-start({ binary: '/opt/obscura-firefox/firefox', url }).then(app => {
+start({ binary: '/opt/obscura-firefox/firefox', url }).then(async app => {
     if (app) {
         for (const signal of ['SIGINT', 'SIGTERM'])
             process.once(signal, () => app.close().catch(console.error));
+    } else if (url) {
+        const config = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config');
+        const record = JSON.parse(await fs.readFile(path.join(config, 'obscura-firefox', 'launcher.json'), 'utf8'));
+        if (!/^http:\/\/127\.0\.0\.1:\d+$/.test(record.origin))
+            throw new Error('Unexpected Obscura service address');
+        const response = await fetch(record.origin + '/mcp', {
+            method: 'POST',
+            redirect: 'error',
+            headers: { 'Content-Type': 'application/json', 'X-Obscura-Token': record.token },
+            body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/call',
+                params: { name: 'browser_new_tab', arguments: { url } } }),
+            signal: AbortSignal.timeout(65000)
+        });
+        const reply = await response.json();
+        if (!response.ok || reply.error || reply.result?.isError)
+            throw new Error('Obscura could not open the requested tab');
     }
 }).catch(error => {
     console.error(error.message);
