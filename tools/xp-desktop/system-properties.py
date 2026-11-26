@@ -487,7 +487,10 @@ def show_devices(_button):
         menu.connect("selection-done", lambda widget: widget.detach())
         menu.show_all()
         if event is None:
-            menu.popup_at_widget(tree, Gdk.Gravity.CENTER, Gdk.Gravity.NORTH_WEST, None)
+            rect = tree.get_cell_area(path, column)
+            menu.popup_at_rect(tree.get_bin_window(), rect, Gdk.Gravity.SOUTH_WEST,
+                               Gdk.Gravity.NORTH_WEST, Gtk.get_current_event())
+            menu.select_first(True)
         else:
             menu.popup_at_pointer(event)
         return True
