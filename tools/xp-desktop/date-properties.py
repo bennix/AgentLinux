@@ -82,6 +82,24 @@ date_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4, border_width
 date_frame.add(date_box)
 calendar = Gtk.Calendar()
 date_box.add(calendar)
+selected_date = Gtk.Label(selectable=True)
+selected_date.get_accessible().set_name(tr("所选日期", "Selected date"))
+date_box.add(selected_date)
+
+
+def update_selected_date(*_):
+    year, month, day = calendar.get_date()
+    try:
+        value = datetime(year, month + 1, day)
+    except ValueError:
+        selected_date.set_text("")
+        return
+    selected_date.set_text(value.strftime(tr("%Y年%m月%d日 %A", "%A, %B %d, %Y")))
+
+
+calendar.connect("day-selected", update_selected_date)
+calendar.connect("month-changed", update_selected_date)
+update_selected_date()
 today_button = Gtk.Button(label=tr("今天", "Today"))
 date_box.add(today_button)
 
