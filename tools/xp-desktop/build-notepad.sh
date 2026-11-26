@@ -92,6 +92,20 @@ s = s.replace(anchor, """    if (g_str_has_prefix(g_get_language_names()[0], "zh
         gtk_window_maximize(GTK_WINDOW(dlg));
 
 """ + anchor)
+# The text view implements these action signals for keyboard editing as well.
+clipboard_actions = {key: key.lower() + "-clipboard" for key in ("CUT", "COPY", "PASTE")}
+declaration = "static void action_clipboard(GSimpleAction* action, GVariant* parameter, gpointer user_data)"
+s = s.replace("static GActionEntry s_window_actions[] = {",
+              declaration + ";\n\nstatic GActionEntry s_window_actions[] = {\n" +
+              "\n".join('    { .name = "%s", .activate = action_clipboard },' % signal
+                        for signal in clipboard_actions.values()))
+s += "\n" + declaration + """
+{
+    WinTCNotepadWindow* wnd = WINTC_NOTEPAD_WINDOW(user_data);
+    (void)parameter;
+    g_signal_emit_by_name(wnd->text_view, g_action_get_name(G_ACTION(action)));
+}
+"""
 p.write_text(s)
 app = Path("application.c")
 source = app.read_text().replace("        first_run = FALSE;", """
@@ -139,6 +153,13 @@ manifest = ET.parse("res/resources.xml")
 for stem, source in [("notepad", "window.c"), ("dlggoto", "dlggoto.c")]:
     filename = stem + ".ui"
     tree = ET.parse("res/" + filename)
+    if stem == "notepad":
+        for item in tree.iter("object"):
+            label = item.find("property[@name='label']")
+            for key, signal in clipboard_actions.items():
+                if label is not None and label.text == "%CTL_" + key + "%":
+                    item.find("property[@name='action-name']").text = "win." + signal
+        tree.write("res/" + filename, encoding="utf-8")
     for field in tree.iter("property"):
         value = field.text or ""
         if value.endswith("%") and "%CTL_" in value:
