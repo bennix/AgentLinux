@@ -34,7 +34,7 @@ content.pack_start(layout, True, True, 0)
 tasks = add_task_pane(layout, tr("打印机任务", "Printer Tasks"))
 right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 layout.pack_start(right, True, True, 0)
-rows = Gtk.ListStore(str, str, str, str, str, str, bool)
+rows = Gtk.ListStore(str, str, str, str, str, str, bool, int)
 table = Gtk.TreeView(model=rows)
 name_column = Gtk.TreeViewColumn(tr("名称", "Name"))
 icon = Gtk.CellRendererPixbuf()
@@ -54,6 +54,8 @@ for index, title in ((4, tr("位置", "Location")), (5, tr("备注", "Comment"))
     column.set_fixed_width(110)
     column.set_resizable(True)
     table.append_column(column)
+for column, sort_key in zip(table.get_columns(), (0, 1, 7, 4, 5)):
+    column.set_sort_column_id(sort_key)
 scroll = Gtk.ScrolledWindow(shadow_type=Gtk.ShadowType.IN)
 scroll.add(table)
 right.pack_start(scroll, True, True, 0)
@@ -99,8 +101,9 @@ def refresh(*_, select_name=None, background=False):
                 pass
         updated.append([name, printer_status(attrs),
                         caption, str(count) if count is not None else "—",
-                        attrs.get("printer-location") or "", attrs.get("printer-info") or "", name == default])
-    if updated != [list(row) for row in rows]:
+                        attrs.get("printer-location") or "", attrs.get("printer-info") or "", name == default,
+                        count if count is not None else -1])
+    if updated != sorted((list(row) for row in rows), key=lambda row: row[0]):
         rows.clear()
         for values in updated:
             rows.append(values)
