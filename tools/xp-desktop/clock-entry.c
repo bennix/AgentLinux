@@ -47,19 +47,29 @@ static gboolean network_tooltip(GtkWidget *widget, gint x, gint y, gboolean keyb
     g_autoptr(GString) text = g_string_new(chinese_menu ? "网络连接" : "Network Connections");
     struct ifaddrs *interfaces = NULL;
     if (getifaddrs(&interfaces) == 0) {
+        struct ifaddrs *best = NULL;
+        int best_score = -1;
         for (struct ifaddrs *it = interfaces; it; it = it->ifa_next) {
             if (!it->ifa_addr || !(it->ifa_flags & IFF_UP) || it->ifa_flags & IFF_LOOPBACK) continue;
             int family = it->ifa_addr->sa_family;
-            const void *address;
-            if (family == AF_INET)
-                address = &((struct sockaddr_in *)it->ifa_addr)->sin_addr;
-            else if (family == AF_INET6)
-                address = &((struct sockaddr_in6 *)it->ifa_addr)->sin6_addr;
-            else
-                continue;
+            if (family != AF_INET && family != AF_INET6) continue;
+            g_autofree gchar *device = g_build_filename("/sys/class/net", it->ifa_name, "device", NULL);
+            int score = (g_file_test(device, G_FILE_TEST_EXISTS) ? 4 : 0) + (family == AF_INET ? 2 : 0);
+            if (family == AF_INET6 && !IN6_IS_ADDR_LINKLOCAL(&((struct sockaddr_in6 *)it->ifa_addr)->sin6_addr))
+                score++;
+            if (score > best_score) {
+                best = it;
+                best_score = score;
+            }
+        }
+        if (best) {
+            int family = best->ifa_addr->sa_family;
+            const void *address = family == AF_INET
+                ? (const void *)&((struct sockaddr_in *)best->ifa_addr)->sin_addr
+                : (const void *)&((struct sockaddr_in6 *)best->ifa_addr)->sin6_addr;
             char buffer[INET6_ADDRSTRLEN];
             if (inet_ntop(family, address, buffer, sizeof(buffer)))
-                g_string_append_printf(text, "\n%s   %s", it->ifa_name, buffer);
+                g_string_append_printf(text, "\n%s   %s", best->ifa_name, buffer);
         }
         freeifaddrs(interfaces);
     }
