@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Obscura Firefox
-Exec=/opt/obscura-firefox/obscura %u
+Exec=/usr/local/bin/agentlinux-obscura %u
 Icon=obscura-firefox
 Categories=Network;WebBrowser;
 Terminal=false

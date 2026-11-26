@@ -73,7 +73,7 @@ RemainAfterExit=yes
     run("dpkg-deb", "-x", args.obscura_firefox, root)
     shutil.copy2(overlay / "usr/share/applications/obscura-firefox.desktop",
                  root / "usr/share/applications/obscura-firefox.desktop")
-    for rel in ("etc/systemd/logind.conf.d/90-agentlinux-lid.conf", "etc/dconf/profile/user",
+    for rel in ("usr/local/bin/agentlinux-obscura", "etc/systemd/logind.conf.d/90-agentlinux-lid.conf", "etc/dconf/profile/user",
                 "etc/dconf/db/agentlinux", "etc/dconf/db/agentlinux.d/10-laptop-lid",
                 "etc/NetworkManager/dispatcher.d/84-agentlinux-proxy", "usr/local/lib/zenmux/cage-terminal", "usr/local/lib/agentlinux-network/settings", "usr/local/lib/agentlinux-network/engine", "usr/local/lib/agentlinux-network/configure", "etc/xdg/autostart/zenmux-workbench.desktop", "etc/firefox/policies/policies.json", "opt/obscura-firefox/distribution/policies.json"):
         dest = root / rel

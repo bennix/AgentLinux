@@ -1,0 +1,20 @@
+#!/opt/obscura-firefox/obscura-desktop/bin/node
+const { start } = require('/opt/obscura-firefox/obscura-desktop/firefox/start.cjs');
+const { pathToFileURL } = require('node:url');
+const path = require('node:path');
+
+const argument = process.argv[2];
+const url = argument && path.isAbsolute(argument) ? pathToFileURL(argument).href : argument;
+if (url && !/^(https?:\/\/|file:\/\/)/i.test(url)) {
+    console.error('Unsupported browser URL');
+    process.exit(1);
+}
+start({ binary: '/opt/obscura-firefox/firefox', url }).then(app => {
+    if (app) {
+        for (const signal of ['SIGINT', 'SIGTERM'])
+            process.once(signal, () => app.close().catch(console.error));
+    }
+}).catch(error => {
+    console.error(error.message);
+    process.exitCode = 1;
+});
