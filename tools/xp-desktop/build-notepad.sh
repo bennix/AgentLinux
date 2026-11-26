@@ -8,6 +8,14 @@ cp -R "$src/." "$work/"
 cd "$work"
 python3 - <<'PY'
 from pathlib import Path
+app = Path("application.c")
+source = app.read_text()
+anchor = "    return app;"
+if source.count(anchor) != 1:
+    raise RuntimeError("Unexpected Notepad application constructor")
+app.write_text(source.replace(anchor, """    const gchar* save_keys[] = { "<Control>s", NULL };
+    gtk_application_set_accels_for_action(GTK_APPLICATION(app), "win.save", save_keys);
+""" + anchor))
 p = Path("window.c")
 s = p.read_text()
 start = s.index("    // FIXME: Double check this works with localization")
