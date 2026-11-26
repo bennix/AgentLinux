@@ -39,6 +39,16 @@ cp -R "$wintc/shared/shell" "$work/shared/"
             wintc-shcommon wintc-shellext wintc-shlang wintc-winbrand libxml-2.0) \
         -o "$work/libwintc-shell.so.1"
 )
+cp -R "$wintc/base/logonui" "$work/logonui"
+(
+    cd "$work/logonui"
+    patch --batch --forward -p1 < "$assets/greeter-arrow-focus.patch"
+    cd src
+    glib-compile-resources res/resources.xml --sourcedir=res --generate-source --target=resources.c
+    cc -O2 -o "$work/agentlinux-logonui" ./*.c classic/*.c welcome/*.c \
+        $(pkg-config --cflags --libs gtk+-3.0 wintc-comctl wintc-comgtk wintc-msgina liblightdm-gobject-1)
+)
+install -m755 "$work/agentlinux-logonui" "$dest/agentlinux-logonui"
 cp -R "$peony" "$work/peony"
 (
     cd "$work/peony"

@@ -1,0 +1,18 @@
+--- a/src/welcome/userlist.c
++++ b/src/welcome/userlist.c
+@@ -1105,13 +1105,13 @@
+         case GDK_KEY_Down:
+         {
+             wintc_welcome_user_list_navigate_down(GTK_WIDGET(user_list));
+-            break;
++            return TRUE;
+         }
+ 
+         case GDK_KEY_Up:
+         {
+             wintc_welcome_user_list_navigate_up(GTK_WIDGET(user_list));
+-            break;
++            return TRUE;
+         }
+ 
+         default: break;

@@ -96,6 +96,7 @@ files.extend([
     (greeter / "lock-background.svg", resource_dir / "lock-background.svg", 0o644),
     (greeter / "bliss.png", Path("usr/local/share/agentlinux-xp/screensaver/bliss.png"), 0o644),
     (assets.parents[1] / "overlay/usr/local/bin/agentlinux-components", Path("usr/local/bin/agentlinux-components"), 0o755),
+    (args.components / "agentlinux-logonui", Path("usr/local/libexec/agentlinux-logonui"), 0o755),
     (assets / "login-greeter.sh", Path("usr/local/libexec/agentlinux-xp-greeter"), 0o755),
     (greeter / "agentlinux-xp.desktop", Path("usr/share/xgreeters/agentlinux-xp.desktop"), 0o644),
     (Path(__file__).with_name("lightdm-locale.conf"), Path("etc/systemd/system/lightdm.service.d/locale.conf"), 0o644),

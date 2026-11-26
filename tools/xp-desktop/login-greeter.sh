@@ -15,4 +15,4 @@ case "$greeter_locale" in
     zh_CN*|zh:*) G_RESOURCE_OVERLAYS="$prefix=$assets/zh:$G_RESOURCE_OVERLAYS" ;;
 esac
 export G_RESOURCE_OVERLAYS
-exec /usr/sbin/logonui
+exec /usr/local/libexec/agentlinux-logonui
