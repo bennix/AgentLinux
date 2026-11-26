@@ -256,7 +256,7 @@ entries = [
     ("网络连接", "Network Connections", "preferences-system-network", "agentlinux-xp-connections.desktop"),
     ("系统网络", "System Network", "network-wired", "agentlinux-system-network.desktop"),
     ("输入法", "Input Method", "preferences-desktop-keyboard", "myime-settings.desktop"),
-    ("添加打印机", "Add Printer", "printer", "agentlinux-xp-add-printer.desktop"),
+    ("添加打印机", "Add Printer", "gnome-dev-printer-new", "agentlinux-xp-add-printer.desktop"),
     ("打印机和传真", "Printers and Faxes", "printer", "agentlinux-xp-printers.desktop"),
     ("系统设置", "System Settings", "preferences-system", "agentlinux-xp-settings.desktop"),
     ("系统", "System", "computer", "agentlinux-xp-system.desktop"),
@@ -282,6 +282,7 @@ classic = preference.exists() and preference.read_text().strip() == "classic"
 luna_icons = {
     "system-software-install": "file_generic_installer", "preferences-desktop-display": "control_display",
     "network-wireless": "net_wireless", "audio-card": "volume_on", "printer": "printer",
+    "gnome-dev-printer-new": "printer",
     "computer": "laptop", "preferences-desktop-personal": "people", "appointment-new": "calendar",
     "preferences-desktop-accessibility": "accessibility", "input-mouse": "mouse",
     "preferences-desktop-font": "file_ttf", "preferences-system-network": "net_lan",
@@ -308,6 +309,16 @@ def tile(label, icon, resource=None):
         path = Path("/usr/share/icons/luna/res") / size / f"{resource}.png"
         if path.is_file():
             image.set_from_file(str(path))
+            if icon == "gnome-dev-printer-new":
+                badge = path.parents[1] / "16x16/add.png"
+                if badge.is_file():
+                    overlay = Gtk.Overlay()
+                    overlay.add(image)
+                    plus = Gtk.Image.new_from_file(str(badge))
+                    plus.set_halign(Gtk.Align.END)
+                    plus.set_valign(Gtk.Align.END)
+                    overlay.add_overlay(plus)
+                    image = overlay
             break
     image.set_size_request(48, 48)
     contents = Gtk.Box(orientation=Gtk.Orientation.VERTICAL if classic else Gtk.Orientation.HORIZONTAL, spacing=6)
