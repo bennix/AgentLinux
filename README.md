@@ -36,20 +36,20 @@ About AgentLinux now shows the college emblem, operating system version, kernel 
 
 Open the classic XP System Settings grid from the Start menu or with `control settings`.
 
-XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。在 x86-64 UEFI 虚拟机中，正式版 `v2026.11.27.1` 已全新安装到 48 GiB 虚拟硬盘。移除 ISO 后，测试账户成功从硬盘登录中文 XP 风格桌面。
+XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。在 x86-64 UEFI 虚拟机中，正式版 `v2026.11.27.2` 已全新安装到 48 GiB 虚拟硬盘。移除 ISO 后，测试账户成功从硬盘登录中文 XP 风格桌面。
 
-Release `v2026.11.27.1` was installed on a blank 48 GiB virtual disk in an x86-64 UEFI VM. After the ISO was removed, the test account signed in to the Chinese XP-style desktop from that disk.
+Release `v2026.11.27.2` was installed on a blank 48 GiB virtual disk in an x86-64 UEFI VM. After the ISO was removed, the test account signed in to the Chinese XP-style desktop from that disk.
 
 快捷方式向导支持含空格的路径和同名文件。右键点击已连接的 Wi-Fi 可查看连接状态和 TCP/IPv4 属性。
 
 The shortcut wizard handles paths with spaces and existing filenames. Right-click a connected Wi-Fi network to view its status and TCP/IPv4 properties.
 
-**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.1/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
+**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.2/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.2/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
 
-ISO SHA-256 (v2026.11.27.1)
+ISO SHA-256 (v2026.11.27.2)
 
-`0381e6fe6806ea83d254c251d40285db88e4b2c5480204f56161b1e943d3226d`
+`11a435daae790d38eab13a6b54bfeb46a02a6297377cfd1f9e1419a1ebc04921`
 
 | 启动方式 / Boot mode | 用户名 / Username | 密码 / Password |
 | --- | --- | --- |
@@ -57,7 +57,7 @@ ISO SHA-256 (v2026.11.27.1)
 | 预装 SanDisk U 盘 / Preinstalled SanDisk USB | `agent` | `agentfudan` |
 | 自行安装到硬盘 / Installation on your own disk | 安装时创建 / Set during installation | 安装时设置 / Set during installation |
 
-[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.2/AgentLinux-24.04.5-desktop-amd64.iso?download=true)
 
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可双击桌面的“安装到硬盘”启动安装器。
 
@@ -108,7 +108,7 @@ unsquashfs -ll xp-standard.squashfs
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.27.1)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.27.2)
 
 运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。请为 ISO 预留至少 9 GB 可用空间。Allow at least 9 GB of free space for the ISO. Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
@@ -175,5 +175,9 @@ python3 packaging/zenoffice/build-image.py AgentLinux-24.04.5-myime-wechat-amd64
 在系统托盘展开已连接的 Wi-Fi，点击“属性”查看当前 IP、网关和 DNS，或进入网络连接编辑器。
 
 ### 界面语言与输入法
+
+要切换中英文界面，按 Win+R，输入 `control intl.cpl`，选择「简体中文」或「English」。点击「确定」，注销后重新登录即可生效。
+
+To change the desktop language, press Win+R, enter `control intl.cpl`, select English or 简体中文, and click OK. Sign out and sign back in to apply the change.
 
 AgentLinux 自有设置界面支持中英文。UKUI 登录时启动 Fcitx 5 并注册输入法托盘，异常退出后会自动重启。
