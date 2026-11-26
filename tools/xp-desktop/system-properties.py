@@ -56,7 +56,7 @@ if sys.argv[1:] == ["--version"]:
 
 dialog = Gtk.Dialog(title=tr("系统属性", "System Properties"))
 dialog.set_icon_name("computer")
-dialog.set_default_size(475, 320)
+fit_window(dialog, 475, 450)
 dialog.add_button(tr("确定", "OK"), Gtk.ResponseType.OK)
 dialog.add_button(tr("取消", "Cancel"), Gtk.ResponseType.CANCEL)
 dialog.set_default_response(Gtk.ResponseType.OK)
@@ -66,7 +66,10 @@ dialog.get_content_area().pack_start(tabs, True, True, 0)
 
 def page(zh, en):
     box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12, border_width=16)
-    tabs.append_page(box, Gtk.Label(label=tr(zh, en)))
+    scroll = Gtk.ScrolledWindow()
+    scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+    scroll.add(box)
+    tabs.append_page(scroll, Gtk.Label(label=tr(zh, en)))
     return box
 
 def line(box, value):
@@ -537,6 +540,6 @@ else:
     dialog.show_all()
     pages = {"--computer-name": computer, "--hardware": hardware, "--advanced": advanced}
     if len(sys.argv) == 2 and sys.argv[1] in pages:
-        tabs.set_current_page(tabs.page_num(pages[sys.argv[1]]))
+        tabs.set_current_page(tabs.page_num(pages[sys.argv[1]].get_ancestor(Gtk.ScrolledWindow)))
     dialog.run()
 dialog.destroy()
