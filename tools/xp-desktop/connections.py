@@ -126,7 +126,9 @@ def show_status(*_):
     device = selected()
     if not device or device.get_state() != NM.DeviceState.ACTIVATED:
         return
-    dialog = Gtk.Dialog(title=tr("网络连接状态", "Network Connection Status"), transient_for=window, modal=True)
+    title = (tr("无线网络连接 状态", "Wireless Network Connection Status") if isinstance(device, NM.DeviceWifi)
+             else tr("本地连接 状态", "Local Area Connection Status"))
+    dialog = Gtk.Dialog(title=title, transient_for=window, modal=True)
     dialog.add_button(tr("关闭", "Close"), Gtk.ResponseType.CLOSE)
     edit = Gtk.Button(label=tr("属性", "Properties"))
     dialog.get_action_area().pack_start(edit, False, False, 0)
