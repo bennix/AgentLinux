@@ -51,6 +51,25 @@ def activate(app):
     link = Gtk.Button(label=more.text)
     link.connect("clicked", lambda *_: subprocess.Popen(["/usr/bin/yelp", "help-list:"]))
     content.pack_end(link, False, False, 0)
+    topic_targets = {"desktop": "search", "programs": "programs", "fonts": "fonts", "printers": "printers",
+                     "input": "keyboard", "network": "connections"}
+    target = None
+    open_topic = Gtk.Button()
+    open_topic.set_no_show_all(True)
+    content.pack_end(open_topic, False, False, 0)
+
+    def launch_topic(_button):
+        if target:
+            try:
+                target.launch([], window.get_display().get_app_launch_context())
+            except GLib.Error as error:
+                notice = Gtk.MessageDialog(transient_for=window, modal=True,
+                                           message_type=Gtk.MessageType.ERROR,
+                                           buttons=Gtk.ButtonsType.CLOSE, text=error.message)
+                notice.run()
+                notice.destroy()
+
+    open_topic.connect("clicked", launch_topic)
     group = None
     for section in doc.findall("{*}section"):
         if section.get("id") == "more":
@@ -61,8 +80,19 @@ def activate(app):
         button.set_mode(False)
         sidebar.pack_start(button, False, False, 0)
 
-        def select(widget, topic=name, text=paragraph):
+        def select(widget, topic=name, text=paragraph, component=topic_targets.get(section.get("id"))):
+            nonlocal target
             if widget.get_active():
+                target = None
+                if component:
+                    try:
+                        target = Gio.DesktopAppInfo.new(f"agentlinux-xp-{component}.desktop")
+                    except TypeError:
+                        pass
+                if target:
+                    label = target.get_display_name()
+                    open_topic.set_label(f"打开“{label}”" if chinese else f"Open {label}")
+                open_topic.set_visible(target is not None)
                 heading.set_text(topic)
                 body.set_text(text)
                 reading.get_vadjustment().set_value(0)
