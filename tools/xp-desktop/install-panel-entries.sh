@@ -152,6 +152,13 @@ menu_link() {
 accessories="${XDG_CONFIG_HOME:-$HOME/.config}/wintc/start-menu/Accessories"
 mkdir -p "$accessories"
 menu_link "$apps/agentlinux-xp-printers.desktop" "$(dirname "$accessories")/agentlinux-xp-printers.desktop"
+# Let GIO launch the installed terminal entry, including the Cage wrapper.
+terminal=/usr/share/applications/mate-terminal.desktop
+if [ -f "$terminal" ]; then
+    mkdir -p "$assets/menu-launchers"
+    sed 's/^Exec=mate-terminal$/Exec=\/usr\/bin\/gtk-launch mate-terminal/' "$terminal" > "$assets/menu-launchers/mate-terminal.desktop"
+    menu_link "$assets/menu-launchers/mate-terminal.desktop" "$(dirname "$accessories")/mate-terminal.desktop"
+fi
 for entry in zcode.desktop zenmux-agent.desktop agentlinux-system-network.desktop; do
     launcher="/usr/share/applications/$entry"
     destination="$(dirname "$accessories")/$entry"
