@@ -54,7 +54,7 @@ def folder_options(_button):
         double = Gtk.RadioButton.new_with_mnemonic_from_widget(single, tr("双击打开项目(_D)", "_Double-click to open an item"))
         choices.add(single)
         choices.add(double)
-        reset_click = Gtk.Button(label=tr("还原默认值", "Restore Defaults"))
+        reset_click = Gtk.Button.new_with_mnemonic(tr("还原默认值(_U)", "Restore Defa_ults"))
         reset_click.set_halign(Gtk.Align.END)
         reset_click.connect("clicked", lambda _button: double.set_active(True))
         general.pack_end(reset_click, False, False, 0)
@@ -93,7 +93,7 @@ def folder_options(_button):
             if settings.is_writable(key):
                 settings.reset(key)
 
-    restore = Gtk.Button(label=tr("还原默认值", "Restore Defaults"))
+    restore = Gtk.Button.new_with_mnemonic(tr("还原默认值(_U)", "Restore Defa_ults"))
     restore.set_halign(Gtk.Align.END)
     restore.connect("clicked", restore_defaults)
     panel.pack_end(restore, False, False, 0)
