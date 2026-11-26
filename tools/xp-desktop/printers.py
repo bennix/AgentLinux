@@ -34,7 +34,7 @@ content.pack_start(layout, True, True, 0)
 tasks = add_task_pane(layout, tr("打印机任务", "Printer Tasks"))
 right = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
 layout.pack_start(right, True, True, 0)
-rows = Gtk.ListStore(str, str, str, str, str, str)
+rows = Gtk.ListStore(str, str, str, str, str, str, bool)
 table = Gtk.TreeView(model=rows)
 name_column = Gtk.TreeViewColumn(tr("名称", "Name"))
 icon = Gtk.CellRendererPixbuf()
@@ -99,7 +99,7 @@ def refresh(*_, select_name=None, background=False):
                 pass
         updated.append([name, printer_status(attrs),
                         caption, str(count) if count is not None else "—",
-                        attrs.get("printer-location") or "", attrs.get("printer-info") or ""])
+                        attrs.get("printer-location") or "", attrs.get("printer-info") or "", name == default])
     if updated != [list(row) for row in rows]:
         rows.clear()
         for values in updated:
@@ -546,8 +546,10 @@ tasks.pack_start(properties_button, False, False, 0)
 
 
 def selection_changed(selection):
-    for action_button in (queue_button, test_button, default_button, properties_button):
-        action_button.set_sensitive(selection.count_selected_rows() > 0)
+    model, item = selection.get_selected()
+    for action_button in (queue_button, test_button, properties_button):
+        action_button.set_sensitive(item is not None)
+    default_button.set_sensitive(item is not None and not model[item][6])
 
 
 table.get_selection().connect("changed", selection_changed)
