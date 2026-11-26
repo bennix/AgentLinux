@@ -41,6 +41,13 @@ if path.exists():
 settings.set_string("Settings", "gtk-icon-theme-name", "luna")
 settings.save_to_file(str(path))
 PY
+# ZenOffice ships its artwork in a size absent from Ubuntu's hicolor index.
+office_art=/usr/share/icons/hicolor/1024x1024/apps/genoffice.png
+office_icon="${XDG_DATA_HOME:-$HOME/.local/share}/icons/hicolor/32x32/apps/genoffice.png"
+if [ -r "$office_art" ] && { [ ! -s "$office_icon" ] || [ "$office_art" -nt "$office_icon" ]; }; then
+    mkdir -p "$(dirname "$office_icon")"
+    gdk-pixbuf-thumbnailer -s 32 "$office_art" "$office_icon"
+fi
 if [ -r "$assets/college-bliss.svg" ]; then
     mkdir -p "$assets/screensaver"
     gdk-pixbuf-thumbnailer -s 1920 "$assets/college-bliss.svg" "$assets/screensaver/bliss.png"

@@ -7,6 +7,14 @@ directory = Path.home() / ".local/share/agentlinux-xp/taskbar-zh"
 directory.mkdir(parents=True, exist_ok=True)
 resource = "/uk/oddmatics/wintc/taskband/personal-menu.ui"
 root = ET.fromstring(subprocess.check_output(["gresource", "extract", "/usr/bin/wintc-taskband", resource]))
+# Keep the right column wide enough for single-line menu commands.
+for label in root.iter("object"):
+    wrap = label.find("property[@name='wrap']")
+    if label.get("class") == "GtkLabel" and wrap is not None:
+        wrap.text = "False"
+english = directory.with_name("taskbar-en")
+english.mkdir(parents=True, exist_ok=True)
+ET.ElementTree(root).write(english / "personal-menu.ui", encoding="UTF-8")
 folders = {
     "%PLACE_DOCUMENTS%": ("我的文档", "打开用于存放文档的文件夹。"),
     "%PLACE_PICTURES%": ("图片收藏", "打开用于存放照片和图片的文件夹。"),
