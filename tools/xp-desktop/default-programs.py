@@ -35,6 +35,8 @@ def open_choices(label, _group_cycling):
 for row, (cn, en, mime) in enumerate([
     ("网页链接（HTTP_S）", "Web links (HTTP_S)", "x-scheme-handler/https"),
     ("网页链接（_HTTP）", "Web links (_HTTP)", "x-scheme-handler/http"),
+    ("HTML 网页文件(_W)", "HTML _web pages", "text/html"),
+    ("_XHTML 网页文件", "_XHTML web pages", "application/xhtml+xml"),
     ("电子邮件(_E)", "_Email", "x-scheme-handler/mailto"),
     ("文本文档(_T)", "_Text documents", "text/plain"),
     ("_PDF 文档", "_PDF documents", "application/pdf"),
