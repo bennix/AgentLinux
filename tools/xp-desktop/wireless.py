@@ -88,14 +88,23 @@ def ask_network_key(parent, network, sae):
     network_label.set_max_width_chars(38)
     network_label.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
     box.add(network_label)
-    caption = Gtk.Label(label=tr("网络密钥(_K)", "Network _key"), use_underline=True, xalign=0)
-    box.add(caption)
-    entry = Gtk.Entry(visibility=False, activates_default=True, placeholder_text=tr("网络密钥", "Network key"))
-    entry.set_input_purpose(Gtk.InputPurpose.PASSWORD)
-    caption.set_mnemonic_widget(entry)
-    box.add(entry)
+    grid = Gtk.Grid(column_spacing=8, row_spacing=6)
+    box.add(grid)
+    fields = []
+    for row, label in enumerate((tr("网络密钥(_K)", "Network _key"),
+                                 tr("确认网络密钥(_F)", "Con_firm network key"))):
+        caption = Gtk.Label(label=label, use_underline=True, xalign=0)
+        field = Gtk.Entry(visibility=False, hexpand=True, activates_default=bool(row))
+        field.set_input_purpose(Gtk.InputPurpose.PASSWORD)
+        caption.set_mnemonic_widget(field)
+        grid.attach(caption, 0, row, 1, 1)
+        grid.attach(field, 1, row, 1, 1)
+        fields.append(field)
+    entry, confirmation = fields
+    entry.connect("activate", lambda *_: confirmation.grab_focus())
     reveal = Gtk.CheckButton(label=tr("显示网络密钥", "Show network key"))
-    reveal.connect("toggled", lambda toggle: entry.set_visibility(toggle.get_active()))
+    for field in fields:
+        reveal.bind_property("active", field, "visibility", 0)
     box.add(reveal)
     hint = Gtk.Label(xalign=0, wrap=True)
     box.add(hint)
@@ -103,12 +112,16 @@ def ask_network_key(parent, network, sae):
     def validate(*_):
         text = entry.get_text()
         valid = bool(text) if sae else NM.utils_wpa_psk_valid(text)
-        dialog.set_response_sensitive(Gtk.ResponseType.OK, valid)
+        matches = text == confirmation.get_text()
+        dialog.set_response_sensitive(Gtk.ResponseType.OK, valid and matches)
         hint.set_text(tr("请输入 8 至 63 字节的密码，或 64 位十六进制密钥。",
                          "Enter an 8–63 byte passphrase or a 64-digit hexadecimal key.")
-                      if text and not valid else "")
+                      if text and not valid else
+                      tr("两次输入的网络密钥不一致。", "The network keys do not match.")
+                      if confirmation.get_text() and not matches else "")
 
-    entry.connect("changed", validate)
+    for field in fields:
+        field.connect("changed", validate)
     validate()
     dialog.show_all()
     entry.grab_focus()
