@@ -36,18 +36,18 @@ About AgentLinux now shows the college emblem, operating system version, kernel 
 
 Open the classic XP System Settings grid from the Start menu or with `control settings`.
 
-XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。v2026.11.26.6 已在 x86-64 UEFI 虚拟机中安装到空白硬盘，并在移除 ISO 后启动到中文登录页。
+XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。候选版 `d20c370` 已在 x86-64 UEFI 虚拟机中安装到空白硬盘，并在移除 ISO 后启动到中文登录页。
 
 快捷方式向导支持含空格的路径和同名文件。右键点击已连接的 Wi-Fi 可查看连接状态和 TCP/IPv4 属性。
 
 The shortcut wizard handles paths with spaces and existing filenames. Right-click a connected Wi-Fi network to view its status and TCP/IPv4 properties.
 
-**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.26.6/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.26.6/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
+**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.1/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
 
-ISO SHA-256 (v2026.11.26.6)
+ISO SHA-256 (v2026.11.27.1)
 
-`26e71cb3c15ea48a0fdb1f8a3ca6b66836ffb09cda9f8fb8b0ffe20d74563648`
+`0381e6fe6806ea83d254c251d40285db88e4b2c5480204f56161b1e943d3226d`
 
 | 启动方式 / Boot mode | 用户名 / Username | 密码 / Password |
 | --- | --- | --- |
@@ -55,7 +55,7 @@ ISO SHA-256 (v2026.11.26.6)
 | 预装 SanDisk U 盘 / Preinstalled SanDisk USB | `agent` | `agentfudan` |
 | 自行安装到硬盘 / Installation on your own disk | 安装时创建 / Set during installation | 安装时设置 / Set during installation |
 
-[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.26.6)
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)
 
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可双击桌面的“安装到硬盘”启动安装器。
 
@@ -106,14 +106,14 @@ unsquashfs -ll xp-standard.squashfs
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.26.6)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [完整镜像 / Full image](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)
 
-运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。需要至少 8 GB 可用空间。Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
+从上方链接下载完整 ISO 和校验文件。请为 ISO 预留至少 9 GB 可用空间。Allow at least 9 GB of free space for the ISO. Download the ISO and checksum from the links above. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
 在干净的克隆中按以下步骤还原构建层。Restore the full layer before rebuilding from a clean clone (Linux, xorriso and squashfs-tools):
 
 ```sh
-python3 download-iso.py
+sha256sum -c AgentLinux-24.04.5-desktop-amd64.iso.sha256
 mkdir -p build
 xorriso -osirrox on -indev AgentLinux-24.04.5-desktop-amd64.iso -extract /casper/minimal.agent.squashfs build/agent.squashfs
 unsquashfs -d build/restored-overlay build/agent.squashfs
