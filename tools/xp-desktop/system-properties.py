@@ -510,7 +510,7 @@ def show_devices(_button):
     viewer.destroy()
 
 
-devices = Gtk.Button(label=tr("设备管理器", "Device Manager"))
+devices = Gtk.Button.new_with_mnemonic(tr("设备管理器(_D)", "_Device Manager"))
 devices.connect("clicked", show_devices)
 hardware.pack_start(devices, False, False, 0)
 action(hardware, tr("附加驱动程序", "Additional Drivers"), "software-properties-drivers.desktop")
