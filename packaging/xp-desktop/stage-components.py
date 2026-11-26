@@ -74,6 +74,7 @@ files.extend([
     (Path(__file__).with_name("xsessionrc"), Path("etc/skel/.xsessionrc"), 0o644),
     (Path(__file__).with_name("xfwm4.xml"), Path("etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml"), 0o644),
     (Path(__file__).with_name("xsettings.xml"), Path("etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml"), 0o644),
+    (Path(__file__).with_name("fcitx-xp-theme.conf"), Path("usr/share/fcitx5/themes/agentlinux-xp/theme.conf"), 0o644),
     (Path(__file__).with_name("classicui.conf"), Path("etc/skel/.config/fcitx5/conf/classicui.conf"), 0o644),
     (Path(__file__).with_name("gtk-settings.ini"), Path("etc/skel/.config/gtk-3.0/settings.ini"), 0o644),
     (Path(__file__).with_name("gtk-settings.ini"), Path("etc/skel/.config/gtk-4.0/settings.ini"), 0o644),
