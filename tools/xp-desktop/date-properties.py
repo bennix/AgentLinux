@@ -5,6 +5,7 @@ import os
 import subprocess
 import sys
 from datetime import datetime
+from pathlib import Path
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError, available_timezones
 
 language = os.getenv("LANGUAGE", os.getenv("LANG", "en_US"))
@@ -228,7 +229,13 @@ try:
     from babel.dates import get_timezone_location
 except ImportError:
     get_timezone_location = None
-for name in zones:
+# Localized city names can be identical for a zone and its historical aliases.
+try:
+    zone_table = Path("/usr/share/zoneinfo/zone.tab").read_text().splitlines()
+    locations = {line.split()[2] for line in zone_table if line and not line.startswith("#")}
+except OSError:
+    locations = set()
+for name in sorted(zones, key=lambda zone: zone not in locations):
     city = ""
     if get_timezone_location and "/" in name:
         try:
