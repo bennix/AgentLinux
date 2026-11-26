@@ -165,14 +165,15 @@ def measure(button):
         status.set_text(tr('Import a subscription or load your Clash Verge profile first.'))
         return
     previous = picker.get_active_id()
-    box.set_sensitive(False)
+    nodes.set_sensitive(False)
+    results.clear()
     status.set_text(tr('Testing each node against Google and ZenMux…'))
 
     def progress(done, total):
         GLib.idle_add(status.set_text, tr('Testing nodes: {}% ({}/{})').format(done * 100 // total, done, total))
 
     def finish(rows):
-        box.set_sensitive(True)
+        nodes.set_sensitive(True)
         if not rows:
             status.set_text(tr('No test results. Check your connection.'))
             return
@@ -184,15 +185,17 @@ def measure(button):
             hits, delay = sample
             return f"{hits}/3 · {delay} ms" if hits else "0/3"
         for name, zenmux, google in rows:
+            results.append((name, result(google), result(zenmux)))
             picker.append(name, f"{name}  |  Google {result(google)}  |  ZenMux {result(zenmux)}")
         with picker.handler_block(node_handler):
             if not picker.set_active_id(previous or last_node):
                 picker.set_active(-1)
-        status.set_text(tr('Select a node to apply it to the active system tunnel.'))
+        status.set_text(tr('Benchmark complete: {} nodes.').format(len(rows)))
     def worker():
         try:
             rows = backend.benchmark(data, progress)
-        except (OSError, ValueError, subprocess.SubprocessError):
+        except Exception:
+            # The GUI must recover even if the proxy engine cannot start.
             rows = []
         GLib.idle_add(finish, rows)
     threading.Thread(target=worker, daemon=True).start()
@@ -201,6 +204,14 @@ def measure(button):
 speed = Gtk.Button(label=tr('Benchmark nodes (Google / ZenMux)'))
 speed.connect("clicked", measure)
 nodes.add(speed)
+results = Gtk.ListStore(str, str, str)
+result_table = Gtk.TreeView(model=results)
+for index, title in enumerate((tr('Nodes'), "Google", "ZenMux")):
+    result_table.append_column(Gtk.TreeViewColumn(title, Gtk.CellRendererText(), text=index))
+result_scroll = Gtk.ScrolledWindow()
+result_scroll.set_min_content_height(100)
+result_scroll.add(result_table)
+nodes.pack_start(result_scroll, True, True, 0)
 
 
 def test_google(button):

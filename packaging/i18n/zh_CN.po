@@ -567,3 +567,6 @@ msgstr "节点"
 
 msgid "Diagnostics"
 msgstr "诊断"
+
+msgid "Benchmark complete: {} nodes."
+msgstr "测速完成，共 {} 个节点。"
