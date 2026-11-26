@@ -135,8 +135,14 @@ def show_status(*_):
         connected = state == NM.DeviceState.ACTIVATED
         if connected:
             status = tr("已连接", "Connected")
+        elif state == NM.DeviceState.NEED_AUTH:
+            status = tr("需要验证", "Authentication required")
         elif NM.DeviceState.PREPARE <= state <= NM.DeviceState.SECONDARIES:
             status = tr("正在连接", "Connecting")
+        elif state == NM.DeviceState.DEACTIVATING:
+            status = tr("正在断开连接", "Disconnecting")
+        elif state == NM.DeviceState.FAILED:
+            status = tr("连接失败", "Connection failed")
         else:
             status = tr("未连接", "Disconnected")
         general = [(tr("状态", "Status"), status), (tr("设备", "Device"), device.get_iface())]
