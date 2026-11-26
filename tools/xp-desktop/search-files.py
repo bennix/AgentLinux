@@ -184,6 +184,9 @@ def search(_widget):
     if not case_sensitive:
         term = term.casefold()
     pattern = term if any(c in term for c in "*?[") else "*" + term + "*"
+    # Explorer treats *.* as all names, including names without an extension.
+    if pattern == "*.*":
+        pattern = "*"
     cancel = threading.Event()
     active = cancel
     batches = Queue(maxsize=4)
