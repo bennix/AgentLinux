@@ -143,9 +143,15 @@ Icon=notepad
 Categories=Utility;TextEditor;GTK;
 MimeType=text/plain;
 ENTRY
+# WinTC watches this directory. Leave correct links in place on repeated setup.
+menu_link() {
+    if [ "$(readlink "$2")" != "$1" ]; then
+        ln -sfn "$1" "$2"
+    fi
+}
 accessories="${XDG_CONFIG_HOME:-$HOME/.config}/wintc/start-menu/Accessories"
 mkdir -p "$accessories"
-ln -sfn "$apps/agentlinux-xp-printers.desktop" "$(dirname "$accessories")/agentlinux-xp-printers.desktop"
+menu_link "$apps/agentlinux-xp-printers.desktop" "$(dirname "$accessories")/agentlinux-xp-printers.desktop"
 for entry in zcode.desktop zenmux-agent.desktop; do
     launcher="/usr/share/applications/$entry"
     destination="$(dirname "$accessories")/$entry"
@@ -153,7 +159,7 @@ for entry in zcode.desktop zenmux-agent.desktop; do
         ln -s "$launcher" "$destination"
     fi
 done
-ln -sfn "$apps/notepad.desktop" "$accessories/notepad.desktop"
+menu_link "$apps/notepad.desktop" "$accessories/notepad.desktop"
 cat > "$apps/explorer.desktop" <<ENTRY
 [Desktop Entry]
 Type=Application
@@ -164,11 +170,11 @@ Icon=explorer
 Categories=System;FileManager;
 MimeType=inode/directory;
 ENTRY
-ln -sfn "$apps/explorer.desktop" "$accessories/explorer.desktop"
+menu_link "$apps/explorer.desktop" "$accessories/explorer.desktop"
 for utility in mate-calc gucharmap; do
     entry="/usr/share/applications/$utility.desktop"
     if [ -f "$entry" ]; then
-        ln -sfn "$entry" "$accessories/$utility.desktop"
+        menu_link "$entry" "$accessories/$utility.desktop"
     fi
 done
 cat > "$apps/agentlinux-xp-computer.desktop" <<ENTRY
