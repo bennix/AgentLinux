@@ -29,7 +29,12 @@ if [ "${1:-}" = --login ]; then
     done
 fi
 if ! xfwm_ready; then
-    xfwm4 --replace --compositor=on 9>&- &
+    compositor=on
+    # Virtual framebuffers can omit composited windows from the displayed image.
+    if systemd-detect-virt --vm --quiet; then
+        compositor=off
+    fi
+    xfwm4 --replace --compositor="$compositor" 9>&- &
     wm_pid=$!
     # Wait for Xfwm to take ownership before WinTC measures the desktop.
     for attempt in $(seq 1 60); do
