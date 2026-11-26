@@ -258,7 +258,8 @@ class Wireless(Gtk.Application):
         existing = {row[6]: row.iter for row in self.store}
         for key in existing.keys() - rows.keys():
             self.store.remove(existing[key])
-        ordered = sorted(rows, key=lambda k: rows[k][:2], reverse=True)
+        # NetworkManager may enumerate equally strong networks in a different order after a scan.
+        ordered = sorted(rows, key=lambda key: (not rows[key][0], -rows[key][1], key[1], key))
         for key in ordered:
             current, strength, ap, dev = rows[key]
             name = ssid(ap) + (tr("（已连接）", " (Connected)") if current else "")
