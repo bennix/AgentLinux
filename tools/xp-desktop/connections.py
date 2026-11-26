@@ -122,13 +122,28 @@ def show_status(*_):
     dialog.set_default_size(460, 340)
     dialog.get_content_area().pack_start(notebook, True, True, 0)
     pages = []
+    copy = Gtk.Button(label=tr("复制网络详情", "Copy network details"))
+    copy.set_halign(Gtk.Align.END)
     for title in (tr("常规", "General"), tr("支持", "Support")):
         grid = Gtk.Grid(row_spacing=8, column_spacing=16, border_width=14)
         scroll = Gtk.ScrolledWindow()
         scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scroll.add(grid)
-        notebook.append_page(scroll, Gtk.Label(label=title))
+        page = scroll
+        if pages:
+            page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            page.pack_start(scroll, True, True, 0)
+            page.pack_end(copy, False, False, 4)
+        notebook.append_page(page, Gtk.Label(label=title))
         pages.append((grid, {}))
+
+    def copy_details(_button):
+        text = "\n".join(f"{label}: {field.get_text()}" for label, field in pages[1][1].items())
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        clipboard.set_text(text, -1)
+        clipboard.store()
+
+    copy.connect("clicked", copy_details)
 
     def update():
         present = device in client.get_devices()
@@ -167,6 +182,7 @@ def show_status(*_):
                     continue
                 general.append((label, f"{total:,}"))
         support = address_fields(device, tr) if connected else []
+        copy.set_sensitive(bool(support))
         if not support:
             support = [(tr("网络地址", "Network address"), tr("暂无地址", "No address available"))]
         for (grid, widgets), fields in zip(pages, (general, support)):
