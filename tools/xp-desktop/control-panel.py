@@ -226,11 +226,15 @@ provider.load_from_data(b"""
 #xp-nav { background-image: linear-gradient(to bottom, #7698e7, #647ed4); }
 #xp-task-title { background-color: #e5ecfb; color: #174481; font-weight: bold; padding: 7px; }
 #xp-nav button { color: #183e82; }
-#xp-category, #xp-category:hover, #xp-category:active {
+#xp-category, #xp-category:hover, #xp-category:active,
+#xp-control:not(.classic-view) #xp-icon {
     background: transparent; border-color: transparent; box-shadow: none;
 }
-#xp-category label { color: #174481; }
-#xp-category:hover label { text-decoration: underline; }
+#xp-category label, #xp-control:not(.classic-view) #xp-icon label { color: #174481; }
+#xp-category:hover label, #xp-control:not(.classic-view) #xp-icon:hover label { text-decoration: underline; }
+#xp-category:focus label, #xp-control:not(.classic-view) #xp-icon:focus label {
+    outline: 1px dotted #174481; outline-offset: 1px;
+}
 """)
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 entries = [
