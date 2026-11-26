@@ -36,7 +36,9 @@ About AgentLinux now shows the college emblem, operating system version, kernel 
 
 Open the classic XP System Settings grid from the Start menu or with `control settings`.
 
-XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。候选版 `d20c370` 已在 x86-64 UEFI 虚拟机中安装到空白硬盘，并在移除 ISO 后启动到中文登录页。
+XP 风格桌面提供中英文控制面板、无线网络连接和添加打印机向导。在 x86-64 UEFI 虚拟机中，正式版 `v2026.11.27.1` 已全新安装到 48 GiB 虚拟硬盘。移除 ISO 后，测试账户成功从硬盘登录中文 XP 风格桌面。
+
+Release `v2026.11.27.1` was installed on a blank 48 GiB virtual disk in an x86-64 UEFI VM. After the ISO was removed, the test account signed in to the Chinese XP-style desktop from that disk.
 
 快捷方式向导支持含空格的路径和同名文件。右键点击已连接的 Wi-Fi 可查看连接状态和 TCP/IPv4 属性。
 
