@@ -1,0 +1,36 @@
+#!/usr/bin/python3
+import hashlib
+import select
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+sys.path.insert(0, "/usr/local/lib/zenmux")
+import backend
+
+
+def send(message):
+    print(json.dumps(message), flush=True)
+
+
+selection = json.loads((Path(os.environ["CREDENTIALS_DIRECTORY"]) / "selection").read_text())
+data = selection["data"]
+# A client can request measurements of the administrator-configured provider only.
+digest = hashlib.sha256(data.encode()).hexdigest()
+if not select.select([sys.stdin], [], [], 5)[0]:
+    sys.exit(0)
+if sys.stdin.readline(66).strip() != digest:
+    send({"different_profile": True})
+    sys.exit(0)
+routes = json.loads(subprocess.check_output(["ip", "-j", "-4", "route", "show", "default"]))
+dev = min(routes, key=lambda route: route.get("metric", 0))["dev"]
+engine = json.loads((Path(os.environ["CREDENTIALS_DIRECTORY"]) / "engine").read_text())
+dns = engine["dns"]["proxy-server-nameserver"]
+options = {"routing-mark": 53741, "interface-name": dev, "hosts": selection.get("bootstrap_hosts", {})}
+if dns:
+    options["dns"] = {"enable": True, "nameserver": dns, "proxy-server-nameserver": dns}
+rows = backend.benchmark(data, lambda done, total: send({"progress": [done, total]}),
+                         detailed=True, probe_options=options)
+send({"rows": rows})

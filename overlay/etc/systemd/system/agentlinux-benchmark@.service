@@ -1,0 +1,19 @@
+[Unit]
+Description=Measure the configured AgentLinux network nodes
+
+[Service]
+Type=exec
+ExecStart=/usr/local/lib/agentlinux-network/benchmark-active
+StandardInput=socket
+StandardOutput=socket
+StandardError=journal
+LoadCredential=engine:/run/agentlinux-tunnel/config.yaml
+LoadCredential=selection:/etc/agentlinux-network/selection.json
+DynamicUser=yes
+AmbientCapabilities=CAP_NET_RAW
+CapabilityBoundingSet=CAP_NET_RAW
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+NoNewPrivileges=yes
+UMask=0077

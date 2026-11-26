@@ -68,7 +68,7 @@ def port():
 
 
 @contextlib.contextmanager
-def proxy(data, selection=None, desktop=False):
+def proxy(data, selection=None, desktop=False, probe_options=None):
     with tempfile.TemporaryDirectory(prefix="zenmux-") as tmp:
         root = Path(tmp)
         (root / "nodes").write_text(data)
@@ -83,6 +83,8 @@ def proxy(data, selection=None, desktop=False):
                   "proxy-providers": {"nodes": {"type": "file", "path": "./nodes"}},
                   "proxy-groups": [{"name": "ZenMux Route", "type": "select", "use": ["nodes"]}],
                   "rules": ["MATCH,ZenMux Route"]}
+        if probe_options:
+            config.update(probe_options)
         if selection:
             from smart_routing import configure
             configure(config, root, "ZenMux Route")
@@ -128,15 +130,16 @@ def nodes(source):
         return data, names
 
 
-def benchmark(data, progress):
+def benchmark(data, progress, detailed=False, probe_options=None):
     """Probe each individual proxy via the local Mihomo controller."""
-    with proxy(data) as (names, _, token, control):
+    with proxy(data, probe_options=probe_options) as (names, _, token, control):
         def probe(name, target):
             endpoint = urllib.parse.quote(name, safe="")
             query = urllib.parse.urlencode({"timeout": 4500, "url": target})
             req = urllib.request.Request(f"http://127.0.0.1:{control}/providers/proxies/nodes/{endpoint}/healthcheck?{query}",
                                          headers={"Authorization": "Bearer " + token})
             client = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+            started = time.monotonic()
             delays = []
             for _ in range(3):
                 try:
@@ -146,7 +149,8 @@ def benchmark(data, progress):
                         delays.append(delay)
                 except (OSError, ValueError, KeyError):
                     continue
-            return len(delays), int(statistics.median(delays)) if delays else None
+            sample = (len(delays), int(statistics.median(delays)) if delays else None)
+            return (*sample, round((time.monotonic() - started) * 1000)) if detailed else sample
 
         targets = ("https://zenmux.ai/", "https://www.google.com/generate_204")
         results = {name: {} for name in names}

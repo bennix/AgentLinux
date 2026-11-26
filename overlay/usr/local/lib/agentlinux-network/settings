@@ -4,6 +4,7 @@ from functools import partial
 tr = partial(dgettext, 'agentlinux')
 import json
 import os
+import socket
 import tempfile
 import threading
 import time
@@ -158,12 +159,36 @@ for title, local in [(tr('Import subscription URL'), False), (tr('Load current C
     nodes.add(btn)
 
 
+def benchmark_nodes(data, progress):
+    with socket.socket(socket.AF_UNIX) as client:
+        try:
+            client.connect("/run/agentlinux-benchmark.sock")
+        except (FileNotFoundError, ConnectionRefusedError, PermissionError):
+            pass
+        else:
+            client.settimeout(75)
+            client.sendall((sha256(data.encode()).hexdigest() + "\n").encode())
+            with client.makefile("r") as stream:
+                for line in stream:
+                    event = json.loads(line)
+                    if event.get("different_profile"):
+                        break
+                    if "progress" in event:
+                        progress(*event["progress"])
+                    elif "rows" in event:
+                        return event["rows"]
+                else:
+                    raise RuntimeError("Benchmark service disconnected")
+    return backend.benchmark(data, progress, detailed=True)
+
+
 def measure(button):
     try:
         data = imported.get("data") or json.loads((saved if saved.is_file() else config).read_text())["data"]
     except (OSError, KeyError, ValueError):
         status.set_text(tr('Import a subscription or load your Clash Verge profile first.'))
         return
+    started = time.monotonic()
     previous = picker.get_active_id()
     nodes.set_sensitive(False)
     results.clear()
@@ -177,23 +202,25 @@ def measure(button):
         if not rows:
             status.set_text(tr('No test results. Check your connection.'))
             return
-        # Prefer reliable Google access, then lower median Google latency.
-        rows.sort(key=lambda row: (-row[2][0], row[2][1] or float("inf"), -row[1][0], row[1][1] or float("inf")))
+        # Rank by Google latency, then ZenMux latency; unavailable targets sort last.
+        rows.sort(key=lambda row: (row[2][1] or float("inf"), row[1][1] or float("inf"), row[0]))
         imported["data"] = data
         picker.remove_all()
         def result(sample):
-            hits, delay = sample
-            return f"{hits}/3 · {delay} ms" if hits else "0/3"
+            hits, delay, elapsed = sample
+            if hits:
+                return tr("{} ms · {}/3 · {:.1f} s").format(delay, hits, elapsed / 1000)
+            return tr("Failed · {:.1f} s · 0/3").format(elapsed / 1000)
         for name, zenmux, google in rows:
             results.append((name, result(google), result(zenmux)))
             picker.append(name, f"{name}  |  Google {result(google)}  |  ZenMux {result(zenmux)}")
         with picker.handler_block(node_handler):
             if not picker.set_active_id(previous or last_node):
                 picker.set_active(-1)
-        status.set_text(tr('Benchmark complete: {} nodes.').format(len(rows)))
+        status.set_text(tr('Benchmark complete: {} nodes in {:.1f} s.').format(len(rows), time.monotonic() - started))
     def worker():
         try:
-            rows = backend.benchmark(data, progress)
+            rows = benchmark_nodes(data, progress)
         except Exception:
             # The GUI must recover even if the proxy engine cannot start.
             rows = []

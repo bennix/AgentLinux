@@ -1,0 +1,11 @@
+[Unit]
+Description=AgentLinux active network node benchmark
+PartOf=agentlinux-tunnel.service
+
+[Socket]
+ListenStream=/run/agentlinux-benchmark.sock
+SocketMode=0660
+SocketGroup=sudo
+Accept=yes
+MaxConnections=2
+RemoveOnStop=yes

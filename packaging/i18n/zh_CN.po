@@ -570,3 +570,12 @@ msgstr "诊断"
 
 msgid "Benchmark complete: {} nodes."
 msgstr "测速完成，共 {} 个节点。"
+
+msgid "Benchmark complete: {} nodes in {:.1f} s."
+msgstr "测速完成，共 {} 个节点，用时 {:.1f} 秒。"
+
+msgid "Failed · {:.1f} s · 0/3"
+msgstr "失败 · {:.1f} 秒 · 0/3"
+
+msgid "{} ms · {}/3 · {:.1f} s"
+msgstr "{} ms · {}/3 · 用时 {:.1f} 秒"
