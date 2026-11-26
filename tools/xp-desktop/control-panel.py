@@ -207,6 +207,8 @@ back = Gtk.Button(label=tr("返回分类首页", "Back to categories"))
 switch = Gtk.Button()
 nav.pack_start(switch, False, False, 0)
 nav.pack_start(back, False, False, 0)
+forward = Gtk.Button(label=tr("前进", "Forward"))
+nav.pack_start(forward, False, False, 0)
 content.pack_start(scroll, True, True, 0)
 display = window.get_display()
 monitor = display.get_primary_monitor() or display.get_monitor(0)
@@ -359,6 +361,9 @@ def show(category=None):
     heading.set_markup("<big><b>" + title + "</b></big>")
     switch.set_label(tr("切换到分类视图", "Switch to Category View") if classic else tr("切换到经典视图", "Switch to Classic View"))
     back.set_visible(category is not None)
+    forward.set_visible(forward_category is not None)
+    if forward_category:
+        forward.set_tooltip_text(tr(*forward_category[:2]))
     if not classic and category is None:
         for item in categories:
             button = tile(tr(*item[:2]), by_name[item[2][0]][2], item[3])
@@ -456,6 +461,7 @@ def navigation_key(_window, event):
 
 window.connect("key-press-event", navigation_key)
 back.connect("clicked", lambda _: show())
+forward.connect("clicked", lambda _: show(forward_category))
 switch.connect("clicked", change_view)
 window.connect("destroy", Gtk.main_quit)
 if sys.argv[1:] in (["--admin-tools"], ["--settings"]):
