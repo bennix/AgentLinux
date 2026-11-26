@@ -1,6 +1,13 @@
 . "$HOME/.local/share/agentlinux-xp/session-env.sh"
 case "${XDG_SESSION_DESKTOP:-${DESKTOP_SESSION:-}}" in
     ukui|UKUI)
+        # UKUI publishes the MATE interface preferences to GTK clients over XSettings.
+        if [ -z "$(dconf read /org/mate/desktop/interface/gtk-theme)" ]; then
+            gsettings set org.mate.interface gtk-theme 'Windows XP style (Blue)'
+        fi
+        if [ -z "$(dconf read /org/mate/desktop/interface/icon-theme)" ]; then
+            gsettings set org.mate.interface icon-theme luna
+        fi
         /usr/local/libexec/agentlinux-xp-screensaver-defaults
         if [ -z "$(dconf read /org/gnome/desktop/interface/toolkit-accessibility)" ]; then
             gsettings set org.gnome.desktop.interface toolkit-accessibility true
