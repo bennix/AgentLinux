@@ -16,12 +16,21 @@ from pathlib import Path
 import subprocess
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk, GLib, Gio, Gdk
+from hashlib import sha256
 
 uid = "0e7b6bb9-91e3-46f6-bfc5-00f7c33a7978"
 config = Path.home() / ".config/zenmux-agent/settings.json"
 saved = Path.home() / ".config/agentlinux-network/selection.json"
+display_id = sha256(Gdk.Display.get_default().get_name().encode()).hexdigest()[:16]
+app = Gtk.Application(application_id="org.agentlinux.NetworkSettings.d" + display_id,
+                      flags=Gio.ApplicationFlags.FLAGS_NONE)
+app.register(None)
+if app.get_is_remote():
+    sys.exit(app.run([]))
 window = Gtk.Window(title=tr('System Network · Subscription Proxy'))
+app.add_window(window)
+app.connect("activate", lambda *_: window.present())
 box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
 box.set_border_width(20)
 window.add(box)
@@ -282,6 +291,5 @@ box.add(b)
 b = Gtk.Button(label=tr('Open NetworkManager connections'))
 b.connect("clicked", lambda _: subprocess.Popen(["nm-connection-editor"]))
 box.add(b)
-window.connect("destroy", Gtk.main_quit)
 window.show_all()
-Gtk.main()
+sys.exit(app.run([]))
