@@ -166,18 +166,28 @@ def language(_button):
     update_hint()
     box.add(hint)
     dialog.show_all()
-    if dialog.run() == Gtk.ResponseType.OK:
+    while dialog.run() == Gtk.ResponseType.OK:
         locale = choice.get_active_id()
         if locale in ("zh_CN.UTF-8", "en_US.UTF-8"):
-            config.mkdir(parents=True, exist_ok=True)
-            dmrc = configparser.RawConfigParser()
-            dmrc.optionxform = str
-            dmrc.read(home / ".dmrc")
-            if not dmrc.has_section("Desktop"):
-                dmrc.add_section("Desktop")
-            dmrc.set("Desktop", "Language", locale)
-            write_setting(home / ".dmrc", dmrc.write)
-            write_setting(selected, lambda file: file.write(locale + "\n"))
+            try:
+                config.mkdir(parents=True, exist_ok=True)
+                dmrc = configparser.RawConfigParser()
+                dmrc.optionxform = str
+                dmrc.read(home / ".dmrc")
+                if not dmrc.has_section("Desktop"):
+                    dmrc.add_section("Desktop")
+                dmrc.set("Desktop", "Language", locale)
+                write_setting(home / ".dmrc", dmrc.write)
+                write_setting(selected, lambda file: file.write(locale + "\n"))
+            except (configparser.Error, UnicodeError, OSError) as error:
+                notice = Gtk.MessageDialog(transient_for=dialog, modal=True, message_type=Gtk.MessageType.ERROR,
+                                           buttons=Gtk.ButtonsType.CLOSE,
+                                           text=tr("无法保存桌面语言。", "Could not save the desktop language."))
+                notice.format_secondary_text(str(error))
+                notice.run()
+                notice.destroy()
+                continue
+        break
     dialog.destroy()
 
 
