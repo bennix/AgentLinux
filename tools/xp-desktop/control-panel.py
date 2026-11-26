@@ -306,6 +306,15 @@ luna_icons = {
 }
 
 
+last_tile = None
+
+
+def remember_tile(button, _event, name):
+    global last_tile
+    last_tile = name
+    return False
+
+
 def tile(label, icon, resource=None):
     button = Gtk.Button()
     button.get_accessible().set_name(label)
@@ -349,7 +358,7 @@ current_category = None
 forward_category = None
 
 
-def show(category=None):
+def show(category=None, focus_name=None):
     global current_category, forward_category
     style = window.get_style_context()
     if classic:
@@ -378,8 +387,9 @@ def show(category=None):
         for item in categories:
             button = tile(tr(*item[:2]), by_name[item[2][0]][2], item[3])
             button.set_name("xp-category")
+            button.connect("focus-in-event", remember_tile, item[1])
             button.connect("clicked", lambda _, item=item: show(item))
-            if item == previous:
+            if item == previous or item[1] == focus_name:
                 focus = button
     else:
         if classic:
@@ -389,6 +399,7 @@ def show(category=None):
         for zh, en, icon, desktop in items:
             button = tile(tr(zh, en), icon)
             button.set_name("xp-icon")
+            button.connect("focus-in-event", remember_tile, en)
             if desktop:
                 try:
                     app = Gio.DesktopAppInfo.new(desktop)
@@ -401,6 +412,8 @@ def show(category=None):
                 dialog = folder_options if en == "Folder Options" else language
                 # Let assistive clients finish the activation before entering a modal loop.
                 button.connect("clicked", lambda widget, open_dialog=dialog: GLib.idle_add(open_dialog, widget))
+            if en == focus_name and button.get_sensitive():
+                focus = button
     grid.show_all()
     adjustment = scroll.get_vadjustment()
     if focus is not None:
@@ -428,10 +441,16 @@ def show(category=None):
 
 def change_view(_button):
     global classic
+    if classic:
+        focus_name = next((en for _, en, members, _ in categories if last_tile in members), None)
+    elif current_category:
+        focus_name = last_tile
+    else:
+        focus_name = next((members[0] for _, en, members, _ in categories if en == last_tile), None)
     classic = not classic
     preference.parent.mkdir(parents=True, exist_ok=True)
     write_setting(preference, lambda f: f.write("classic" if classic else "category"))
-    show()
+    show(focus_name=focus_name)
 
 
 def navigation_key(_window, event):
