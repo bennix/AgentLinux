@@ -282,14 +282,17 @@ def launch_path(target):
         dialog.destroy()
 
 
-def show_properties(target):
+def file_manager_action(target, method):
     try:
         bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
         bus.call_sync("org.freedesktop.FileManager1", "/org/freedesktop/FileManager1",
-                      "org.freedesktop.FileManager1", "ShowItemProperties",
+                      "org.freedesktop.FileManager1", method,
                       GLib.Variant("(ass)", ([target.as_uri()], "")), None,
                       Gio.DBusCallFlags.NONE, 5000, None)
     except GLib.Error as exc:
+        if method == "ShowItems":
+            launch_path(target.parent)
+            return
         dialog = Gtk.MessageDialog(transient_for=window, modal=True, message_type=Gtk.MessageType.ERROR,
                                    buttons=Gtk.ButtonsType.CLOSE, text=exc.message)
         dialog.run()
@@ -304,7 +307,7 @@ def result_key(tree, event):
     if row is None:
         return False
     name, directory, *_ = selected_model[row]
-    show_properties(Path(directory, name))
+    file_manager_action(Path(directory, name), "ShowItemProperties")
     return True
 
 
@@ -315,14 +318,16 @@ def result_menu(event=None):
     name, directory, *_ = selected_model[row]
     menu = Gtk.Menu()
     menu.attach_to_widget(results, None)
-    for label, target in [(tr("打开", "Open"), Path(directory, name)),
-                          (tr("打开所在文件夹", "Open Containing Folder"), Path(directory))]:
-        item = Gtk.MenuItem(label=label)
-        item.connect("activate", lambda _, path=target: launch_path(path))
-        menu.append(item)
+    target = Path(directory, name)
+    open_item = Gtk.MenuItem(label=tr("打开", "Open"))
+    open_item.connect("activate", lambda _: launch_path(target))
+    menu.append(open_item)
+    reveal = Gtk.MenuItem(label=tr("打开所在文件夹", "Open Containing Folder"))
+    reveal.connect("activate", lambda _: file_manager_action(target, "ShowItems"))
+    menu.append(reveal)
     menu.append(Gtk.SeparatorMenuItem())
     properties = Gtk.MenuItem(label=tr("属性", "Properties"))
-    properties.connect("activate", lambda _: show_properties(Path(directory, name)))
+    properties.connect("activate", lambda _: file_manager_action(Path(directory, name), "ShowItemProperties"))
     menu.append(properties)
     menu.connect("selection-done", lambda widget: widget.destroy())
     menu.show_all()
