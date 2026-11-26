@@ -394,6 +394,9 @@ def show_devices(_button):
         details = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, border_width=12)
         pages.append_page(details, Gtk.Label(label=tr("详细信息", "Details")))
         selector = Gtk.ComboBoxText()
+        caption = Gtk.Label(label=tr("属性(_P)", "_Property"), use_underline=True, xalign=0)
+        caption.set_mnemonic_widget(selector)
+        details.add(caption)
         details.add(selector)
         values = {}
         if is_input:
@@ -424,7 +427,7 @@ def show_devices(_button):
             selector.append_text(label)
         selector.connect("changed", lambda widget: value_label.set_text(values[widget.get_active_text()]))
         selector.set_active(0)
-        copy = Gtk.Button(label=tr("复制", "Copy"))
+        copy = Gtk.Button.new_with_mnemonic(tr("复制(_Y)", "Cop_y"))
         copy.set_halign(Gtk.Align.END)
         copy.connect("clicked", lambda _: Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).set_text(value_label.get_text(), -1))
         details.add(copy)
