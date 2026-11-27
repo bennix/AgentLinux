@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import fcntl
 import json
 import os
 from pathlib import Path
@@ -10,9 +11,11 @@ import yaml
 
 if os.geteuid() != 0:
     sys.exit("Requires administrator privileges")
+uuid = "0e7b6bb9-91e3-46f6-bfc5-00f7c33a7978"
+service = "agentlinux-tunnel.service"
+dispatcher = "/etc/NetworkManager/dispatcher.d/84-agentlinux-proxy"
 if sys.argv[1:] == ["--direct"]:
-    os.environ["CONNECTION_UUID"] = "0e7b6bb9-91e3-46f6-bfc5-00f7c33a7978"
-    dispatcher = "/etc/NetworkManager/dispatcher.d/84-agentlinux-proxy"
+    os.environ["CONNECTION_UUID"] = uuid
     os.execv(dispatcher, [dispatcher, "", "ensure-direct"])
 
 raw = sys.stdin.buffer.read(10 * 1024 * 1024 + 1)
@@ -21,8 +24,11 @@ if len(raw) > 10 * 1024 * 1024:
 selection = json.loads(raw)
 path = Path("/etc/agentlinux-network/selection.json")
 switch = sys.argv[1:] == ["--switch"]
+apply = sys.argv[1:] == ["--apply"]
+lock = open("/run/agentlinux-network-configure.lock", "a")
+fcntl.flock(lock, fcntl.LOCK_EX)
 if switch:
-    subprocess.run(["systemctl", "is-active", "--quiet", "agentlinux-tunnel.service"], check=True)
+    subprocess.run(["systemctl", "is-active", "--quiet", service], check=True)
     previous = path.read_bytes()
     selection["mode"] = json.loads(previous).get("mode", "smart")
 selection.setdefault("mode", "smart")
@@ -49,12 +55,36 @@ def store(content):
         os.fsync(f.fileno())
     os.replace(f.name, path)
 
+def active_connection():
+    return uuid in subprocess.check_output(
+        ["nmcli", "-g", "UUID", "connection", "show", "--active"], text=True
+    ).splitlines()
+
+
+if apply:
+    was_active = active_connection()
+    previous = path.read_bytes() if was_active or path.exists() else None
+
 store(json.dumps(selection).encode())
-if switch:
+if apply or switch:
     try:
-        subprocess.run(["systemctl", "restart", "agentlinux-tunnel.service"], check=True)
+        if switch or was_active:
+            subprocess.run(["systemctl", "restart", service], check=True)
+        else:
+            subprocess.run(["nmcli", "--wait", "20", "connection", "up", "uuid", uuid], check=True)
+            subprocess.run(["systemctl", "is-active", "--quiet", service], check=True)
     except subprocess.CalledProcessError:
-        store(previous)
-        subprocess.run(["systemctl", "restart", "agentlinux-tunnel.service"], check=True)
+        if previous is None:
+            path.unlink()
+        else:
+            store(previous)
+        if switch or was_active:
+            subprocess.run(["systemctl", "restart", service], check=True)
+        else:
+            if active_connection():
+                subprocess.run(["nmcli", "--wait", "15", "connection", "down", "uuid", uuid], check=True)
+            subprocess.run([dispatcher, "", "ensure-direct"],
+                           env={**os.environ, "CONNECTION_UUID": uuid}, check=True)
         raise
+if switch:
     print(selection["mode"])

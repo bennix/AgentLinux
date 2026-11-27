@@ -268,16 +268,20 @@ def test_google(button):
 def change(button, mode):
     try:
         if mode != "direct":
-            cfg = {"data": imported["data"], "node": picker.get_active_id()} if imported else json.loads((saved if saved.is_file() else config).read_text())
-            selection = {"data": cfg["data"], "node": cfg["node"], "mode": mode}
-            if not all(selection.values()):
-                raise ValueError(tr('Save a node first'))
-            run("pkexec", "/usr/local/lib/agentlinux-network/configure", input=json.dumps(selection).encode())
-            active = run("nmcli", "-t", "-f", "UUID", "connection", "show", "--active").stdout.decode().splitlines()
-            if uid in active:
-                run("pkexec", "/usr/bin/systemctl", "restart", "agentlinux-tunnel.service")
+            if imported:
+                cfg = {"data": imported["data"], "node": picker.get_active_id()}
             else:
-                run("nmcli", "--wait", "20", "connection", "up", "uuid", uid)
+                try:
+                    cfg = json.loads((saved if saved.is_file() else config).read_text())
+                except FileNotFoundError:
+                    cfg = {}
+            if not (cfg.get("data") and cfg.get("node")):
+                tabs.set_current_page(tabs.page_num(nodes.get_ancestor(Gtk.ScrolledWindow)))
+                status.set_text(tr('Enter a subscription URL or load your current Clash Verge profile, then select a node.'))
+                return
+            selection = {"data": cfg["data"], "node": cfg["node"], "mode": mode}
+            run("pkexec", "/usr/local/lib/agentlinux-network/configure", "--apply",
+                input=json.dumps(selection).encode())
             run("gsettings", "set", "org.gnome.system.proxy", "mode", "none")
             remember(selection)
             status.set_text(tr('System connection enabled: ') + cfg["node"] + tr('. Disconnect to restore direct access if the node is unavailable.'))

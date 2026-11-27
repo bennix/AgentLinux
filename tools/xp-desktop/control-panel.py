@@ -2,6 +2,7 @@
 import configparser
 import os
 import sys
+import syslog
 import tempfile
 from pathlib import Path
 
@@ -19,6 +20,53 @@ chinese = GLib.get_language_names()[0].startswith("zh")
 
 def tr(zh, en):
     return zh if chinese else en
+
+
+def launch_error(label, message):
+    dialog = Gtk.MessageDialog(
+        transient_for=window, modal=True, destroy_with_parent=True,
+        message_type=Gtk.MessageType.ERROR, buttons=Gtk.ButtonsType.CLOSE,
+        text=tr("无法打开 {}", "Could not open {}").format(label),
+    )
+    dialog.format_secondary_text(message)
+    dialog.connect("response", lambda widget, _response: widget.destroy())
+    dialog.show()
+
+
+def launch_applet(_button, label, desktop):
+    retry = tr("请稍后重试。", "Try again in a moment.")
+
+    def log_failure(details):
+        syslog.syslog(syslog.LOG_WARNING, f"AgentLinux Control Panel: {desktop}: {details}")
+
+    try:
+        app = Gio.DesktopAppInfo.new(desktop)
+    except TypeError:
+        app = None
+    if app is None:
+        log_failure("missing or invalid desktop entry")
+        launch_error(label, tr("此设置目前不可用。", "This setting is currently unavailable."))
+        return
+
+    def exited(pid, status, started):
+        GLib.spawn_close_pid(pid)
+        try:
+            GLib.spawn_check_wait_status(status)
+        except GLib.Error as error:
+            log_failure(error.message)
+            if GLib.get_monotonic_time() - started < 5 * GLib.USEC_PER_SEC:
+                launch_error(label, retry)
+
+    def spawned(_app, pid, *_data):
+        GLib.child_watch_add(GLib.PRIORITY_DEFAULT, pid, exited, GLib.get_monotonic_time())
+
+    try:
+        if not app.launch_uris_as_manager([], None, GLib.SpawnFlags.DO_NOT_REAP_CHILD, pid_callback=spawned):
+            log_failure("desktop launcher rejected the request")
+            launch_error(label, retry)
+    except GLib.Error as error:
+        log_failure(error.message)
+        launch_error(label, retry)
 
 
 def write_setting(path, writer):
@@ -401,13 +449,7 @@ def show(category=None, focus_name=None):
             button.set_name("xp-icon")
             button.connect("focus-in-event", remember_tile, en)
             if desktop:
-                try:
-                    app = Gio.DesktopAppInfo.new(desktop)
-                except TypeError:
-                    app = None
-                button.set_sensitive(app is not None)
-                if app:
-                    button.connect("clicked", lambda _, target=app: target.launch([], None))
+                button.connect("clicked", launch_applet, tr(zh, en), desktop)
             else:
                 dialog = folder_options if en == "Folder Options" else language
                 # Let assistive clients finish the activation before entering a modal loop.
