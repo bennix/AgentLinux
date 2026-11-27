@@ -68,6 +68,38 @@ driverless.set_active(True)
 driverless.set_no_show_all(True)
 body.pack_start(driverless, False, False, 0)
 
+canon_help = Gtk.Button(label="佳能 LBP6030w 安装帮助" if zh else "Canon LBP6030w setup help")
+canon_help.set_halign(Gtk.Align.START)
+body.pack_start(canon_help, False, False, 0)
+
+
+def show_canon_help(_button):
+    dialog = Gtk.MessageDialog(
+        transient_for=window, modal=True, destroy_with_parent=True,
+        message_type=Gtk.MessageType.INFO, buttons=Gtk.ButtonsType.CLOSE,
+        text="安装佳能 LBP6030w" if zh else "Set up a Canon LBP6030w",
+    )
+    dialog.format_secondary_text(
+        "先从佳能官网下载 UFRII LT Linux 驱动，解压并安装与本机架构匹配的 Debian 软件包。\n\n"
+        "回到向导，选择使用网络打印机地址，输入 socket://打印机地址:9100。选择 Canon LBP6030/6040/6018L，然后打印测试页并确认纸张输出。"
+        if zh else
+        "Download the UFRII LT Linux driver from Canon. Extract it and install the Debian package for your system architecture.\n\n"
+        "Return to the wizard, select the network address option, and enter socket://PRINTER_ADDRESS:9100. "
+        "Choose Canon LBP6030/6040/6018L, then print a test page and check the physical output."
+    )
+    link = Gtk.LinkButton.new_with_label(
+        "https://asia.canon/en/support/0100595001",
+        "佳能官方驱动" if zh else "Canon driver download",
+    )
+    link.set_halign(Gtk.Align.START)
+    dialog.get_message_area().pack_start(link, False, False, 0)
+    link.show()
+    dialog.connect("response", lambda widget, _response: widget.destroy())
+    dialog.show()
+
+
+canon_help.connect("clicked", show_canon_help)
+
 
 def printer_uri(text):
     uri = text.strip()

@@ -41,6 +41,15 @@ class MyIME final : public InputMethodEngine {
     bool suggesting = false, navigated = false, expanded = false, shiftDown = false, englishMode = false;
     int normalSize = 5;
 
+    void clearComposition(InputContext *ic) {
+        raw.clear();
+        list.reset();
+        suggesting = false;
+        ic->inputPanel().reset();
+        ic->updatePreedit();
+        ic->updateUserInterface(UserInterfaceComponent::InputPanel);
+    }
+
     void stop() {
         if (host) g_output_stream_close(g_subprocess_get_stdin_pipe(host), nullptr, nullptr);
         g_clear_object(&output);
@@ -157,13 +166,16 @@ public:
         if(e.isRelease()) return;
         shiftDown=false;
         if (englishMode || key.states().test(KeyState::Ctrl) || key.states().test(KeyState::Alt) || key.states().test(KeyState::Super)) return;
-        bool active=list || !raw.empty();
+        bool active=list || !raw.empty() || suggesting;
         bool handled=true;
         if(sym>=FcitxKey_a && sym<=FcitxKey_z)
             { navigated=expanded=false; handled=request(ic,"append",std::string(1,char(sym))); }
         else if(sym==FcitxKey_apostrophe && !raw.empty()) handled=request(ic,"append","'");
         else if(sym==FcitxKey_BackSpace && active) handled=request(ic,raw.empty()?"reset":"back");
-        else if(sym==FcitxKey_Escape && active) handled=request(ic,"reset");
+        else if(sym==FcitxKey_Escape && active) {
+            expanded = navigated = false;
+            if (!request(ic,"reset")) clearComposition(ic);
+        }
         else if((sym==FcitxKey_Return || sym==FcitxKey_KP_Enter) && active) {
             if(suggesting) request(ic,"reset");
             else if(navigated && list) choose(ic,list->globalCursorIndex());
@@ -175,10 +187,12 @@ public:
             if ((!expanded || i<6) && row+i<list->size()) choose(ic,list->currentPage()*list->pageSize()+row+i);
         } else if(list && (sym==FcitxKey_Left || sym==FcitxKey_Right || sym==FcitxKey_Down || sym==FcitxKey_Up)) {
             navigated=true;
-            if(sym==FcitxKey_Down && !expanded) {expanded=true; list->setPageSize(36);}
-            else if(sym==FcitxKey_Up && expanded && list->cursorIndex()<6) {expanded=false; list->setPageSize(normalSize);}
+            const bool shift = key.states().test(KeyState::Shift);
+            if(shift && sym==FcitxKey_Down && !expanded) {expanded=true; list->setPageSize(36);}
+            else if(shift && sym==FcitxKey_Up && expanded) {expanded=false; list->setPageSize(normalSize);}
             else {
-                int delta=sym==FcitxKey_Right?1:sym==FcitxKey_Left?-1:sym==FcitxKey_Down?6:-6;
+                const int rowStep = expanded && list->layoutHint() != CandidateLayoutHint::Vertical ? 6 : 1;
+                int delta=sym==FcitxKey_Right?1:sym==FcitxKey_Left?-1:sym==FcitxKey_Down?rowStep:-rowStep;
                 list->setGlobalCursorIndex(std::clamp(list->globalCursorIndex()+delta,0,list->totalSize()-1));
             }
             ic->updateUserInterface(UserInterfaceComponent::InputPanel);
