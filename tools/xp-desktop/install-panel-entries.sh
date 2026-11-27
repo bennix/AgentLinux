@@ -159,7 +159,20 @@ if [ -f "$terminal" ]; then
     sed 's/^Exec=mate-terminal$/Exec=\/usr\/bin\/gtk-launch mate-terminal/' "$terminal" > "$assets/menu-launchers/mate-terminal.desktop"
     menu_link "$assets/menu-launchers/mate-terminal.desktop" "$(dirname "$accessories")/mate-terminal.desktop"
 fi
-for entry in zcode.desktop zenmux-agent.desktop agentlinux-system-network.desktop; do
+zencode=/usr/share/applications/zcode.desktop
+zencode_menu="$(dirname "$accessories")/zcode.desktop"
+if [ -f "$zencode" ]; then
+    mkdir -p "$assets/menu-launchers"
+    # WinTC passes the expanded Exec string through its file/MIME parser.
+    # Launch the registered entry with GIO so it handles desktop field codes.
+    sed -e 's|^Exec=.*|Exec=/usr/bin/gtk-launch zcode|' -e '/^MimeType=/d' \
+        "$zencode" > "$assets/menu-launchers/zcode.desktop"
+    if [ "$(readlink "$zencode_menu")" = "$zencode" ] ||
+       { [ ! -e "$zencode_menu" ] && [ ! -L "$zencode_menu" ]; }; then
+        menu_link "$assets/menu-launchers/zcode.desktop" "$zencode_menu"
+    fi
+fi
+for entry in zenmux-agent.desktop agentlinux-system-network.desktop; do
     launcher="/usr/share/applications/$entry"
     destination="$(dirname "$accessories")/$entry"
     if [ -f "$launcher" ] && [ ! -e "$destination" ] && [ ! -L "$destination" ]; then
