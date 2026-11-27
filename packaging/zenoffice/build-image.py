@@ -13,7 +13,7 @@ parser.add_argument("base", type=Path)
 parser.add_argument("deb", type=Path)
 parser.add_argument("output", type=Path)
 parser.add_argument("--clash-verge", type=Path, help="Clash Verge Rev 2.5.10 official amd64 deb")
-parser.add_argument("--obscura-firefox", type=Path, required=True, help="Official Obscura Firefox 0.3.11 Linux amd64 deb")
+parser.add_argument("--obscura-firefox", type=Path, required=True, help="Official Obscura Firefox 0.3.13 Linux amd64 deb")
 parser.add_argument("--claude-cage", required=True, type=Path, help="Official Claude Cage 0.2.0-rc amd64 deb")
 parser.add_argument("--ukcc-deb", type=Path, help="Use a cached UKUI control center package")
 parser.add_argument("--store-deb", type=Path, help="Use a cached UKUI software center package")
@@ -31,8 +31,8 @@ def checksum(path, algorithm):
 def run(*args):
     subprocess.run(args, check=True)
 
-if checksum(args.deb, "sha256") != "b0612de5180c10ea5d5903cf35c531034ce3742bad796efdd4822a1923ac207a":
-    raise SystemExit("Unexpected ZenOffice package checksum (expected upstream v0.6.107 amd64)")
+if checksum(args.deb, "sha256") != "30522732743fe43ea56b4e0f603ea35dd0f5551467269e6b8c71ffe09e5314c8":
+    raise SystemExit("Unexpected ZenOffice package checksum (expected upstream v0.6.108 amd64)")
 with tempfile.TemporaryDirectory(dir=args.output.parent) as directory:
     work = Path(directory)
     root = work / "root"
@@ -68,8 +68,8 @@ RemainAfterExit=yes
     cage_package = root / "opt/claude-cage-package/Cage-0.2.0-rc-linux-amd64.deb"
     cage_package.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(args.claude_cage, cage_package)
-    if checksum(args.obscura_firefox, "sha256") != "94e99c9370dfb19f73027c0776daf83631fb086c53ad7057dc1d74c25663a905":
-        raise SystemExit("Unexpected Obscura Firefox 0.3.11 amd64 package checksum")
+    if checksum(args.obscura_firefox, "sha256") != "df7887b9dedb53f0792ec62eb94cdfb718de1af536d29927063319edf685a151":
+        raise SystemExit("Unexpected Obscura Firefox 0.3.13 amd64 package checksum")
     run("dpkg-deb", "-x", args.obscura_firefox, root)
     shutil.copy2(overlay / "usr/share/applications/obscura-firefox.desktop",
                  root / "usr/share/applications/obscura-firefox.desktop")

@@ -1,0 +1,51 @@
+--- a/peony-qt-desktop/desktop-item-model.h
++++ b/peony-qt-desktop/desktop-item-model.h
+@@ -123,0 +124 @@
++    bool m_studioIcons = false;
+--- a/peony-qt-desktop/desktop-item-model.cpp
++++ b/peony-qt-desktop/desktop-item-model.cpp
+@@ -47,0 +48,2 @@
++#include <QFile>
++#include <QFileInfo>
+@@ -59,0 +62,17 @@
++namespace {
++QString studioIconName(const QString &uri, bool directory)
++{
++    if (uri == "computer:///") return "computer";
++    if (uri == "trash:///") return "trash";
++    const QString name = QFileInfo(QUrl(uri).toLocalFile()).fileName();
++    if (name == "agentlinux-xp-explorer.desktop" || name == "explorer.desktop") return "folder";
++    if (name == "agentlinux-xp-places.desktop") return "network";
++    if (name == "agentlinux-xp-control.desktop") return "settings";
++    if (name == "agentlinux-xp-wifi.desktop") return "wifi";
++    if (name == "agentlinux-xp-documents.desktop") return "documents";
++    if (name == "agentlinux-install-to-disk.desktop" ||
++        name == "ubuntu-desktop-bootstrap_ubuntu-desktop-bootstrap.desktop") return "install";
++    return directory ? QStringLiteral("folder") : QString();
++}
++}
++
+@@ -62,0 +82,15 @@
++    const auto updateStudioIcons = [this]() {
++        QFile preference(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation)
++                         + "/agentlinux-xp/desktop-theme");
++        const bool studio = preference.open(QIODevice::ReadOnly)
++                            && preference.readLine().trimmed() == "studio";
++        if (studio == m_studioIcons) return;
++        m_studioIcons = studio;
++        if (rowCount() > 0)
++            Q_EMIT dataChanged(index(0), index(rowCount() - 1), {Qt::DecorationRole});
++    };
++    updateStudioIcons();
++    auto timer = new QTimer(this);
++    connect(timer, &QTimer::timeout, this, updateStudioIcons);
++    timer->start(500);
++
+@@ -615,0 +650,7 @@
++        if (m_studioIcons) {
++            const QString name = studioIconName(info->uri(), info->isDir());
++            if (!name.isEmpty()) {
++                const QString path = "/usr/local/share/agentlinux/studio-icons/" + name + ".png";
++                if (QFileInfo::exists(path)) return QIcon(path);
++            }
++        }

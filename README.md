@@ -44,16 +44,20 @@ Release `v2026.11.27.2` was installed on a blank 48 GiB virtual disk in an x86-6
 
 The shortcut wizard handles paths with spaces and existing filenames. Right-click a connected Wi-Fi network to view its status and TCP/IPv4 properties.
 
-**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.6/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.6/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
+**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.28.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.28.1/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
 
 MyIME 支持用上下方向键选词和 Esc 取消输入。添加打印机向导提供佳能 LBP6030w 官方驱动下载和网络设置指引。Live、简装与标准安装均包含修复。
 
 MyIME supports Up and Down for candidate selection and Esc to cancel composition. The Add Printer Wizard links to the official Canon LBP6030w driver and explains network setup. The update is included in all three desktop layers.
 
-ISO SHA-256 (v2026.11.27.6)
+Studio 主题提供原创桌面图标、顶部菜单栏、Dock、窗口边框和浅色控制面板。从 **控制面板 → 外观和主题 → 桌面主题** 可即时切换 XP 和 Studio。两种切换方向均已在 UEFI Live 会话实测。
 
-`d3da5dcd44e7b4534450034436d467b39ab51f6a30d0b2c10de99bb41e75ccd3`
+Studio adds original desktop icons, a top menu bar, a dock, window decorations, and a light Control Panel. Switch between XP and Studio via **Control Panel → Appearance and Themes → Desktop Theme**. Both directions were verified in a UEFI Live session.
+
+ISO SHA-256 (v2026.11.28.1)
+
+`abdd974839d4293c6e0badbeaa94cea10be46b5555ae6d5515eddfb4245df7ee`
 
 | 启动方式 / Boot mode | 用户名 / Username | 密码 / Password |
 | --- | --- | --- |
@@ -61,7 +65,7 @@ ISO SHA-256 (v2026.11.27.6)
 | 预装 SanDisk U 盘 / Preinstalled SanDisk USB | `agent` | `agentfudan` |
 | 自行安装到硬盘 / Installation on your own disk | 安装时创建 / Set during installation | 安装时设置 / Set during installation |
 
-[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.27.6/AgentLinux-24.04.5-desktop-amd64.iso?download=true)
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.28.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)
 
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可双击桌面的“安装到硬盘”启动安装器。
 
@@ -100,7 +104,7 @@ unsquashfs -ll xp-standard.squashfs
 
 ## 定制版信息
 
-默认浏览器采用 Obscura Firefox 0.3.11，保留上游手动更新方式。系统选择它处理 HTTP、HTTPS 和 HTML。简体中文分别使用 Noto Sans CJK SC、Noto Serif CJK SC 和 Noto Sans Mono CJK SC。
+默认浏览器采用 Obscura Firefox 0.3.13，保留上游手动更新方式。系统选择它处理 HTTP、HTTPS 和 HTML。简体中文分别使用 Noto Sans CJK SC、Noto Serif CJK SC 和 Noto Sans Mono CJK SC。
 
 桌面菜单、Ctrl+Alt+T、Win+T、文件管理器的终端动作以及系统默认终端入口使用 Cage。首次使用会打开安装和配置工作台；配置完成后再开终端，即通过 claude-cage shell 连接 Cage 环境。每个窗口是独立会话，同一 Cage 配置共用一台持久客机。桌面入口不执行传入的宿主命令。系统 TTY 和 SSH 登录仍用于维护。
 
@@ -112,7 +116,7 @@ unsquashfs -ll xp-standard.squashfs
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.27.6)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.28.1)
 
 运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。请为 ISO 预留至少 9 GB 可用空间。Allow at least 9 GB of free space for the ISO. Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
@@ -131,7 +135,7 @@ cp -a build/restored-overlay/. overlay/
 ### 上游版本 / Upstream releases
 
 - [ZenCode 3.14.45](https://github.com/bennix/ZCode/releases/tag/v3.14.45)
-- [Obscura Firefox 0.3.11](https://github.com/bennix/ObscuraFirefox/releases/tag/firefox-v0.3.11)
+- [Obscura Firefox 0.3.13](https://github.com/bennix/ObscuraFirefox/releases/tag/firefox-v0.3.13)
 - [Claude Cage 0.2.0-rc](https://github.com/Lee-xeo/Claude-Cage/releases/tag/v0.2.0-rc)
 
 ## Claude Code 隐私
@@ -156,13 +160,13 @@ cp -a build/restored-overlay/. overlay/
 
 ### ZenOffice
 
-MyIME、微信和 ZenOffice 合集镜像在“办公”菜单中提供 ZenOffice 0.6.107，可直接启动。该版本来自项目发布的 amd64 Debian 包。构建脚本校验上游 SHA-256，并把应用、菜单入口及随包的 AppArmor 配置加入 Live、最小安装和标准安装的文件系统层。
+MyIME、微信和 ZenOffice 合集镜像在“办公”菜单中提供 ZenOffice 0.6.108，可直接启动。该版本来自项目发布的 amd64 Debian 包。构建脚本校验上游 SHA-256，并把应用、菜单入口及随包的 AppArmor 配置加入 Live、最小安装和标准安装的文件系统层。
 
 ```sh
-python3 packaging/zenoffice/build-image.py AgentLinux-24.04.5-myime-wechat-amd64.iso zenoffice_0.6.107_amd64.deb AgentLinux-24.04.5-myime-wechat-zenoffice-amd64.iso --obscura-firefox ObscuraFirefox-0.3.11-linux-amd64.deb --claude-cage Cage-0.2.0-rc-linux-amd64.deb
+python3 packaging/zenoffice/build-image.py AgentLinux-24.04.5-myime-wechat-amd64.iso zenoffice_0.6.108_amd64.deb AgentLinux-24.04.5-myime-wechat-zenoffice-amd64.iso --obscura-firefox ObscuraFirefox-0.3.13-linux-amd64.deb --claude-cage Cage-0.2.0-rc-linux-amd64.deb
 ```
 
-[ZenOffice 产品主页](https://bennix.github.io/GenZenMuxAIOffice/) · [对应版本](https://github.com/bennix/GenZenMuxAIOffice/releases/tag/v0.6.107)
+[ZenOffice 产品主页](https://bennix.github.io/GenZenMuxAIOffice/) · [对应版本](https://github.com/bennix/GenZenMuxAIOffice/releases/tag/v0.6.108)
 
 ### 硬盘安装与桌面合集
 

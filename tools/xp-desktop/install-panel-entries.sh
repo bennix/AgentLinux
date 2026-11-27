@@ -172,7 +172,7 @@ if [ -f "$zencode" ]; then
         menu_link "$assets/menu-launchers/zcode.desktop" "$zencode_menu"
     fi
 fi
-for entry in zenmux-agent.desktop agentlinux-system-network.desktop; do
+for entry in zenmux-agent.desktop agentlinux-system-network.desktop agentlinux-desktop-theme.desktop; do
     launcher="/usr/share/applications/$entry"
     destination="$(dirname "$accessories")/$entry"
     if [ -f "$launcher" ] && [ ! -e "$destination" ] && [ ! -L "$destination" ]; then

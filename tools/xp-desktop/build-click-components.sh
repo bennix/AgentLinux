@@ -53,6 +53,7 @@ cp -R "$peony" "$work/peony"
 (
     cd "$work/peony"
     patch --batch --forward -p1 < "$assets/peony-standard-icons.patch"
+    patch --batch --forward -p1 < "$assets/peony-studio-icons.patch"
     patch --batch --forward -p1 < "$assets/peony-label-width.patch"
     patch --batch --forward -p1 < "$assets/peony-single-click.patch"
     patch --batch --forward -p1 < "$assets/peony-display-properties.patch"

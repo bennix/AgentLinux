@@ -44,7 +44,7 @@ if ! xfwm_ready; then
     done
 fi
 taskbar_visible() {
-    xdotool search --onlyvisible --class '^Wintc-taskband$' >/dev/null 2>&1
+    xdotool search --onlyvisible --class '^(Wintc-taskband|Agentlinux-studio)$' >/dev/null 2>&1
 }
 if ! taskbar_visible; then
     # Keep the XP panel available if its primary process exits during login.
@@ -52,7 +52,7 @@ if ! taskbar_visible; then
         delay=1
         while :; do
             started=$(date +%s)
-            "$HOME/.local/share/agentlinux-xp/taskbar.sh" || true
+            "$HOME/.local/share/agentlinux-xp/desktop-panel.sh" || true
             # X closes at logout. A second instance may also own the panel.
             xprop -root _NET_CLIENT_LIST >/dev/null 2>&1 || exit 0
             taskbar_visible && exit 0

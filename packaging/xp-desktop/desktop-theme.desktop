@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Switch Desktop Theme
+Name[zh_CN]=切换桌面主题
+Exec=/usr/local/bin/agentlinux-desktop-theme
+Icon=preferences-desktop-theme
+Categories=Settings;

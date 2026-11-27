@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Restore keyboard focus after unlocking
+Name[zh_CN]=解锁后恢复键盘焦点
+Exec=/usr/local/libexec/agentlinux-xp-restore-keyboard-focus
+OnlyShowIn=UKUI;
+NoDisplay=true

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import configparser
 import os
+import subprocess
 import sys
 import syslog
 import tempfile
@@ -73,6 +74,42 @@ def write_setting(path, writer):
     with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, delete=False) as tmp:
         writer(tmp)
     os.replace(tmp.name, path)
+
+
+def studio_selected():
+    try:
+        preference = Path(GLib.get_user_config_dir()) / "agentlinux-xp/desktop-theme"
+        return preference.read_text().strip() == "studio"
+    except OSError:
+        return False
+
+
+def desktop_theme(_button):
+    dialog = Gtk.Dialog(title=tr("桌面主题", "Desktop Theme"), transient_for=window,
+                        modal=True, destroy_with_parent=True)
+    dialog.add_button(tr("取消", "Cancel"), Gtk.ResponseType.CANCEL)
+    dialog.add_button(tr("应用", "Apply"), Gtk.ResponseType.APPLY)
+    body = dialog.get_content_area()
+    body.set_border_width(14)
+    body.set_spacing(8)
+    xp = Gtk.RadioButton.new_with_label_from_widget(None, tr("XP 桌面", "XP Desktop"))
+    studio = Gtk.RadioButton.new_with_label_from_widget(xp, tr("Studio 桌面", "Studio Desktop"))
+    for option in (xp, studio):
+        body.pack_start(option, False, False, 0)
+    (studio if studio_selected() else xp).set_active(True)
+    dialog.set_default_response(Gtk.ResponseType.APPLY)
+    dialog.show_all()
+    response = dialog.run()
+    theme = "studio" if studio.get_active() else "xp"
+    dialog.destroy()
+    if response == Gtk.ResponseType.APPLY:
+        try:
+            subprocess.run(["/usr/local/bin/agentlinux-desktop-theme", theme], check=True)
+            show(current_category, focus_name="Desktop Theme")
+        except (OSError, subprocess.SubprocessError) as error:
+            syslog.syslog(syslog.LOG_WARNING, f"AgentLinux desktop theme: {error}")
+            launch_error(tr("桌面主题", "Desktop Theme"), tr("请稍后重试。", "Try again in a moment."))
+    return GLib.SOURCE_REMOVE
 
 
 def folder_options(_button):
@@ -295,6 +332,24 @@ provider.load_from_data(b"""
 #xp-category:focus label, #xp-control:not(.classic-view) #xp-icon:focus label {
     outline: 1px dotted #174481; outline-offset: 1px;
 }
+#xp-control.studio, #xp-control.studio.classic-view { background: #f7f9fc; }
+#xp-control.studio #xp-nav { background: #e8edf5; border-right: 1px solid #d9e2ef; }
+#xp-control.studio #xp-task-title { background: none; color: #233753; }
+#xp-control.studio #xp-nav button {
+    background: #f7f9fc; color: #233753; border: 1px solid #d5deec;
+    border-radius: 7px; box-shadow: none; margin: 3px;
+}
+#xp-control.studio #xp-category, #xp-control.studio #xp-icon {
+    background: #ffffff; border: 1px solid #dce4f0; border-radius: 10px;
+}
+#xp-control.studio .studio-tile-icon {
+    background: linear-gradient(to bottom, #e8f1ff, #d8e6fa);
+    color: #214a83; border-radius: 10px; margin: 0 6px; padding: 6px;
+}
+#xp-control.studio #xp-category:hover, #xp-control.studio #xp-icon:hover { background: #edf3fc; }
+#xp-control.studio #xp-category label, #xp-control.studio #xp-icon label {
+    color: #233753; text-decoration: none;
+}
 """)
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 entries = [
@@ -322,9 +377,10 @@ entries = [
     ("系统", "System", "computer", "agentlinux-xp-system.desktop"),
     ("任务管理器", "Task Manager", "utilities-system-monitor", "agentlinux-xp-taskmgr.desktop"),
     ("界面语言 / Language", "Language / 界面语言", "preferences-desktop-locale", None),
+    ("桌面主题", "Desktop Theme", "preferences-desktop-theme", None),
 ]
 categories = [
-    ("外观和主题", "Appearance and Themes", ["Display Properties", "Folder Options", "Fonts"], "control_appearance"),
+    ("外观和主题", "Appearance and Themes", ["Display Properties", "Desktop Theme", "Folder Options", "Fonts"], "control_appearance"),
     ("打印机和其他硬件", "Printers and Other Hardware", ["Printers and Faxes", "Add Printer", "Mouse", "Keyboard"], "hardware"),
     ("网络和 Internet 连接", "Network and Internet Connections", ["Wireless Network Connection", "Network Connections", "My Network Places", "Shared Folders", "System Network"], "net_internet"),
     ("用户帐户", "User Accounts", ["User Accounts"], "people"),
@@ -374,7 +430,17 @@ def tile(label, icon, resource=None):
     button.set_relief(Gtk.ReliefStyle.NONE)
     resource = resource or luna_icons.get(icon)
     image = Gtk.Image.new_from_icon_name(icon, Gtk.IconSize.DIALOG)
-    for size in ("48x48", "32x32"):
+    studio = window.get_style_context().has_class("studio")
+    if studio:
+        theme = Gtk.IconTheme.get_default()
+        symbolic = icon + "-symbolic"
+        if not theme.has_icon(symbolic):
+            symbolic = "emblem-system-symbolic"
+        image.set_from_icon_name(symbolic, Gtk.IconSize.DIALOG)
+        image.set_pixel_size(23)
+        image.set_valign(Gtk.Align.CENTER)
+        image.get_style_context().add_class("studio-tile-icon")
+    for size in (() if studio else ("48x48", "32x32")):
         path = Path("/usr/share/icons/luna/res") / size / f"{resource}.png"
         if path.is_file():
             image.set_from_file(str(path))
@@ -389,7 +455,8 @@ def tile(label, icon, resource=None):
                     overlay.add_overlay(plus)
                     image = overlay
             break
-    image.set_size_request(48, 48)
+    icon_size = 38 if studio else 48
+    image.set_size_request(icon_size, icon_size)
     contents = Gtk.Box(orientation=Gtk.Orientation.VERTICAL if classic else Gtk.Orientation.HORIZONTAL, spacing=6)
     image.set_halign(Gtk.Align.START)
     contents.pack_start(image, False, False, 0)
@@ -407,6 +474,10 @@ forward_category = None
 
 
 def show(category=None, focus_name=None):
+    if studio_selected():
+        window.get_style_context().add_class("studio")
+    else:
+        window.get_style_context().remove_class("studio")
     global current_category, forward_category
     style = window.get_style_context()
     if classic:
@@ -451,7 +522,8 @@ def show(category=None, focus_name=None):
             if desktop:
                 button.connect("clicked", launch_applet, tr(zh, en), desktop)
             else:
-                dialog = folder_options if en == "Folder Options" else language
+                dialog = {"Folder Options": folder_options, "Language / 界面语言": language,
+                          "Desktop Theme": desktop_theme}[en]
                 # Let assistive clients finish the activation before entering a modal loop.
                 button.connect("clicked", lambda widget, open_dialog=dialog: GLib.idle_add(open_dialog, widget))
             if en == focus_name and button.get_sensitive():

@@ -46,6 +46,11 @@ for lang in ("C", "zh_CN"):
                   Path("usr/share/help") / lang / "agentlinux-xp/index.page", 0o644))
 for slide in sorted(slides.glob("*/*.html")):
     files.append((slide, installer_assets / "slides" / slide.relative_to(slides), 0o644))
+for icon in sorted((assets.parents[1] / "packaging/branding/studio-icons").glob("*.png")):
+    files.append((icon, Path("usr/local/share/agentlinux/studio-icons") / icon.name, 0o644))
+for decoration in sorted((assets.parents[1] / "packaging/branding/studio-xfwm4").iterdir()):
+    target = Path("usr/share/themes/AgentLinux Studio/xfwm4") / decoration.name
+    files.append((decoration, target, 0o644))
 for relative in ("accesskeys", "clock-entry.so", "start-actions.so", "task-manager-run.so", "taskmgr-localized", "notepad", "new-task", "mount-compat.so", "run-shortcut",
                  "explorer-toolbar.so", "explorer-newmenu.so", "run-network.so", "display-language.so",
                  "peony-qt-desktop", "explorer-lib/libwintc-comctl.so.1", "explorer-lib/libwintc-shell.so.1"):
@@ -61,6 +66,7 @@ for name in (
     "programs.py", "fonts.py", "accessibility.py", "user-accounts.py", "network-places.py",
     "connections.py", "wireless.py", "search-files.py", "default-programs.py", "printers.py", "add-printer.py", "printer_test_page.py", "dns_properties.py",
     "login-start.sh", "shell-start.sh", "session-env.sh", "taskbar.sh", "task-manager.sh", "display-mode.py",
+    "desktop-panel.sh", "studio-panel.py", "window-appearance.py",
     "session-dialog.py", "menu-open.sh", "explorer-launch.sh", "run-dialog.sh", "control-command.sh",
     "network_details.py", "task_pane.py", "cursor_preview.py",
 ):
@@ -70,6 +76,11 @@ files.extend([
     (Path(__file__).with_name("kscreen-theme.conf"), Path("etc/systemd/user/plasma-kscreen.service.d/theme.conf"), 0o644),
     (assets / "lid-backlight.py", Path("usr/local/libexec/agentlinux-xp-lid"), 0o755),
     (Path(__file__).with_name("lid.desktop"), Path("etc/xdg/autostart/agentlinux-xp-lid.desktop"), 0o644),
+    (assets / "desktop-theme", Path("usr/local/bin/agentlinux-desktop-theme"), 0o755),
+    (Path(__file__).with_name("desktop-theme.desktop"), Path("usr/share/applications/agentlinux-desktop-theme.desktop"), 0o644),
+    (assets.parents[1] / "packaging/branding/studio-wallpaper.jpg", Path("usr/local/share/agentlinux/studio-wallpaper.jpg"), 0o644),
+    (assets / "restore-keyboard-focus.py", Path("usr/local/libexec/agentlinux-xp-restore-keyboard-focus"), 0o755),
+    (Path(__file__).with_name("restore-keyboard-focus.desktop"), Path("etc/xdg/autostart/agentlinux-xp-restore-keyboard-focus.desktop"), 0o644),
     (assets.parents[1] / "packaging/branding/greeter-logo.png", user_assets / "college-emblem.png", 0o644),
     (Path(__file__).with_name("xsessionrc"), Path("etc/skel/.xsessionrc"), 0o644),
     (Path(__file__).with_name("xfwm4.xml"), Path("etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml"), 0o644),

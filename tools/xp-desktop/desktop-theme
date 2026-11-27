@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eu
+config="${XDG_CONFIG_HOME:-$HOME/.config}/agentlinux-xp"
+mkdir -p "$config"
+current=$(cat "$config/desktop-theme" 2>/dev/null || true)
+case "${1:-toggle}" in
+    xp|studio) theme=$1 ;;
+    toggle) if [ "$current" = studio ]; then theme=xp; else theme=studio; fi ;;
+    *) exit 2 ;;
+esac
+temporary=$(mktemp "$config/.desktop-theme.XXXXXX")
+trap 'rm -f "$temporary"' EXIT
+printf '%s\n' "$theme" > "$temporary"
+mv -f "$temporary" "$config/desktop-theme"
