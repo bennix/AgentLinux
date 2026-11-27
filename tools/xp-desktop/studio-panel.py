@@ -199,20 +199,91 @@ style.load_from_data(b"""
 """)
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), style, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
+def launcher(app, label=None):
+    item = Gtk.MenuItem(label=label or app.get_display_name())
+    item.connect("activate", lambda _: launch(app))
+    return item
+
+
+APP_GROUPS = (
+    ("办公", "Office", {"Office"}),
+    ("网络与通信", "Internet & Communication", {"Network", "WebBrowser", "Chat", "InstantMessaging", "VideoConference"}),
+    ("影音与图形", "Media & Graphics", {"AudioVideo", "Audio", "Video", "Graphics"}),
+    ("开发", "Development", {"Development"}),
+    ("文件与位置", "Files & Places", {"FileManager"}),
+    ("系统设置", "System Settings", {"Settings", "DesktopSettings", "HardwareSettings"}),
+    ("系统工具", "System Tools", {"System", "TerminalEmulator"}),
+    ("附件", "Accessories", {"Utility", "Education", "Game"}),
+    ("其他应用", "Other Applications", set()),
+)
+
+PINNED_APPS = (
+    ("explorer.desktop", "文件管理", "File Manager"),
+    ("obscura-firefox.desktop", "Obscura Firefox", "Obscura Firefox"),
+    ("zcode.desktop", "ZenCode", "ZenCode"),
+    ("genoffice.desktop", "ZenOffice", "ZenOffice"),
+    ("agentlinux-xp-control.desktop", "控制面板", "Control Panel"),
+)
+
+# These entries are alternate launchers for applications that have a preferred entry.
+APP_ALIASES = {
+    "iexplore.desktop": "obscura-firefox.desktop",
+    "uk.co.oddmatics.wintc.iexplore.desktop": "obscura-firefox.desktop",
+}
+
+
+def application_menu():
+    menu = Gtk.Menu()
+    available = {
+        app.get_id(): app for app in Gio.AppInfo.get_all()
+        if isinstance(app, Gio.DesktopAppInfo) and app.get_id() and app.should_show()
+    }
+
+    for desktop, zh, en in PINNED_APPS:
+        app = available.get(desktop)
+        if app:
+            menu.append(launcher(app, tr(zh, en)))
+    if menu.get_children():
+        menu.append(Gtk.SeparatorMenuItem())
+
+    pinned = {desktop for desktop, _, _ in PINNED_APPS}
+    groups = [[] for _ in APP_GROUPS]
+    apps = sorted(available.items(), key=lambda item: GLib.utf8_collate_key(item[1].get_display_name(), -1))
+    for desktop, app in apps:
+        if desktop in pinned or APP_ALIASES.get(desktop) in available:
+            continue
+        categories = set((app.get_categories() or "").split(";"))
+        if desktop in {"wechat.desktop", "weixin.desktop", "wemeetapp.desktop"}:
+            categories.add("Network")
+        if desktop in {"peony.desktop", "peony-home.desktop", "peony-computer.desktop", "peony-trash.desktop",
+                       "agentlinux-xp-documents.desktop", "agentlinux-xp-places.desktop"}:
+            categories.add("FileManager")
+        if desktop.startswith("agentlinux-xp-") and "TerminalEmulator" not in categories:
+            categories.add("Settings")
+        index = next((i for i, (_, _, keys) in enumerate(APP_GROUPS) if keys & categories), len(groups) - 1)
+        groups[index].append(app)
+
+    for (zh, en, _), apps in zip(APP_GROUPS, groups):
+        if not apps:
+            continue
+        category = Gtk.MenuItem(label=tr(zh, en))
+        submenu = Gtk.Menu()
+        for app in apps:
+            submenu.append(launcher(app))
+        category.set_submenu(submenu)
+        menu.append(category)
+
+    menu.append(Gtk.SeparatorMenuItem())
+    switch = Gtk.MenuItem(label=tr("切换到 XP 主题", "Switch to XP theme"))
+    switch.connect("activate", lambda _: subprocess.Popen(["/usr/local/bin/agentlinux-desktop-theme", "xp"]))
+    menu.append(switch)
+    menu.show_all()
+    return menu
+
+
 bar = Gtk.Box(spacing=8, margin_start=10, margin_end=10)
 applications = Gtk.MenuButton(label="AgentLinux")
-menu = Gtk.Menu()
-switch = Gtk.MenuItem(label=tr("切换到 XP 主题", "Switch to XP theme"))
-switch.connect("activate", lambda _: subprocess.Popen(["/usr/local/bin/agentlinux-desktop-theme", "xp"]))
-menu.append(switch)
-menu.append(Gtk.SeparatorMenuItem())
-for app in sorted(Gio.AppInfo.get_all(), key=lambda item: item.get_display_name().casefold()):
-    if app.should_show():
-        item = Gtk.MenuItem(label=app.get_display_name())
-        item.connect("activate", lambda _, application=app: launch(application))
-        menu.append(item)
-menu.show_all()
-applications.set_popup(menu)
+applications.set_popup(application_menu())
 bar.pack_start(applications, False, False, 0)
 clock = Gtk.Label()
 bar.pack_end(clock, False, False, 6)

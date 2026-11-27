@@ -44,7 +44,7 @@ Release `v2026.11.27.2` was installed on a blank 48 GiB virtual disk in an x86-6
 
 The shortcut wizard handles paths with spaces and existing filenames. Right-click a connected Wi-Fi network to view its status and TCP/IPv4 properties.
 
-**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.28.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.28.1/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
+**[完整 ISO 单文件 / Download full ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.28.2/AgentLinux-24.04.5-desktop-amd64.iso?download=true)** · [SHA-256](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.28.2/AgentLinux-24.04.5-desktop-amd64.iso.sha256?download=true) · [Hugging Face](https://huggingface.co/datasets/Bennixzp2024/AgentLinux)
 
 
 MyIME 支持用上下方向键选词和 Esc 取消输入。添加打印机向导提供佳能 LBP6030w 官方驱动下载和网络设置指引。Live、简装与标准安装均包含修复。
@@ -55,9 +55,13 @@ Studio 主题提供原创桌面图标、顶部菜单栏、Dock、窗口边框和
 
 Studio adds original desktop icons, a top menu bar, a dock, window decorations, and a light Control Panel. Switch between XP and Studio via **Control Panel → Appearance and Themes → Desktop Theme**. Both directions were verified in a UEFI Live session.
 
-ISO SHA-256 (v2026.11.28.1)
+Studio 顶部菜单将常用入口置顶，其余应用按用途分组。
 
-`abdd974839d4293c6e0badbeaa94cea10be46b5555ae6d5515eddfb4245df7ee`
+The Studio menu keeps frequent launchers at the top and groups other applications by category.
+
+ISO SHA-256 (v2026.11.28.2)
+
+`563b01b58861cf8ff0549b571f030f3954e1bc472818957d04bebec1c944a7e5`
 
 | 启动方式 / Boot mode | 用户名 / Username | 密码 / Password |
 | --- | --- | --- |
@@ -65,7 +69,7 @@ ISO SHA-256 (v2026.11.28.1)
 | 预装 SanDisk U 盘 / Preinstalled SanDisk USB | `agent` | `agentfudan` |
 | 自行安装到硬盘 / Installation on your own disk | 安装时创建 / Set during installation | 安装时设置 / Set during installation |
 
-[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.28.1/AgentLinux-24.04.5-desktop-amd64.iso?download=true)
+[产品官网（中文）](https://bennix.github.io/AgentLinux/) · [English website](https://bennix.github.io/AgentLinux/en.html) · [下载完整 ISO](https://huggingface.co/datasets/Bennixzp2024/AgentLinux/resolve/v2026.11.28.2/AgentLinux-24.04.5-desktop-amd64.iso?download=true)
 
 基于 Ubuntu Kylin 24.04.5 LTS，适用于 Intel / AMD x86-64 电脑和 x86-64 虚拟机。Apple Silicon 需要使用 x86-64 模拟。将 ISO 挂载到虚拟光驱后启动，可试用中文桌面，也可双击桌面的“安装到硬盘”启动安装器。
 
@@ -116,7 +120,7 @@ unsquashfs -ll xp-standard.squashfs
 
 ## 发布与完整构建层 / Release and complete build layer
 
-[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.28.1)
+[中文产品页](https://bennix.github.io/AgentLinux/) · [English landing page](https://bennix.github.io/AgentLinux/en.html) · [Release](https://github.com/bennix/AgentLinux/releases/tag/v2026.11.28.2)
 
 运行 `python3 download-iso.py` 下载、续传、合并并校验完整 ISO。请为 ISO 预留至少 9 GB 可用空间。Allow at least 9 GB of free space for the ISO. Run the same command from a writable directory to download and verify the complete image. The ISO contains every bundled component. Ordinary Git tracks the integration sources; the release carries the complete filesystem layer, including third-party packages and browser modifications.
 
