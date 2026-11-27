@@ -58,6 +58,7 @@ gboolean wintc_launch_action(WinTCAction action, GError **error)
         return g_spawn_async(NULL, argv, NULL, G_SPAWN_DEFAULT, NULL, NULL, NULL, error);
     }
     case WINTC_ACTION_SEARCH:    script = "search-files.py"; break;
+    case WINTC_ACTION_CONTROL:   script = "control-panel.py"; break;
     case WINTC_ACTION_CONNECTTO: script = "connections.py"; break;
     case WINTC_ACTION_MIMEMGMT: script = "default-programs.py"; break;
     case WINTC_ACTION_HELP: script = "help-center.py"; break;
