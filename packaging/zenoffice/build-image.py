@@ -13,7 +13,7 @@ parser.add_argument("base", type=Path)
 parser.add_argument("deb", type=Path)
 parser.add_argument("output", type=Path)
 parser.add_argument("--clash-verge", type=Path, help="Clash Verge Rev 2.5.10 official amd64 deb")
-parser.add_argument("--obscura-firefox", type=Path, required=True, help="Official Obscura Firefox 0.3.14 Linux amd64 deb")
+parser.add_argument("--obscura-firefox", type=Path, required=True, help="Official Obscura Firefox 0.3.15 Linux amd64 deb")
 parser.add_argument("--claude-cage", required=True, type=Path, help="Official Claude Cage 0.2.0-rc amd64 deb")
 parser.add_argument("--ukcc-deb", type=Path, help="Use a cached UKUI control center package")
 parser.add_argument("--store-deb", type=Path, help="Use a cached UKUI software center package")
@@ -68,8 +68,8 @@ RemainAfterExit=yes
     cage_package = root / "opt/claude-cage-package/Cage-0.2.0-rc-linux-amd64.deb"
     cage_package.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(args.claude_cage, cage_package)
-    if checksum(args.obscura_firefox, "sha256") != "9328c21c84f00ae7fc9d013b88448ca51b648d9e77b451f7a4b41c9767c1e143":
-        raise SystemExit("Unexpected Obscura Firefox 0.3.14 amd64 package checksum")
+    if checksum(args.obscura_firefox, "sha256") != "3799872dbab02fe1c6258082ba30046ae05cc3ee67e18ee24ef7b6ea08cb821f":
+        raise SystemExit("Unexpected Obscura Firefox 0.3.15 amd64 package checksum")
     run("dpkg-deb", "-x", args.obscura_firefox, root)
     shutil.copy2(overlay / "usr/share/applications/obscura-firefox.desktop",
                  root / "usr/share/applications/obscura-firefox.desktop")
